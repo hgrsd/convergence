@@ -33,4 +33,5 @@ class Place(db.Model):
     __tablename__ = 'places'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), index=True)
-    coordinates = db.Column(db.ARRAY(db.Integer, True, 2))
+    x_coord = db.Column(db.Float)
+    y_coord = db.Column(db.Float)
