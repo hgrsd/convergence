@@ -1,4 +1,4 @@
-from convergence import db
+from . import db
 from passlib.apps import custom_app_context as pwd_context
 
 
@@ -28,6 +28,7 @@ class UserGroup(db.Model):
     user_id = db.Column(db.ForeignKey('users.id'), index=True)
     group_id = db.Column(db.ForeignKey('groups.id'), index=True)
     __table_args__ = (db.UniqueConstraint('user_id', 'group_id'),)
+
 
 class Place(db.Model):
     __tablename__ = 'places'
