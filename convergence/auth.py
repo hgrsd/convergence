@@ -1,4 +1,5 @@
-from flask import Blueprint, request, g
+from flask import Blueprint, request, g, jsonify
+from sqlalchemy import exc
 from . import http_auth, db
 from .models import User
 
@@ -12,7 +13,11 @@ def register_user():
     user = User(username=username)
     user.hash_password(pw)
     db.session.add(user)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except exc.IntegrityError:
+        db.session.rollback()
+        return jsonify({"error": {"message": "username exists already"}}), 400
     return "Registered.\n"
 
 

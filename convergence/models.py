@@ -7,6 +7,8 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(32), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
+    last_x_coord = db.Column(db.Float)
+    last_y_coord = db.Column(db.Float)
 
     def hash_password(self, password):
         self.password_hash = pwd_context.encrypt(password)
@@ -28,6 +30,9 @@ class UserGroup(db.Model):
     user_id = db.Column(db.ForeignKey('users.id'), index=True)
     group_id = db.Column(db.ForeignKey('groups.id'), index=True)
     __table_args__ = (db.UniqueConstraint('user_id', 'group_id'),)
+
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
 class Place(db.Model):
