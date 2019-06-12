@@ -9,5 +9,7 @@ db = SQLAlchemy(app)
 
 from .groups import groups
 from .auth import auth
+from .location import location
 app.register_blueprint(auth)
 app.register_blueprint(groups)
+app.register_blueprint(location)

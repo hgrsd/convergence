@@ -5,7 +5,7 @@ from .models import User
 
 auth = Blueprint("auth", __name__)
 
-@auth.route('/register', methods=['POST'])
+@auth.route('/auth/register', methods=['POST'])
 def register_user():
     username = request.json.get('username')
     pw = request.json.get('password')
