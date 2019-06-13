@@ -3,15 +3,10 @@ from sqlalchemy import exc
 from . import http_auth, db
 from .models import User
 
-auth = Blueprint("auth", __name__)
 
-@auth.route('/auth/register', methods=['POST'])
-def register_user():
-    username = request.json.get('username')
-    pw = request.json.get('password')
-    print(username, pw)
+def register_user(username, password):
     user = User(username=username)
-    user.hash_password(pw)
+    user.hash_password(password)
     db.session.add(user)
     try:
         db.session.commit()

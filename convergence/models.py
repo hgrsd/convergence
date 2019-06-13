@@ -7,8 +7,8 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(32), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
-    last_x_coord = db.Column(db.Float)
-    last_y_coord = db.Column(db.Float)
+    last_seen_lat = db.Column(db.Float)
+    last_seen_long = db.Column(db.Float)
 
     def hash_password(self, password):
         self.password_hash = pwd_context.encrypt(password)
@@ -38,6 +38,13 @@ class UserGroup(db.Model):
 class Place(db.Model):
     __tablename__ = 'places'
     id = db.Column(db.Integer, primary_key=True)
+    gm_id = db.Column(db.String(), unique=True)
     name = db.Column(db.String(128), index=True)
-    x_coord = db.Column(db.Float)
-    y_coord = db.Column(db.Float)
+    lat = db.Column(db.Float)
+    long = db.Column(db.Float)
+    gm_price = db.Column(db.Integer)
+    gm_rating = db.Column(db.Float)
+    gm_types = db.Column(db.ARRAY(db.String()))
+    address = db.Column(db.String(128))
+    timestamp = db.Column(db.DateTime)
+
