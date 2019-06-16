@@ -145,4 +145,4 @@ def get_groups(user_id):
     my_groups = UserGroup.query.filter_by(user_id=user_id)
     if not my_groups:
         return {"body": {"status": "success", "data": {"groups": []}}, "status_code": 200}
-    return {"body": {"status": "success", "data": list(group.as_dict() for group in my_groups)}, "status_code": 200}
+    return {"body": {"status": "success", "data": [group.as_dict() for group in my_groups]}, "status_code": 200}
