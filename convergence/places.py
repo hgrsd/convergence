@@ -1,12 +1,12 @@
-from .models import Place
-from . import db
-from . import gmaps_api
-from .location import Point
 from sqlalchemy import exc
 from datetime import datetime
 
-MAX_PLACES = 10
+from . import db
+from . import gmaps_api
+from .models import Place
+from .location import Point
 
+MAX_PLACES = 10
 
 def get_places_around_centroid(point, radius, place_type):
     """

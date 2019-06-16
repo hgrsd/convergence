@@ -1,4 +1,5 @@
 from flask import Blueprint, g, jsonify
+
 from . import http_auth
 from . import groups, location, user, suggestions
 

@@ -1,11 +1,12 @@
+import math
+
 from .models import User
 from . import db
-import math
 
 
 class Point:
     """ Point class, used for coordinates"""
-    
+
     def __init__(self, lat, long):
         self.lat = lat
         self.long = long
@@ -45,8 +46,8 @@ def update_location(user_id, lat, long):
         db.session.commit()
     except:
         db.session.rollback()
-        return {"error": {"message": "error updating location"}}, 400
-    return {"status": "success"}, 200
+        return {"body": {"error": {"message": "error updating location"}}, "status_code": 400}
+    return {"body": {"status": "success"}, "status_code": 200}
 
 
 def get_coordinates(user_id):
