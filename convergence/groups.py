@@ -112,6 +112,19 @@ def get_members(request_id, group_id):
     return {"body": {"status": "success", "data": [user.as_dict() for user in users]}, "status_code": 200}
 
 
+def get_owned_groups(user_id):
+    """
+    Get groups owned by user_id
+    :param user_id: user requesting operation
+    :return list of groups (as dict) owned by user_id
+    """
+    groups_owned = Group.query.filter_by(owner=user_id).all()
+    if not groups_owned:
+        return {"body": {"status": "success", "data": []}, "status_code": 200}
+    else:
+        return {"body": {"status": "success", "data": [group.as_dict() for group in groups_owned]}, "status_code": 200}
+
+
 def get_available_members(request_id, group_id):
     """
     Get available members from group

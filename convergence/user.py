@@ -37,6 +37,18 @@ def delete_user(user_id):
     return {"body": {"status": "success"}, "status_code": 200}
 
 
+def find_user(username):
+    """
+    Return user info for username
+    :return user id
+    """
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return {"body": {"error": {"message": "username not found"}}, "status_code": 404}
+    else:
+        return {"body": {"status": "success", "data": user.as_dict()}, "status_code": 200}
+
+
 def set_availability(user_id, availability):
     """
     Set availability.

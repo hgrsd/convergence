@@ -1,5 +1,6 @@
 from flask import Blueprint, g, jsonify
 
+
 from . import http_auth
 from . import groups, location, user, suggestions
 
@@ -30,6 +31,16 @@ def delete_user():
     response = user.delete_user(g.user_id)
     return jsonify(response['body']), response['status_code']
 
+
+@user_bp.route("/user/<string:username>", methods=["GET"])
+@http_auth.login_required
+def find_user(username):
+    """ 
+    Find user info by username
+    :return: HTTP response
+    """
+    response = user.find_user(username)
+    return jsonify(response["body"]), response['status_code']
 
 @user_bp.route("/user/availability/<int:available>", methods=['PUT'])
 @http_auth.login_required
@@ -79,6 +90,17 @@ def delete_group(group_id):
     :return: HTTP response
     """
     response = groups.delete_group(g.user_id, group_id)
+    return jsonify(response['body']), response['status_code']
+
+
+@groups_bp.route('/groups/owned', methods=['GET'])
+@http_auth.login_required
+def owned_groups():
+    """
+    Get groups owned by user
+    :return: HTTP response
+    """
+    response = groups.get_owned_groups(g.user_id)
     return jsonify(response['body']), response['status_code']
 
 
