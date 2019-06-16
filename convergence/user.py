@@ -5,6 +5,10 @@ from .models import User
 
 
 def register_user(username, password):
+    """
+    Register user.
+    :return tuple(status message, status code)
+    """
     user = User(username=username, available=False)
     user.hash_password(password)
     db.session.add(user)
@@ -17,6 +21,10 @@ def register_user(username, password):
 
 
 def delete_user(user_id):
+    """
+    Delete user.
+    :return tuple(status message, status code)
+    """
     user = User.query.get(user_id)
     if not user:
         return {"error": {"message": "invalid user id"}}, 400
@@ -30,6 +38,12 @@ def delete_user(user_id):
 
 
 def set_availability(user_id, availability):
+    """
+    Set availability.
+    :param user_id: user requesting operation
+    :param availability: bool
+    :return: tuple(status message, status code)
+    """
     user = User.query.get(user_id)
     user.available = availability
     db.session.add(user)
@@ -43,6 +57,12 @@ def set_availability(user_id, availability):
 
 @http_auth.verify_password
 def verify_password(username, password):
+    """
+    Verify authentication details and set g.user_id
+    :param username: string
+    :param password: string
+    :return: bool
+    """
     user = User.query.filter_by(username=username).first()
     if not user or not user.verify_password(password):
         return False

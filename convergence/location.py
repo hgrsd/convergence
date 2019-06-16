@@ -4,6 +4,7 @@ import math
 
 
 class Point:
+    """ Point class, used for coordinates"""
     
     def __init__(self, lat, long):
         self.lat = lat
@@ -13,6 +14,11 @@ class Point:
         return f"{self.lat}, {self.long}"
 
     def distance_to(self, other):
+        """
+        Return distance between this and other Point
+        :param other: other Point
+        :return: distance in metres
+        """
         self_lat = math.radians(self.lat)
         self_long = math.radians(self.long)
         other_lat = math.radians(other.lat)
@@ -21,10 +27,17 @@ class Point:
         dist = math.acos(math.sin(self_lat) * math.sin(other_lat)
                          + math.cos(self_lat) * math.cos(other_lat)
                          * math.cos(self_long - other_long)) * R
-        return dist * 1000  # return distance in metres
+        return dist * 1000
 
 
 def update_location(user_id, lat, long):
+    """
+    Update user location in database
+    :param user_id: user to update
+    :param lat: new latitude
+    :param long: new longitude
+    :return: tuple(status message, status code)
+    """
     user = User.query.filter_by(id=user_id).first()
     user.last_seen_lat, user.last_seen_long = lat, long
     db.session.add(user)
@@ -37,6 +50,11 @@ def update_location(user_id, lat, long):
 
 
 def get_coordinates(user_id):
+    """
+    Get coordinates of user
+    :param user_id: user to show coordinates of
+    :return: user's coordinates as Point
+    """
     user = User.query.filter_by(id=user_id).first()
     if not user:
         return None
@@ -45,6 +63,11 @@ def get_coordinates(user_id):
 
 
 def find_centroid(coordinates):
+    """
+    Find centroid of list of coordinates
+    :param coordinates: list of coordinates, as Points
+    :return: centroid, as Point
+    """
     x_total, y_total, z_total = 0, 0, 0
     for coordinate in coordinates:
         lat = math.radians(float(coordinate.lat))
@@ -59,6 +82,12 @@ def find_centroid(coordinates):
 
 
 def mean_dist_from_centroid(coordinates, centroid):
+    """
+    Calculate mean distance between centroid and list of coordinates
+    :param coordinates: list of coordinates as Points
+    :param centroid: centroid as Point
+    :return: mean distance between centroid and coordinates in metres
+    """
     dist = sum(coordinate.distance_to(centroid) for coordinate in coordinates)
     return dist / len(coordinates)
 

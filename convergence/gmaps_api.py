@@ -11,6 +11,14 @@ DISTANCE_MATRIX_MAX_ELEMENTS = 100
 
 
 def places_around_point(point, radius, place_type):
+    """
+    Find, using Google Nearby Places API, all places of place_type within
+    specified radius from point
+    :param point: centre point, type Point
+    :param radius: radius in metres
+    :param place_type: place type to find
+    :return: list of places (as dicts)
+    """
     init_request = GM_PLACES_URL.format(point.lat, point.long, radius, place_type, GM_API_KEY)
     response = requests.get(init_request).json()
     places = _json_extract_places(response)
@@ -23,6 +31,14 @@ def places_around_point(point, radius, place_type):
 
 
 def distance_matrix(origins, destinations, mode):
+    """
+    Use Google Distance Matrix API to request distance matrix between origins
+    and destinations, using specified mode of transportation
+    :param origins: list of Points
+    :param destinations: list of Points
+    :param mode: mode of transportation
+    :return: distance matrix of dimension len(origins) * len(destinations)
+    """
     no_requests = math.ceil(len(origins) * len(destinations) / DISTANCE_MATRIX_MAX_ELEMENTS)
     matrix = [None] * len(origins)
     for i in range(no_requests):
@@ -54,6 +70,11 @@ def distance_matrix(origins, destinations, mode):
 
 
 def _json_extract_places(response_string):
+    """
+    Extract place information from Google Places API JSON object.
+    :param response_string: response JSON object
+    :return: list of places (as dict)
+    """
     places = []
     for result in response_string['results']:
         if 'permanently_closed' in result:

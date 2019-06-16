@@ -1,3 +1,8 @@
+"""
+convergence-server
+A REStful API service that helps you find the ideal place to meet.
+"""
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import flask_httpauth
