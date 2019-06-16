@@ -14,7 +14,7 @@ def get_suggestions(request_id, group_id, place_type, suggestions_mode):
     :param suggestions_mode: suggestions mode (e.g. "distance", "walking", "driving")
     :return: tuple(object with suggestions / status message, status code)
     """
-    group_members = get_available_members(request_id, group_id)[0]
+    group_members = get_available_members(request_id, group_id)['body']
     user_coordinates = [get_coordinates(member['id']) for member in group_members['data']]
     centroid = find_centroid(user_coordinates)
     dist_from_centroid = mean_dist_from_centroid(user_coordinates, centroid)
@@ -22,11 +22,11 @@ def get_suggestions(request_id, group_id, place_type, suggestions_mode):
     places = get_places_around_centroid(centroid, radius, place_type)
     places = sift_places_by_rating(places)
     if not places:
-        return {"status": "success", "data": []}, 200
+        return {"body": {"status": "success", "data": []}, "status_code": 200}
     if suggestions_mode == "distance":
         ordered_places = order_places_by_distance(user_coordinates, places)
     else:
         ordered_places = order_places_by_travel_time(user_coordinates, places, suggestions_mode)
-    return {"status": "success", "data": ordered_places}, 200
+    return {"body": {"status": "success", "data": ordered_places}, "status_code": 200}
 
 

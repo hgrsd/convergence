@@ -7,7 +7,7 @@ from .models import User
 def register_user(username, password):
     """
     Register user.
-    :return tuple(status message, status code)
+    :return dict object with body and status code
     """
     user = User(username=username, available=False)
     user.hash_password(password)
@@ -16,25 +16,25 @@ def register_user(username, password):
         db.session.commit()
     except exc.IntegrityError:
         db.session.rollback()
-        return {"error": {"message": "username exists already"}}, 400
-    return {"status": "success"}, 200
+        return {"body": {"error": {"message": "username exists already"}}, "status_code": 400}
+    return {"body": {"status": "success"}, "status_code": 200}
 
 
 def delete_user(user_id):
     """
     Delete user.
-    :return tuple(status message, status code)
+    :return dict object with body and status code
     """
     user = User.query.get(user_id)
     if not user:
-        return {"error": {"message": "invalid user id"}}, 400
+        return {"body": {"error": {"message": "invalid user id"}}, "status_code": 400}
     db.session.delete(user)
     try:
         db.session.commit()
     except:
         db.session.rollback()
-        return {"error": {"message": "error writing to database"}}, 400
-    return {"status": "success"}, 200
+        return {"body": {"error": {"message": "error writing to database"}}, "status_code": 400}
+    return {"body": {"status": "success"}, "status_code": 200}
 
 
 def set_availability(user_id, availability):
@@ -42,7 +42,7 @@ def set_availability(user_id, availability):
     Set availability.
     :param user_id: user requesting operation
     :param availability: bool
-    :return: tuple(status message, status code)
+    :return: dict object with body and status code
     """
     user = User.query.get(user_id)
     user.available = availability
@@ -51,8 +51,8 @@ def set_availability(user_id, availability):
         db.session.commit()
     except:
         db.session.rollback()
-        return {"error": {"message": "error updating database"}}, 400
-    return {"status": "success"}, 200
+        return {"body": {"error": {"message": "error updating database"}}, "status_code": 400}
+    return {"body": {"status": "success"}, "status_code": 200}
 
 
 @http_auth.verify_password
