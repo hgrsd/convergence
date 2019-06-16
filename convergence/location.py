@@ -61,3 +61,4 @@ def find_centroid(coordinates):
 def mean_dist_from_centroid(coordinates, centroid):
     dist = sum(coordinate.distance_to(centroid) for coordinate in coordinates)
     return dist / len(coordinates)
+

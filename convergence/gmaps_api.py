@@ -56,6 +56,8 @@ def distance_matrix(origins, destinations, mode):
 def _json_extract_places(response_string):
     places = []
     for result in response_string['results']:
+        if 'permanently_closed' in result:
+            continue
         lat = result['geometry']['location']['lat']
         long = result['geometry']['location']['lng']
         name = result['name']
