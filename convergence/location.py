@@ -18,9 +18,10 @@ class Point:
         other_lat = math.radians(other.lat)
         other_long = math.radians(other.long)
         R = 6371
-        dist = math.acos(math.sin(self_lat) * math.sin(other_lat) + math.cos(self_lat) * math.cos(other_lat)
+        dist = math.acos(math.sin(self_lat) * math.sin(other_lat)
+                         + math.cos(self_lat) * math.cos(other_lat)
                          * math.cos(self_long - other_long)) * R
-        return dist * 1000 # returns in metres
+        return dist * 1000  # return distance in metres
 
 
 def update_location(user_id, lat, long):
@@ -55,6 +56,7 @@ def find_centroid(coordinates):
     y = float(y_total / len(coordinates))
     z = float(z_total / len(coordinates))
     return Point(math.degrees(math.atan2(z, math.sqrt(x * x + y * y))), math.degrees(math.atan2(y, x)))
+
 
 def mean_dist_from_centroid(coordinates, centroid):
     dist = sum(coordinate.distance_to(centroid) for coordinate in coordinates)

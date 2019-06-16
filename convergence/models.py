@@ -66,9 +66,10 @@ class Place(db.Model):
         other_lat = math.radians(point[0])
         other_long = math.radians(point[1])
         R = 6371
-        dist = math.acos(math.sin(self_lat) * math.sin(other_lat) + math.cos(self_lat) * math.cos(other_lat)
+        dist = math.acos(math.sin(self_lat) * math.sin(other_lat)
+                         + math.cos(self_lat) * math.cos(other_lat)
                          * math.cos(self_long - other_long)) * R
-        return dist < radius / 1000
+        return dist < radius / 1000  # radius in metres, convert to km
 
     @within_range.expression
     def distance_to(cls, point, radius):
@@ -77,9 +78,10 @@ class Place(db.Model):
         other_lat = func.radians(point.lat)
         other_long = func.radians(point.long)
         R = 6371
-        dist = func.acos(func.sin(self_lat) * func.sin(other_lat) + func.cos(self_lat) * func.cos(other_lat)
+        dist = func.acos(func.sin(self_lat) * func.sin(other_lat)
+                         + func.cos(self_lat) * func.cos(other_lat)
                          * func.cos(self_long - other_long)) * R
-        return dist < radius / 1000
+        return dist < radius / 1000  # radius in metres, convert to km
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
