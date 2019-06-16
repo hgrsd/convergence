@@ -13,9 +13,13 @@ def main():
     mode = input("Mode (g=groups, u=users, l=location, s=suggestions, q=quit: ")
     while mode != "q":
         if mode == "g":
-            group_mode = input("[c]reate, [d]elete, [a]dd user, [r]emove user, [g]et members, [q]uit group menu: ")
-            if group_mode == "c":
+            group_mode = input("[c]urrent user's groups, [o]wned groups, [n]ew, [d]elete, [a]dd user, [r]emove user, [g]et members, [q]uit group menu: ")
+            if group_mode == "n":
                 create_group()
+            elif group_mode == "o":
+                owned_groups()
+            elif group_mode == "c":
+                get_groups()
             elif group_mode == "d":
                 delete_group()
             elif group_mode == "a":
@@ -25,19 +29,15 @@ def main():
             elif group_mode == "g":
                 get_group_members()
         elif mode == "u":
-            user_mode = input("[n]ew user, [d]elete user, [f]ind user, [s]witch user, [a]vailability, user [g]roups, [o]wned groups, [q]uit user menu: ")
+            user_mode = input("[n]ew user, [d]elete user, [f]ind user, [s]witch user, [a]vailability, [q]uit user menu: ")
             if user_mode == "n":
                 new_user()
-            elif user_mode == "o":
-                owned_groups()
             elif user_mode == "d":
                 delete_user()
             elif user_mode == "s":
                 switch_user()
             elif user_mode == "a":
                 set_availability()
-            elif user_mode == "g":
-                get_groups()
             elif user_mode == "f":
                 find_user()
         elif mode == "l":
