@@ -4,6 +4,7 @@ import math
 
 
 class Point:
+    
     def __init__(self, lat, long):
         self.lat = lat
         self.long = long
@@ -19,7 +20,7 @@ class Point:
         R = 6371
         dist = math.acos(math.sin(self_lat) * math.sin(other_lat) + math.cos(self_lat) * math.cos(other_lat)
                          * math.cos(self_long - other_long)) * R
-        return dist
+        return dist * 1000 # returns in metres
 
 
 def update_location(user_id, lat, long):
@@ -54,3 +55,7 @@ def find_centroid(coordinates):
     y = float(y_total / len(coordinates))
     z = float(z_total / len(coordinates))
     return Point(math.degrees(math.atan2(z, math.sqrt(x * x + y * y))), math.degrees(math.atan2(y, x)))
+
+def mean_dist_from_centroid(coordinates, centroid):
+    dist = sum(coordinate.distance_to(centroid) for coordinate in coordinates)
+    return dist / len(coordinates)

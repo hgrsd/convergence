@@ -9,7 +9,7 @@ from datetime import datetime
 def get_places_around_centroid(point, radius, place_type):
     places = Place.query.filter(Place.within_range(point, radius))
     places_typechecked = [place.as_dict() for place in places if place_type in place.gm_types]
-    if places_typechecked:
+    if len(places_typechecked) != 0:
         return places_typechecked
     else:
         places = gmaps_api.places_around_point(point, radius, place_type)

@@ -1,7 +1,7 @@
 from . import db
 import math
 from passlib.apps import custom_app_context as pwd_context
-from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
+from sqlalchemy.ext.hybrid import hybrid_method
 from sqlalchemy import func
 
 
@@ -68,7 +68,7 @@ class Place(db.Model):
         R = 6371
         dist = math.acos(math.sin(self_lat) * math.sin(other_lat) + math.cos(self_lat) * math.cos(other_lat)
                          * math.cos(self_long - other_long)) * R
-        return dist < radius
+        return dist < radius / 1000
 
     @within_range.expression
     def distance_to(cls, point, radius):
