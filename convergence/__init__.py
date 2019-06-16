@@ -8,8 +8,8 @@ app.config.from_pyfile('config.py')
 http_auth = flask_httpauth.HTTPBasicAuth()
 db = SQLAlchemy(app)
 
-from .endpoints import groups_bp, location_bp, auth_bp, core_bp
-app.register_blueprint(auth_bp)
+from .endpoints import groups_bp, location_bp, user_bp, suggestions_bp
+app.register_blueprint(user_bp)
 app.register_blueprint(groups_bp)
 app.register_blueprint(location_bp)
-app.register_blueprint(core_bp)
+app.register_blueprint(suggestions_bp)

@@ -1,5 +1,8 @@
 from . import db
+import math
 from passlib.apps import custom_app_context as pwd_context
+from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
+from sqlalchemy import func
 
 
 class User(db.Model):
@@ -9,12 +12,20 @@ class User(db.Model):
     password_hash = db.Column(db.String(128))
     last_seen_lat = db.Column(db.Float)
     last_seen_long = db.Column(db.Float)
+    available = db.Column(db.Boolean)
 
     def hash_password(self, password):
         self.password_hash = pwd_context.encrypt(password)
 
     def verify_password(self, password):
         return pwd_context.verify(password, self.password_hash)
+
+    def as_dict(self):
+        return {"id": self.id,
+                "username": self.username,
+                "last_lat": self.last_seen_lat,
+                "last_long": self.last_seen_long,
+                "available": self.available}
 
 
 class Group(db.Model):
@@ -48,3 +59,27 @@ class Place(db.Model):
     address = db.Column(db.String(128))
     timestamp = db.Column(db.DateTime)
 
+    @hybrid_method
+    def within_range(self, point, radius):
+        self_lat = math.radians(self.lat)
+        self_long = math.radians(self.long)
+        other_lat = math.radians(point[0])
+        other_long = math.radians(point[1])
+        R = 6371
+        dist = math.acos(math.sin(self_lat) * math.sin(other_lat) + math.cos(self_lat) * math.cos(other_lat)
+                         * math.cos(self_long - other_long)) * R
+        return dist < radius
+
+    @within_range.expression
+    def distance_to(cls, point, radius):
+        self_lat = func.radians(cls.lat)
+        self_long = func.radians(cls.long)
+        other_lat = func.radians(point.lat)
+        other_long = func.radians(point.long)
+        R = 6371
+        dist = func.acos(func.sin(self_lat) * func.sin(other_lat) + func.cos(self_lat) * func.cos(other_lat)
+                         * func.cos(self_long - other_long)) * R
+        return dist < radius / 1000
+
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
