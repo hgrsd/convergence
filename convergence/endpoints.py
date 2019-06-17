@@ -3,12 +3,18 @@ from flask import Blueprint, g, jsonify, request
 
 from . import http_auth
 from . import groups, location, user, suggestions
+from . import app
 
 user_bp = Blueprint("user", __name__)
 groups_bp = Blueprint("groups", __name__)
 location_bp = Blueprint("locations", __name__)
 suggestions_bp = Blueprint("suggestions", __name__)
 
+
+# -- web interface
+@app.route("/", methods=['GET'])
+def root():
+    return app.send_static_file('index.html')
 
 # -- user endpoints:
 @user_bp.route("/user", methods=['POST'])
