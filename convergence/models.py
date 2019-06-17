@@ -1,4 +1,5 @@
 from . import db
+from .location import Point
 import math
 from passlib.apps import custom_app_context as pwd_context
 from sqlalchemy.ext.hybrid import hybrid_method
@@ -20,12 +21,11 @@ class User(db.Model):
     def verify_password(self, password):
         return pwd_context.verify(password, self.password_hash)
 
-    def as_dict(self):
-        return {"id": self.id,
-                "username": self.username,
-                "last_lat": self.last_seen_lat,
-                "last_long": self.last_seen_long,
-                "available": self.available}
+    def basic_info(self):
+        return {"id": self.id, "username": self.username}
+
+    def get_location(self):
+        return Point(self.last_seen_lat, self.last_seen_long)
 
 
 class Group(db.Model):
