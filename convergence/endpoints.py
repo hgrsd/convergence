@@ -1,4 +1,4 @@
-from flask import Blueprint, g, jsonify
+from flask import Blueprint, g, jsonify, request
 
 
 from . import http_auth
@@ -11,12 +11,14 @@ suggestions_bp = Blueprint("suggestions", __name__)
 
 
 # -- user endpoints:
-@user_bp.route("/user/<string:username>:<string:password>", methods=['POST'])
-def register_user(username, password):
+@user_bp.route("/user", methods=['POST'])
+def register_user():
     """
     Register new user
     :return: HTTP response
     """
+    username = request.get_json()['username']
+    password = request.get_json()['password']
     response = user.register_user(username, password)
     return jsonify(response['body']), response['status_code']
 
