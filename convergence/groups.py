@@ -1,4 +1,5 @@
 from .models import *
+from sqlalchemy import exc 
 
 
 def create_group(user_id, name):
@@ -10,12 +11,15 @@ def create_group(user_id, name):
     """
     group = Group(name=name, owner=user_id)
     db.session.add(group)
-    db.session.flush()
+    try: 
+        db.session.flush()
+    except exc.IntegrityError:
+        return {"body": {"error": {"message": "you already own a group with that name"}}, "status_code": 400}
     usergroup = UserGroup(user_id=user_id, group_id=group.id)
     db.session.add(usergroup)
     try:
         db.session.commit()
-    except:
+    except: 
         db.session.rollback()
         return {"body": {"error": {"message": "error writing to database"}}, "status_code": 400}
     return {"body": {"status": "success"}, "status_code": 200}
