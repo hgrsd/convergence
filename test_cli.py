@@ -90,9 +90,9 @@ def get_group_members():
     print(json.dumps(response.json(), sort_keys=True, indent=4))
 
 def new_user():
-    name = input("Username: ")
-    passw = input("Password (careful, plain text): ")
-    response = requests.post(f"http://localhost:5000/user/{name}:{passw}")
+    username = input("Username: ")
+    password = input("Password (careful, plain text): ")
+    response = requests.post("http://localhost:5000/user", json={"username": username, "password": password})
     print(json.dumps(response.json(), sort_keys=True, indent=4))
 
 def delete_user():
