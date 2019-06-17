@@ -33,7 +33,8 @@ class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128))
     owner = db.Column(db.ForeignKey('users.id', ondelete="CASCADE"), index=True)
-    
+    __table_args__ = (db.UniqueConstraint('name', 'owner'),)
+
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
