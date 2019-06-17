@@ -109,7 +109,7 @@ def get_members(request_id, group_id):
     if not entries:
         return {"body": {"status": "success", "data": []}, "status_code": 200}
     users = [User.query.get(entry.user_id) for entry in entries]
-    return {"body": {"status": "success", "data": [user.as_dict() for user in users]}, "status_code": 200}
+    return {"body": {"status": "success", "data": [user.basic_info() for user in users]}, "status_code": 200}
 
 
 def get_owned_groups(user_id):
@@ -146,7 +146,7 @@ def get_available_members(request_id, group_id):
             available_users.append(user)
     if not available_users:
         return {"body": {"status": "success", "data": []}, "status_code": 200}
-    return {"body": {"status": "success", "data": [user.as_dict() for user in available_users]}, "status_code": 200}
+    return {"body": {"status": "success", "data": [user.basic_info() for user in available_users]}, "status_code": 200}
 
 
 def get_groups(user_id):

@@ -1,6 +1,4 @@
 import math
-
-from .models import User
 from . import db
 
 MIN_LAT = -90.0
@@ -56,19 +54,6 @@ def update_location(user_id, lat, long):
         db.session.rollback()
         return {"body": {"error": {"message": "error updating location"}}, "status_code": 400}
     return {"body": {"status": "success"}, "status_code": 200}
-
-
-def get_coordinates(user_id):
-    """
-    Get coordinates of user
-    :param user_id: user to show coordinates of
-    :return: user's coordinates as Point
-    """
-    user = User.query.filter_by(id=user_id).first()
-    if not user:
-        return None
-    else:
-        return Point(user.last_seen_lat, user.last_seen_long)
 
 
 def find_centroid(coordinates):

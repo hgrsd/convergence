@@ -46,7 +46,7 @@ def find_user(username):
     if not user:
         return {"body": {"error": {"message": "username not found"}}, "status_code": 404}
     else:
-        return {"body": {"status": "success", "data": user.as_dict()}, "status_code": 200}
+        return {"body": {"status": "success", "data": user.basic_info()}, "status_code": 200}
 
 
 def set_availability(user_id, availability):
