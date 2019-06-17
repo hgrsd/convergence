@@ -32,7 +32,7 @@ class Group(db.Model):
     __tablename__ = 'groups'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128))
-    owner = db.Column(db.ForeignKey('users.id', ondelete="CASCADE"))
+    owner = db.Column(db.ForeignKey('users.id', ondelete="CASCADE"), index=True)
     
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
