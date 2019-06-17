@@ -8,8 +8,6 @@ def create_group(user_id, name):
     :param name: the name of the new group
     :return: dict object with body and status code
     """
-    if Group.query.filter_by(name=name).first():
-        return {"body": {"error": {"message": "group name exists already"}}, "status_code": 400}
     group = Group(name=name, owner=user_id)
     db.session.add(group)
     db.session.flush()
@@ -155,7 +153,8 @@ def get_groups(user_id):
     :param user_id: user requesting operation
     :return: dict object with body and status code
     """
-    my_groups = UserGroup.query.filter_by(user_id=user_id)
-    if not my_groups:
+    user_groups = UserGroup.query.filter_by(user_id=user_id)
+    groups = [Group.query.get(user_group.group_id) for user_group in user_groups]
+    if not groups:
         return {"body": {"status": "success", "data": {"groups": []}}, "status_code": 200}
-    return {"body": {"status": "success", "data": [group.as_dict() for group in my_groups]}, "status_code": 200}
+    return {"body": {"status": "success", "data": [group.as_dict() for group in groups]}, "status_code": 200}
