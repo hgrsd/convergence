@@ -3,6 +3,10 @@ import math
 from .models import User
 from . import db
 
+MIN_LAT = -90.0
+MAX_LAT = 90.0
+MIN_LON = -180.0
+MAX_LON = 180.0
 
 class Point:
     """ Point class, used for coordinates"""
@@ -39,6 +43,10 @@ def update_location(user_id, lat, long):
     :param long: new longitude
     :return: tuple(status message, status code)
     """
+    if (lat < MIN_LAT or lat > MAX_LAT
+            or long < MIN_LON or long > MAX_LON):
+        return {"body": {"error": {"message": "invalid location"}}, "status_code": 400}
+
     user = User.query.filter_by(id=user_id).first()
     user.last_seen_lat, user.last_seen_long = lat, long
     db.session.add(user)
