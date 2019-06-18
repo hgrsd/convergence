@@ -1,5 +1,5 @@
 from . import db
-from .location import Point
+from .point import Point
 import math
 from passlib.apps import custom_app_context as pwd_context
 from sqlalchemy.ext.hybrid import hybrid_method

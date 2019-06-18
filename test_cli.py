@@ -137,19 +137,19 @@ def transit_suggestions():
 def driving_suggestions():
     group = input("Group id: ")
     sug_type = input("Type: ")
-    response = requests.get(f"http://localhost:5000/suggestions/driving/{group}:{sug_type}", auth=(username, pw))
+    response = requests.get(f"http://localhost:5000/suggestions/drive/{group}:{sug_type}", auth=(username, pw))
     print(json.dumps(response.json(), sort_keys=True, indent=4))
 
 def cycling_suggestions():
     group = input("Group id: ")
     sug_type = input("Type: ")
-    response = requests.get(f"http://localhost:5000/suggestions/cycling/{group}:{sug_type}", auth=(username, pw))
+    response = requests.get(f"http://localhost:5000/suggestions/cycle/{group}:{sug_type}", auth=(username, pw))
     print(json.dumps(response.json(), sort_keys=True, indent=4))
 
 def walking_suggestions():
     group = input("Group id: ")
     sug_type = input("Type: ")
-    response = requests.get(f"http://localhost:5000/suggestions/walking/{group}:{sug_type}", auth=(username, pw))
+    response = requests.get(f"http://localhost:5000/suggestions/walk/{group}:{sug_type}", auth=(username, pw))
     print(json.dumps(response.json(), sort_keys=True, indent=4))
 
 if __name__ == "__main__":
