@@ -9,6 +9,8 @@ def register_user(username, password):
     Register user.
     :return dict object with body and status code
     """
+    if not username.isalnum():
+        return {"body": {"error": {"message": "username contains non-alphanumeric characters"}}, "status_code": 400}
     user = User(username=username, available=False)
     user.hash_password(password)
     db.session.add(user)
