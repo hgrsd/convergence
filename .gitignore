@@ -3,3 +3,7 @@
 venv/
 instance/
 migrations/
+.gitignore
+*.json
+*.pyc
+.idea/*
