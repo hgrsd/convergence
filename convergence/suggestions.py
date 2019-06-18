@@ -15,8 +15,8 @@ def get_suggestions(request_id, group_id, place_type, suggestions_mode):
     :param suggestions_mode: suggestions mode (e.g. "distance", "walking", "driving")
     :return: tuple(object with suggestions / status message, status code)
     """
-    group_members = get_available_members(request_id, group_id)['body']['data']
-    user_coordinates = [User.query.get(member['id']).get_location() for member in group_members]
+    group_members = get_available_members(request_id, group_id)["body"]["data"]
+    user_coordinates = [User.query.get(member["id"]).get_location() for member in group_members]
     centroid = find_centroid(user_coordinates)
     dist_from_centroid = mean_dist_from_centroid(user_coordinates, centroid)
     radius = int(dist_from_centroid / 4)

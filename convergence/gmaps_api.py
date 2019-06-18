@@ -7,7 +7,7 @@ from . import app
 
 GM_PLACES_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={:f},{:f}&radius={:d}&type={:s}&key={:s}"
 GM_TRAVEL_TIME_URL = "https://maps.googleapis.com/maps/api/distancematrix/json?origins={:s}&destinations={:s}&mode={:s}&key={:s}"
-GM_API_KEY = app.config.get('GM_API_KEY')
+GM_API_KEY = app.config.get("GM_API_KEY")
 DISTANCE_MATRIX_MAX_ELEMENTS = 100
 
 
@@ -60,11 +60,11 @@ def distance_matrix(origins, destinations, mode):
                                             mode,
                                             GM_API_KEY)
         response = requests.get(request).json()
-        for i, row in enumerate(response['rows']):
+        for i, row in enumerate(response["rows"]):
             if not matrix[i]:
-                matrix[i] = row['elements']
+                matrix[i] = row["elements"]
             else:
-                matrix[i].extend(row['elements'])
+                matrix[i].extend(row["elements"])
         if no_requests > 1:
             time.sleep(2)
     return matrix
@@ -77,21 +77,21 @@ def _json_extract_places(response_string):
     :return: list of places (as dict)
     """
     places = []
-    for result in response_string['results']:
-        if 'permanently_closed' in result:
+    for result in response_string["results"]:
+        if "permanently_closed" in result:
             continue
-        lat = result['geometry']['location']['lat']
-        long = result['geometry']['location']['lng']
-        name = result['name']
-        types = result['types']
-        address = result['vicinity']
-        gm_id = result['place_id']
+        lat = result["geometry"]["location"]["lat"]
+        long = result["geometry"]["location"]["lng"]
+        name = result["name"]
+        types = result["types"]
+        address = result["vicinity"]
+        gm_id = result["place_id"]
         try:
-            price_level = result['price_level']
+            price_level = result["price_level"]
         except KeyError:
             price_level = None
         try:
-            rating = result['rating']
+            rating = result["rating"]
         except KeyError:
             rating = None
         places.append({"name": name, "gm_id": gm_id, "lat": lat, "long": long, "address": address,

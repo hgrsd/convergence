@@ -11,19 +11,19 @@ suggestions_bp = Blueprint("suggestions", __name__)
 
 
 # -- user endpoints:
-@user_bp.route("/user", methods=['POST'])
+@user_bp.route("/user", methods=["POST"])
 def register_user():
     """
     Register new user
     :return: HTTP response
     """
-    username = request.get_json()['username']
-    password = request.get_json()['password']
+    username = request.get_json()["username"]
+    password = request.get_json()["password"]
     response = user.register_user(username, password)
-    return jsonify(response['body']), response['status_code']
+    return jsonify(response["body"]), response["status_code"]
 
 
-@user_bp.route("/user", methods=['DELETE'])
+@user_bp.route("/user", methods=["DELETE"])
 @http_auth.login_required
 def delete_user():
     """
@@ -31,7 +31,7 @@ def delete_user():
     :return: HTTP response
     """
     response = user.delete_user(g.user_id)
-    return jsonify(response['body']), response['status_code']
+    return jsonify(response["body"]), response["status_code"]
 
 
 @user_bp.route("/user/<string:username>", methods=["GET"])
@@ -42,36 +42,36 @@ def find_user(username):
     :return: HTTP response
     """
     response = user.find_user(username)
-    return jsonify(response["body"]), response['status_code']
+    return jsonify(response["body"]), response["status_code"]
 
-@user_bp.route("/user/availability/<int:available>", methods=['PUT'])
+@user_bp.route("/user/availability/<int:available>", methods=["PUT"])
 @http_auth.login_required
 def set_availability(available):
     """
-    Update current user's availability
+    Update current user"s availability
     :param available: 0 = False, 1 = True
     :return: HTTP response
     """
     response = user.set_availability(g.user_id, bool(available))
-    return jsonify(response['body']), response['status_code']
+    return jsonify(response["body"]), response["status_code"]
 
 
 # -- location endpoints:
-@location_bp.route("/loc/<float:lat>:<float:long>", methods=['PUT'])
+@location_bp.route("/loc/<float:lat>:<float:long>", methods=["PUT"])
 @http_auth.login_required
 def update_location(lat, long):
     """
-    Update current user's location
+    Update current user"s location
     :param lat: current latitude, float
     :param long: current longitude, float
     :return: HTTP response
     """
     response = location.update_location(g.user_id, lat, long)
-    return jsonify(response['body']), response['status_code']
+    return jsonify(response["body"]), response["status_code"]
 
 
 # -- group endpoints:
-@groups_bp.route('/groups/<string:name>', methods=['POST'])
+@groups_bp.route("/groups/<string:name>", methods=["POST"])
 @http_auth.login_required
 def create_group(name):
     """
@@ -80,10 +80,10 @@ def create_group(name):
     :return: HTTP response
     """
     response = groups.create_group(g.user_id, name)
-    return jsonify(response['body']), response['status_code']
+    return jsonify(response["body"]), response["status_code"]
 
 
-@groups_bp.route('/groups/<int:group_id>', methods=['DELETE'])
+@groups_bp.route("/groups/<int:group_id>", methods=["DELETE"])
 @http_auth.login_required
 def delete_group(group_id):
     """
@@ -92,10 +92,10 @@ def delete_group(group_id):
     :return: HTTP response
     """
     response = groups.delete_group(g.user_id, group_id)
-    return jsonify(response['body']), response['status_code']
+    return jsonify(response["body"]), response["status_code"]
 
 
-@groups_bp.route('/groups/owned', methods=['GET'])
+@groups_bp.route("/groups/owned", methods=["GET"])
 @http_auth.login_required
 def owned_groups():
     """
@@ -103,10 +103,10 @@ def owned_groups():
     :return: HTTP response
     """
     response = groups.get_owned_groups(g.user_id)
-    return jsonify(response['body']), response['status_code']
+    return jsonify(response["body"]), response["status_code"]
 
 
-@groups_bp.route('/groups/user_group/<int:group_id>:<int:user_id>', methods=['POST'])
+@groups_bp.route("/groups/user_group/<int:group_id>:<int:user_id>", methods=["POST"])
 @http_auth.login_required
 def add_user_to_group(group_id, user_id):
     """
@@ -116,10 +116,10 @@ def add_user_to_group(group_id, user_id):
     :return: HTTP response
     """
     response = groups.add_user_to_group(g.user_id, user_id, group_id)
-    return jsonify(response['body']), response['status_code']
+    return jsonify(response["body"]), response["status_code"]
 
 
-@groups_bp.route('/groups/user_group/<int:group_id>:<int:user_id>', methods=['DELETE'])
+@groups_bp.route("/groups/user_group/<int:group_id>:<int:user_id>", methods=["DELETE"])
 @http_auth.login_required
 def remove_user_from_group(group_id, user_id):
     """
@@ -129,10 +129,10 @@ def remove_user_from_group(group_id, user_id):
     :return: HTTP response
     """
     response = groups.remove_user_from_group(g.user_id, user_id, group_id)
-    return jsonify(response['body']), response['status_code']
+    return jsonify(response["body"]), response["status_code"]
 
 
-@groups_bp.route('/groups/<int:group_id>:<int:available>', methods=['GET'])
+@groups_bp.route("/groups/<int:group_id>:<int:available>", methods=["GET"])
 @http_auth.login_required
 def get_members(group_id, available):
     """
@@ -145,10 +145,10 @@ def get_members(group_id, available):
         response = groups.get_available_members(g.user_id, group_id)
     else:
         response = groups.get_members(g.user_id, group_id)
-    return jsonify(response['body']), response['status_code']
+    return jsonify(response["body"]), response["status_code"]
 
 
-@groups_bp.route('/groups', methods=['GET'])
+@groups_bp.route("/groups", methods=["GET"])
 @http_auth.login_required
 def get_groups():
     """
@@ -156,11 +156,11 @@ def get_groups():
     :return: HTTP response
     """
     response = groups.get_groups(g.user_id)
-    return jsonify(response['body']), response['status_code']
+    return jsonify(response["body"]), response["status_code"]
 
 
 # -- suggestions endpoints:
-@suggestions_bp.route('/suggestions/distance/<int:group_id>:<string:place_type>', methods=['GET'])
+@suggestions_bp.route("/suggestions/distance/<int:group_id>:<string:place_type>", methods=["GET"])
 @http_auth.login_required
 def suggestions_distance(group_id, place_type):
     """
@@ -172,10 +172,10 @@ def suggestions_distance(group_id, place_type):
     """
     request_id = g.user_id
     response = suggestions.get_suggestions(request_id, group_id, place_type, "distance")
-    return jsonify(response['body']), response['status_code']
+    return jsonify(response["body"]), response["status_code"]
 
 
-@suggestions_bp.route('/suggestions/transit/<int:group_id>:<string:place_type>', methods=['GET'])
+@suggestions_bp.route("/suggestions/transit/<int:group_id>:<string:place_type>", methods=["GET"])
 @http_auth.login_required
 def suggestions_transit(group_id, place_type):
     """
@@ -187,10 +187,10 @@ def suggestions_transit(group_id, place_type):
     """
     request_id = g.user_id
     response = suggestions.get_suggestions(request_id, group_id, place_type, "transit")
-    return jsonify(response['body']), response['status_code']
+    return jsonify(response["body"]), response["status_code"]
 
 
-@suggestions_bp.route('/suggestions/drive/<int:group_id>:<string:place_type>', methods=['GET'])
+@suggestions_bp.route("/suggestions/drive/<int:group_id>:<string:place_type>", methods=["GET"])
 @http_auth.login_required
 def suggestions_driving(group_id, place_type):
     """
@@ -202,10 +202,10 @@ def suggestions_driving(group_id, place_type):
     """
     request_id = g.user_id
     response = suggestions.get_suggestions(request_id, group_id, place_type, "driving")
-    return jsonify(response['body']), response['status_code']
+    return jsonify(response["body"]), response["status_code"]
 
 
-@suggestions_bp.route('/suggestions/walk/<int:group_id>:<string:place_type>', methods=['GET'])
+@suggestions_bp.route("/suggestions/walk/<int:group_id>:<string:place_type>", methods=["GET"])
 @http_auth.login_required
 def suggestions_walking(group_id, place_type):
     """
@@ -217,10 +217,10 @@ def suggestions_walking(group_id, place_type):
     """
     request_id = g.user_id
     response = suggestions.get_suggestions(request_id, group_id, place_type, "walking")
-    return jsonify(response['body']), response['status_code']
+    return jsonify(response["body"]), response["status_code"]
 
 
-@suggestions_bp.route('/suggestions/cycle/<int:group_id>:<string:place_type>', methods=['GET'])
+@suggestions_bp.route("/suggestions/cycle/<int:group_id>:<string:place_type>", methods=["GET"])
 @http_auth.login_required
 def suggestions_bicycling(group_id, place_type):
     """
@@ -232,5 +232,5 @@ def suggestions_bicycling(group_id, place_type):
     """
     request_id = g.user_id
     response = suggestions.get_suggestions(request_id, group_id, place_type, "bicycling")
-    return jsonify(response['body']), response['status_code']
+    return jsonify(response["body"]), response["status_code"]
 

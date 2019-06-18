@@ -8,8 +8,8 @@ from flask_sqlalchemy import SQLAlchemy
 import flask_httpauth
 
 app = Flask(__name__, instance_relative_config=True)
-app.config.from_object('config')
-app.config.from_pyfile('config.py')
+app.config.from_object("config")
+app.config.from_pyfile("config.py")
 http_auth = flask_httpauth.HTTPBasicAuth()
 db = SQLAlchemy(app)
 

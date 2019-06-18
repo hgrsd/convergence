@@ -21,10 +21,10 @@ def get_places_around_centroid(point, radius, place_type):
     if len(places) < 0.25 * MAX_PLACES:
         places = gmaps_api.places_around_point(point, radius, place_type)
         for place in places:
-            place_entry = Place(name=place['name'], gm_id=place['gm_id'],
-                                lat=place['lat'], long=place['long'],
-                                address=place['address'], gm_price=place['price_level'],
-                                gm_rating=place['gm_rating'], gm_types=place['types'],
+            place_entry = Place(name=place["name"], gm_id=place["gm_id"],
+                                lat=place["lat"], long=place["long"],
+                                address=place["address"], gm_price=place["price_level"],
+                                gm_rating=place["gm_rating"], gm_types=place["types"],
                                 timestamp=datetime.utcnow())
             db.session.add(place_entry)
         try:
@@ -42,13 +42,13 @@ def order_places_by_distance(user_coordinates, places):
     :return: list of places (as dicts) in ascending order, with travel_total
             added as key for each place
     """
-    places_coordinates = [Point(place['lat'], place['long']) for place in places]
+    places_coordinates = [Point(place["lat"], place["long"]) for place in places]
     for place in places:
-        place['travel_total'] = 0
+        place["travel_total"] = 0
     for user in user_coordinates:
         for i, place in enumerate(places_coordinates):
-            places[i]['travel_total'] += user.distance_to(place)
-    ordered_places = sorted(places, key=lambda x: x['travel_total'])
+            places[i]["travel_total"] += user.distance_to(place)
+    ordered_places = sorted(places, key=lambda x: x["travel_total"])
     return ordered_places
 
 
@@ -62,14 +62,14 @@ def order_places_by_travel_time(user_coordinates, places, mode):
     :return: sorted list of places (as dicts)with travel_total added
             as key for each place
     """
-    places_coordinates = [Point(place['lat'], place['long']) for place in places]
+    places_coordinates = [Point(place["lat"], place["long"]) for place in places]
     dist_matrix = gmaps_api.distance_matrix(user_coordinates, places_coordinates, mode)
     for place in places:
-        place['travel_total'] = 0
+        place["travel_total"] = 0
     for row in dist_matrix:
         for i, place in enumerate(row):
-            places[i]['travel_total'] += place['duration']['value']
-    ordered_places = sorted(places, key=lambda x: x['travel_total'])
+            places[i]["travel_total"] += place["duration"]["value"]
+    ordered_places = sorted(places, key=lambda x: x["travel_total"])
     return ordered_places
 
 
@@ -84,7 +84,7 @@ def sift_places_by_rating(places):
         return places
     else:
         for place in places:
-            if not place['gm_rating']:
-                place['gm_rating'] = 1
-        places = sorted(places, key=lambda x: x['gm_rating'], reverse=True)
+            if not place["gm_rating"]:
+                place["gm_rating"] = 1
+        places = sorted(places, key=lambda x: x["gm_rating"], reverse=True)
         return places[:MAX_PLACES]
