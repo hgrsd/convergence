@@ -18,6 +18,15 @@ def login(username, password):
     return {"body": {"access_token": access_token, "id": user.id}, "status_code": 200}
 
 
+def get_info(user_id):
+    """
+    Get full info about currently logged in user
+    :return dict object with body and status code
+    """
+    user = User.query.get(user_id)
+    return {"body": user.full_info(), "status_code": 200}
+
+
 def register_user(username, password):
     """
     Register user.

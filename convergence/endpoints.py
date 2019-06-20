@@ -51,6 +51,18 @@ def delete_user():
     return jsonify(response["body"]), response["status_code"]
 
 
+@user_bp.route("/user", methods=["GET"])
+@flask_jwt_extended.jwt_required
+def get_user_info():
+    """
+    Get info for current user 
+    :return: HTTP response
+    """
+    user_id = flask_jwt_extended.get_jwt_identity()
+    response = user.get_info(user_id)
+    return jsonify(response["body"]), response["status_code"]
+
+
 @user_bp.route("/user/<string:username>", methods=["GET"])
 @flask_jwt_extended.jwt_required
 def find_user(username):

@@ -24,7 +24,7 @@ def main():
             elif group_mode == "g":
                 get_group_members()
         elif mode == "u":
-            user_mode = input("[n]ew, [d]elete, [f]ind, [s]witch, [a]vailability, set [l]ocation, [q]uit\n> ")
+            user_mode = input("[n]ew, [d]elete, [f]ind, [s]witch, [a]vailability, set [l]ocation, [i]nfo, [q]uit\n> ")
             if user_mode == "n":
                 new_user()
             elif user_mode == "d":
@@ -37,6 +37,8 @@ def main():
                 find_user()
             elif user_mode == "l":
                 update_location()
+            elif user_mode == "i":
+                get_info()
         elif mode == "s":
             sug_mode = input("[d]istance, [t]ransit, d[r]iving, [c]ycling, [w]alking, [q]uit\n> ")
             if sug_mode == "d":
@@ -92,6 +94,10 @@ def new_user():
 
 def delete_user():
     response = requests.delete(f"http://localhost:5000/user", headers=header).json()
+    print(json.dumps(response, sort_keys=True, indent=4))
+
+def get_info():
+    response = requests.get(f"http://localhost:5000/user", headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
 def owned_groups():

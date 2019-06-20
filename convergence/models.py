@@ -27,6 +27,12 @@ class User(db.Model):
     def get_location(self):
         return Point(self.last_seen_lat, self.last_seen_long)
 
+    def full_info(self):
+        """ Return all info except for password hash """
+        return {"id": self.id, "username": self.username,
+                "last_seen_lat": self.last_seen_lat, "last_seen_long": self.last_seen_long,
+                "available": self.available}
+
 
 class Group(db.Model):
     __tablename__ = "groups"
