@@ -1,7 +1,21 @@
 from flask import g
+import flask_jwt_extended
 from sqlalchemy import exc
-from . import http_auth, db
+from . import db
 from .models import User
+
+def login(username, password):
+    """
+    Login user
+    :return dict object with body and status code
+    """
+    if not username or not password:
+        return {"body": {"error": {"message": "please enter username and password"}}, "status_code": 400}
+    user = User.query.filter_by(username=username).first()
+    if not user or not user.verify_password(password):
+        return {"body": {"error": {"message": "invalid username or password"}}, "status_code": 400}
+    access_token = flask_jwt_extended.create_access_token(identity=user.id) 
+    return {"body": {"access_token": access_token, "id": user.id}, "status_code": 200}
 
 
 def register_user(username, password):
@@ -19,7 +33,7 @@ def register_user(username, password):
     except exc.IntegrityError:
         db.session.rollback()
         return {"body": {"error": {"message": "username exists already"}}, "status_code": 400}
-    return {"body": {"status": "success"}, "status_code": 200}
+    return {"body": {"status": "success", "user_id": user.id}, "status_code": 200}
 
 
 def delete_user(user_id):
@@ -68,17 +82,3 @@ def set_availability(user_id, availability):
         return {"body": {"error": {"message": "error updating database"}}, "status_code": 400}
     return {"body": {"status": "success"}, "status_code": 200}
 
-
-@http_auth.verify_password
-def verify_password(username, password):
-    """
-    Verify authentication details and set g.user_id
-    :param username: string
-    :param password: string
-    :return: bool
-    """
-    user = User.query.filter_by(username=username).first()
-    if not user or not user.verify_password(password):
-        return False
-    g.user_id = user.id
-    return True

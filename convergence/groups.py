@@ -1,5 +1,6 @@
+from . import db
 from .models import Group, UserGroup, User
-from sqlalchemy import exc 
+from sqlalchemy import exc
 
 
 def create_group(user_id, name):
