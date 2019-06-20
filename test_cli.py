@@ -5,7 +5,7 @@ header = ""
 
 def main():
     login()
-    mode = input("Menu:\n\t[u]ser\n\t[g]roup\n\t[l]ocation\n\t[s]uggestions\n\t[q]uit\n\n> ")
+    mode = input("Menu:\n\t[u]ser\n\t[g]roup\n\t[s]uggestions\n\t[q]uit\n\n> ")
     while mode != "q":
         if mode == "g":
             group_mode = input("[c]urrent user's groups, [o]wned groups, [n]ew, [d]elete, [a]dd user, [r]emove user, [g]et members, [q]uit group menu: ")
@@ -24,7 +24,7 @@ def main():
             elif group_mode == "g":
                 get_group_members()
         elif mode == "u":
-            user_mode = input("[n]ew, [d]elete, [f]ind, [s]witch, [a]vailability, [l]ocation, [q]uit\n> ")
+            user_mode = input("[n]ew, [d]elete, [f]ind, [s]witch, [a]vailability, set [l]ocation, [q]uit\n> ")
             if user_mode == "n":
                 new_user()
             elif user_mode == "d":
