@@ -15,6 +15,7 @@ flask-httpauth = "*"
 passlib = "*"
 requests = "*"
 flask-jwt-extended = "*"
+faker = "*"
 
 [requires]
 python_version = "3.7"
