@@ -1,11 +1,11 @@
 import {
 	Navigation
-} from "./navigation.js";
+} from "./navigation";
 
 import {
 	ConvergenceService
 }
-from "./convergence-service.js";
+from "./convergence-service";
 
 import {
 	MapView
@@ -21,7 +21,15 @@ import {
 
 import {
 	ToolbarViewModel
-} from "./toolbar/viewmodel.js";
+} from "./toolbar/viewmodel";
+
+import {
+	LoginView
+} from "./login/view";
+
+import {
+	LoginViewModel
+} from "./login/viewmodel";
 
 (function() {
 	const toolbarViewModel = new ToolbarViewModel();

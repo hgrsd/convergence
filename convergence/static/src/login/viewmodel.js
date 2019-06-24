@@ -1,9 +1,13 @@
 import {
-	BehaviorSubject
+	BehaviorSubject,
+	Subject,
+	combineLatest
 } from "rxjs";
 
 import {
-	map
+	map,
+	pipe,
+	startWith
 } from "rxjs/operators";
 
 export class LoginViewModel {
