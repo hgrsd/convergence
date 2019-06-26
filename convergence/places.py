@@ -8,9 +8,11 @@ from .location import Point
 
 MAX_PLACES = 10
 
+
 def get_places_around_centroid(point, radius, place_type):
     """
-    Find places of place_type within a radius around a centroid and add to database.
+    Find places of place_type within a radius around a centroid
+    and add to database.
     :param point: the centroid, of type Point
     :param radius: radius (in metres)
     :param place_type: type of place to be searched for
@@ -23,8 +25,10 @@ def get_places_around_centroid(point, radius, place_type):
         for place in places:
             place_entry = Place(name=place["name"], gm_id=place["gm_id"],
                                 lat=place["lat"], long=place["long"],
-                                address=place["address"], gm_price=place["price_level"],
-                                gm_rating=place["gm_rating"], gm_types=place["types"],
+                                address=place["address"],
+                                gm_price=place["price_level"],
+                                gm_rating=place["gm_rating"],
+                                gm_types=place["types"],
                                 timestamp=datetime.utcnow())
             db.session.add(place_entry)
         try:
@@ -36,7 +40,8 @@ def get_places_around_centroid(point, radius, place_type):
 
 def order_places_by_distance(user_coordinates, places):
     """
-    Return places sorted in ascending order by the sum of their distances to each user.
+    Return places sorted in ascending order by the sum of their distances
+    to each user.
     :param user_coordinates: list of Points for relevant users
     :param places: list of places (as dicts) to be ordered
     :return: list of places (as dicts) in ascending order, with travel_total
@@ -62,8 +67,11 @@ def order_places_by_travel_time(user_coordinates, places, mode):
     :return: sorted list of places (as dicts)with travel_total added
             as key for each place
     """
-    places_coordinates = [Point(place["lat"], place["long"]) for place in places]
-    dist_matrix = gmaps_api.distance_matrix(user_coordinates, places_coordinates, mode)
+    places_coordinates = [Point(place["lat"],
+                          place["long"]) for place in places]
+    dist_matrix = gmaps_api.distance_matrix(user_coordinates,
+                                            places_coordinates,
+                                            mode)
     for place in places:
         place["travel_total"] = 0
     for row in dist_matrix:
@@ -75,8 +83,8 @@ def order_places_by_travel_time(user_coordinates, places, mode):
 
 def sift_places_by_rating(places):
     """
-    Return MAX_PLACES-length list of places, sorted by rating in descending order
-    if len(places) > MAX_PLACES
+    Return MAX_PLACES-length list of places, sorted by rating in descending
+    order if len(places) > MAX_PLACES
     :param places: list of places (as dict)
     :return: MAX_PLACES-length list of places (as dict), sorted by rating
     """

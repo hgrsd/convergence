@@ -1,4 +1,4 @@
-from flask import Blueprint, g, jsonify, request
+from flask import Blueprint, jsonify, request
 import flask_jwt_extended
 from . import groups, location, user, suggestions
 from . import app
@@ -10,12 +10,14 @@ suggestions_bp = Blueprint("suggestions", __name__)
 
 
 # -- web interface
-@app.route("/", methods=['GET'])
+@app.route("/",
+           methods=['GET'])
 def root():
     return app.send_static_file('index.html')
 
 # -- user endpoints:
-@user_bp.route("/user", methods=["POST"])
+@user_bp.route("/user",
+               methods=["POST"])
 def register_user():
     """
     Register new user
@@ -27,7 +29,8 @@ def register_user():
     return jsonify(response["body"]), response["status_code"]
 
 
-@user_bp.route("/user/login", methods=["POST"])
+@user_bp.route("/user/login",
+               methods=["POST"])
 def login():
     """
     Login user
@@ -39,7 +42,8 @@ def login():
     return jsonify(response["body"]), response["status_code"]
 
 
-@user_bp.route("/user", methods=["DELETE"])
+@user_bp.route("/user",
+               methods=["DELETE"])
 @flask_jwt_extended.jwt_required
 def delete_user():
     """
@@ -51,7 +55,8 @@ def delete_user():
     return jsonify(response["body"]), response["status_code"]
 
 
-@user_bp.route("/user", methods=["GET"])
+@user_bp.route("/user",
+               methods=["GET"])
 @flask_jwt_extended.jwt_required
 def get_user_info():
     """
@@ -63,7 +68,8 @@ def get_user_info():
     return jsonify(response["body"]), response["status_code"]
 
 
-@user_bp.route("/user/<string:username>", methods=["GET"])
+@user_bp.route("/user/<string:username>",
+               methods=["GET"])
 @flask_jwt_extended.jwt_required
 def find_user(username):
     """
@@ -73,7 +79,9 @@ def find_user(username):
     response = user.find_user(username)
     return jsonify(response["body"]), response["status_code"]
 
-@user_bp.route("/user/availability/<int:available>", methods=["PUT"])
+
+@user_bp.route("/user/availability/<int:available>",
+               methods=["PUT"])
 @flask_jwt_extended.jwt_required
 def set_availability(available):
     """
@@ -87,7 +95,8 @@ def set_availability(available):
 
 
 # -- location endpoints:
-@location_bp.route("/loc/<float:lat>:<float:long>", methods=["PUT"])
+@location_bp.route("/loc/<float:lat>:<float:long>",
+                   methods=["PUT"])
 @flask_jwt_extended.jwt_required
 def update_location(lat, long):
     """
@@ -102,7 +111,8 @@ def update_location(lat, long):
 
 
 # -- group endpoints:
-@groups_bp.route("/groups/<string:name>", methods=["POST"])
+@groups_bp.route("/groups/<string:name>",
+                 methods=["POST"])
 @flask_jwt_extended.jwt_required
 def create_group(name):
     """
@@ -115,7 +125,8 @@ def create_group(name):
     return jsonify(response["body"]), response["status_code"]
 
 
-@groups_bp.route("/groups/<int:group_id>", methods=["DELETE"])
+@groups_bp.route("/groups/<int:group_id>",
+                 methods=["DELETE"])
 @flask_jwt_extended.jwt_required
 def delete_group(group_id):
     """
@@ -128,7 +139,8 @@ def delete_group(group_id):
     return jsonify(response["body"]), response["status_code"]
 
 
-@groups_bp.route("/groups/owned", methods=["GET"])
+@groups_bp.route("/groups/owned",
+                 methods=["GET"])
 @flask_jwt_extended.jwt_required
 def owned_groups():
     """
@@ -140,7 +152,8 @@ def owned_groups():
     return jsonify(response["body"]), response["status_code"]
 
 
-@groups_bp.route("/groups/user_group/<int:group_id>:<int:user_id>", methods=["POST"])
+@groups_bp.route("/groups/user_group/<int:group_id>:<int:user_id>",
+                 methods=["POST"])
 @flask_jwt_extended.jwt_required
 def add_user_to_group(group_id, user_id):
     """
@@ -154,7 +167,8 @@ def add_user_to_group(group_id, user_id):
     return jsonify(response["body"]), response["status_code"]
 
 
-@groups_bp.route("/groups/user_group/<int:group_id>:<int:user_id>", methods=["DELETE"])
+@groups_bp.route("/groups/user_group/<int:group_id>:<int:user_id>",
+                 methods=["DELETE"])
 @flask_jwt_extended.jwt_required
 def remove_user_from_group(group_id, user_id):
     """
@@ -168,7 +182,8 @@ def remove_user_from_group(group_id, user_id):
     return jsonify(response["body"]), response["status_code"]
 
 
-@groups_bp.route("/groups/<int:group_id>:<int:available>", methods=["GET"])
+@groups_bp.route("/groups/<int:group_id>:<int:available>",
+                 methods=["GET"])
 @flask_jwt_extended.jwt_required
 def get_members(group_id, available):
     """
@@ -185,7 +200,8 @@ def get_members(group_id, available):
     return jsonify(response["body"]), response["status_code"]
 
 
-@groups_bp.route("/groups", methods=["GET"])
+@groups_bp.route("/groups",
+                 methods=["GET"])
 @flask_jwt_extended.jwt_required
 def get_groups():
     """
@@ -198,22 +214,25 @@ def get_groups():
 
 
 # -- suggestions endpoints:
-@suggestions_bp.route("/suggestions/distance/<int:group_id>:<string:place_type>", methods=["GET"])
+@suggestions_bp.route("/suggestions/distance/<int:group_id>:<string:place_type>",
+                      methods=["GET"])
 @flask_jwt_extended.jwt_required
 def suggestions_distance(group_id, place_type):
     """
-    Get meeting place suggestions based on lowest average distance as-the-crow-flies
-    for group members.
+    Get meeting place suggestions based on lowest average distance
+    as-the-crow-flies for group members.
     :param group_id: group to request suggestions for
     :param place_type: type of place
     :return: HTTP response
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    response = suggestions.get_suggestions(request_id, group_id, place_type, "distance")
+    response = suggestions.get_suggestions(request_id, group_id,
+                                           place_type, "distance")
     return jsonify(response["body"]), response["status_code"]
 
 
-@suggestions_bp.route("/suggestions/transit/<int:group_id>:<string:place_type>", methods=["GET"])
+@suggestions_bp.route("/suggestions/transit/<int:group_id>:<string:place_type>",
+                      methods=["GET"])
 @flask_jwt_extended.jwt_required
 def suggestions_transit(group_id, place_type):
     """
@@ -224,11 +243,13 @@ def suggestions_transit(group_id, place_type):
     :return: HTTP response
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    response = suggestions.get_suggestions(request_id, group_id, place_type, "transit")
+    response = suggestions.get_suggestions(request_id, group_id,
+                                           place_type, "transit")
     return jsonify(response["body"]), response["status_code"]
 
 
-@suggestions_bp.route("/suggestions/drive/<int:group_id>:<string:place_type>", methods=["GET"])
+@suggestions_bp.route("/suggestions/drive/<int:group_id>:<string:place_type>",
+                      methods=["GET"])
 @flask_jwt_extended.jwt_required
 def suggestions_driving(group_id, place_type):
     """
@@ -239,11 +260,13 @@ def suggestions_driving(group_id, place_type):
     :return: HTTP response
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    response = suggestions.get_suggestions(request_id, group_id, place_type, "driving")
+    response = suggestions.get_suggestions(request_id, group_id,
+                                           place_type, "driving")
     return jsonify(response["body"]), response["status_code"]
 
 
-@suggestions_bp.route("/suggestions/walk/<int:group_id>:<string:place_type>", methods=["GET"])
+@suggestions_bp.route("/suggestions/walk/<int:group_id>:<string:place_type>",
+                      methods=["GET"])
 @flask_jwt_extended.jwt_required
 def suggestions_walking(group_id, place_type):
     """
@@ -254,11 +277,13 @@ def suggestions_walking(group_id, place_type):
     :return: HTTP response
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    response = suggestions.get_suggestions(request_id, group_id, place_type, "walking")
+    response = suggestions.get_suggestions(request_id, group_id,
+                                           place_type, "walking")
     return jsonify(response["body"]), response["status_code"]
 
 
-@suggestions_bp.route("/suggestions/cycle/<int:group_id>:<string:place_type>", methods=["GET"])
+@suggestions_bp.route("/suggestions/cycle/<int:group_id>:<string:place_type>",
+                      methods=["GET"])
 @flask_jwt_extended.jwt_required
 def suggestions_bicycling(group_id, place_type):
     """
@@ -269,6 +294,6 @@ def suggestions_bicycling(group_id, place_type):
     :return: HTTP response
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    response = suggestions.get_suggestions(request_id, group_id, place_type, "bicycling")
+    response = suggestions.get_suggestions(request_id, group_id,
+                                           place_type, "bicycling")
     return jsonify(response["body"]), response["status_code"]
-

@@ -19,7 +19,8 @@ def update_location(user_id, lat, long):
     """
     if (lat < MIN_LAT or lat > MAX_LAT
             or long < MIN_LON or long > MAX_LON):
-        return {"body": {"error": {"message": "invalid location"}}, "status_code": 400}
+        return {"body": {"error": {"message": "invalid location"}},
+                "status_code": 400}
     user = User.query.filter_by(id=user_id).first()
     user.last_seen_lat, user.last_seen_long = lat, long
     db.session.add(user)
@@ -27,7 +28,8 @@ def update_location(user_id, lat, long):
         db.session.commit()
     except:
         db.session.rollback()
-        return {"body": {"error": {"message": "error updating location"}}, "status_code": 400}
+        return {"body": {"error": {"message": "error updating location"}},
+                "status_code": 400}
     return {"body": {"status": "success"}, "status_code": 200}
 
 
@@ -47,7 +49,8 @@ def find_centroid(coordinates):
     x = float(x_total / len(coordinates))
     y = float(y_total / len(coordinates))
     z = float(z_total / len(coordinates))
-    return Point(math.degrees(math.atan2(z, math.sqrt(x * x + y * y))), math.degrees(math.atan2(y, x)))
+    return Point(math.degrees(math.atan2(z, math.sqrt(x * x + y * y))),
+                 math.degrees(math.atan2(y, x)))
 
 
 def mean_dist_from_centroid(coordinates, centroid):
@@ -59,4 +62,3 @@ def mean_dist_from_centroid(coordinates, centroid):
     """
     dist = sum(coordinate.distance_to(centroid) for coordinate in coordinates)
     return dist / len(coordinates)
-

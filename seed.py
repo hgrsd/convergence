@@ -1,5 +1,4 @@
-""" 
--- seed.py
+""" -- seed.py
 
 Seeds database for testing purposes using Faker library to generate data. 
 

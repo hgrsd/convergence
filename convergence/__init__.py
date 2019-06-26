@@ -13,7 +13,7 @@ app.config.from_object("config")
 app.config.from_pyfile("config.py")
 
 # check if env var is set by seed.py -- if so, follow its db uri
-db_uri = os.getenv("SQLALCHEMY_DATABASE_URI") 
+db_uri = os.getenv("SQLALCHEMY_DATABASE_URI")
 if db_uri:
     app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
 

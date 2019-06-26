@@ -5,8 +5,10 @@ import math
 from urllib.parse import quote
 from . import app
 
-GM_PLACES_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={:f},{:f}&radius={:d}&type={:s}&key={:s}"
-GM_TRAVEL_TIME_URL = "https://maps.googleapis.com/maps/api/distancematrix/json?origins={:s}&destinations={:s}&mode={:s}&key={:s}"
+GM_PLACES_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/" \
+                "json?location={:f},{:f}&radius={:d}&type={:s}&key={:s}"
+GM_TRAVEL_TIME_URL = "https://maps.googleapis.com/maps/api/distancematrix/" \
+                     "json?origins={:s}&destinations={:s}&mode={:s}&key={:s}"
 GM_API_KEY = app.config.get("GM_API_KEY")
 DISTANCE_MATRIX_MAX_ELEMENTS = 100
 
@@ -20,12 +22,15 @@ def places_around_point(point, radius, place_type):
     :param place_type: place type to find
     :return: list of places (as dicts)
     """
-    init_request = GM_PLACES_URL.format(point.lat, point.long, radius, place_type, GM_API_KEY)
+    init_request = GM_PLACES_URL.format(point.lat, point.long,
+                                        radius, place_type,
+                                        GM_API_KEY)
     response = requests.get(init_request).json()
     places = _json_extract_places(response)
     while "next_page_token" in response:
         time.sleep(1.5)
-        request = init_request + "&pagetoken=" + quote(response["next_page_token"])
+        request = init_request + "&pagetoken=" \
+            + quote(response["next_page_token"])
         response = requests.get(request).json()
         places.extend(_json_extract_places(response))
     return places
@@ -40,7 +45,8 @@ def distance_matrix(origins, destinations, mode):
     :param mode: mode of transportation
     :return: distance matrix of dimension len(origins) * len(destinations)
     """
-    no_requests = math.ceil(len(origins) * len(destinations) / DISTANCE_MATRIX_MAX_ELEMENTS)
+    no_requests = math.ceil(len(origins) * len(destinations)
+                            / DISTANCE_MATRIX_MAX_ELEMENTS)
     matrix = [None] * len(origins)
     for i in range(no_requests):
         start = 0 + i * (len(destinations) // no_requests)
@@ -49,12 +55,14 @@ def distance_matrix(origins, destinations, mode):
         for origin in origins:
             if locations_string != "":
                 locations_string += "|"
-            locations_string = locations_string + str(origin.lat) + "," + str(origin.long)
+            locations_string = locations_string + str(origin.lat) + "," \
+                + str(origin.long)
         places_string = ""
         for destination in destinations[start:cutoff]:
             if places_string != "":
                 places_string += "|"
-            places_string = places_string + str(destination.lat) + "," + str(destination.long)
+            places_string = places_string + str(destination.lat) + "," \
+                + str(destination.long)
         request = GM_TRAVEL_TIME_URL.format(quote(locations_string),
                                             quote(places_string),
                                             mode,
@@ -94,6 +102,8 @@ def _json_extract_places(response_string):
             rating = result["rating"]
         except KeyError:
             rating = None
-        places.append({"name": name, "gm_id": gm_id, "lat": lat, "long": long, "address": address,
-                       "types": types, "price_level": price_level, "gm_rating": rating})
+        places.append({"name": name, "gm_id": gm_id,
+                       "lat": lat, "long": long,
+                       "address": address, "types": types,
+                       "price_level": price_level, "gm_rating": rating})
     return places

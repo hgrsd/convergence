@@ -3,6 +3,7 @@ import requests
 
 header = ""
 
+
 def main():
     login()
     mode = input("Menu:\n\t[u]ser\n\t[g]roup\n\t[s]uggestions\n\t[q]uit\n\n> ")
@@ -53,15 +54,18 @@ def main():
                 walking_suggestions()
         mode = input("Menu:\n\t[u]ser\n\t[g]roup\n\t[l]ocation\n\t[s]uggestions\n\t[q]uit\n\n> ")
 
+
 def create_group():
     name = input("Group name: ")
     response = requests.post(f"http://localhost:5000/groups/{name}", headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
+
 def delete_group():
     group_id = input("Group id: ")
     response = requests.delete(f"http://localhost:5000/groups/{group_id}", headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
+
 
 def add_user_to_group():
     group_id = input("Group id: ")
@@ -69,10 +73,12 @@ def add_user_to_group():
     response = requests.post(f"http://localhost:5000/groups/user_group/{group_id}:{user_id}", headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
+
 def find_user():
     user = input("Username: ")
     response = requests.get(f"http://localhost:5000/user/{user}", headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
+
 
 def remove_user_from_group():
     group_id = input("Group id: ")
@@ -80,11 +86,13 @@ def remove_user_from_group():
     response = requests.delete(f"http://localhost:5000/groups/user_group/{group_id}:{user_id}", headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
+
 def get_group_members():
     group_id = input("Group id: ")
     available = int(input("Available members only? 0=No, 1=Yes: "))
     response = requests.get(f"http://localhost:5000/groups/{group_id}:{available}", headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
+
 
 def new_user():
     username = input("Username: ")
@@ -92,21 +100,26 @@ def new_user():
     response = requests.post("http://localhost:5000/user", json={"username": username, "password": password}).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
+
 def delete_user():
     response = requests.delete(f"http://localhost:5000/user", headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
+
 
 def get_info():
     response = requests.get(f"http://localhost:5000/user", headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
+
 def owned_groups():
     response = requests.get("http://localhost:5000/groups/owned", headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
+
 def get_groups():
     response = requests.get("http://localhost:5000/groups", headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
+
 
 def login():
     username = input("Username: ")
@@ -118,10 +131,12 @@ def login():
         header = {"Authorization": f"Bearer {access_token}"}
     print(json.dumps(response, sort_keys=True, indent=4))
 
+
 def set_availability():
     availability = input("Set availability, 0=unavailable, 1=available: ")
     response = requests.put(f"http://localhost:5000/user/availability/{availability}", headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
+
 
 def update_location():
     lat = input("New latitude: ")
@@ -129,11 +144,13 @@ def update_location():
     response = requests.put(f"http://localhost:5000/loc/{lat}:{long}", headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
+
 def dist_suggestions():
     group = input("Group id: ")
     sug_type = input("Type: ")
     response = requests.get(f"http://localhost:5000/suggestions/distance/{group}:{sug_type}", headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
+
 
 def transit_suggestions():
     group = input("Group id: ")
@@ -141,11 +158,13 @@ def transit_suggestions():
     response = requests.get(f"http://localhost:5000/suggestions/transit/{group}:{sug_type}", headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
+
 def driving_suggestions():
     group = input("Group id: ")
     sug_type = input("Type: ")
     response = requests.get(f"http://localhost:5000/suggestions/drive/{group}:{sug_type}", headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
+
 
 def cycling_suggestions():
     group = input("Group id: ")
@@ -153,12 +172,13 @@ def cycling_suggestions():
     response = requests.get(f"http://localhost:5000/suggestions/cycle/{group}:{sug_type}", headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
+
 def walking_suggestions():
     group = input("Group id: ")
     sug_type = input("Type: ")
     response = requests.get(f"http://localhost:5000/suggestions/walk/{group}:{sug_type}", headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
+
 if __name__ == "__main__":
     main()
-

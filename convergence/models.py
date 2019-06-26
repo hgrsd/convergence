@@ -30,7 +30,8 @@ class User(db.Model):
     def full_info(self):
         """ Return all info except for password hash """
         return {"id": self.id, "username": self.username,
-                "last_seen_lat": self.last_seen_lat, "last_seen_long": self.last_seen_long,
+                "last_seen_lat": self.last_seen_lat,
+                "last_seen_long": self.last_seen_long,
                 "available": self.available}
 
 
@@ -38,7 +39,8 @@ class Group(db.Model):
     __tablename__ = "groups"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128))
-    owner = db.Column(db.ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    owner = db.Column(db.ForeignKey("users.id", ondelete="CASCADE"),
+                      index=True)
     __table_args__ = (db.UniqueConstraint("name", "owner"),)
 
     def as_dict(self):
@@ -48,8 +50,10 @@ class Group(db.Model):
 class UserGroup(db.Model):
     __tablename__ = "usergroups"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.ForeignKey("users.id", ondelete="CASCADE"), index=True)
-    group_id = db.Column(db.ForeignKey("groups.id", ondelete="CASCADE"), index=True)
+    user_id = db.Column(db.ForeignKey("users.id", ondelete="CASCADE"),
+                        index=True)
+    group_id = db.Column(db.ForeignKey("groups.id", ondelete="CASCADE"),
+                         index=True)
     __table_args__ = (db.UniqueConstraint("user_id", "group_id"),)
 
     def as_dict(self):

@@ -1,5 +1,6 @@
 import math
 
+
 class Point:
     """ Point class, used for coordinates"""
 

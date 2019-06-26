@@ -12,7 +12,7 @@ def get_suggestions(request_id, group_id, place_type, suggestions_mode):
     :param request_id: requesting user
     :param group_id: specified group
     :param place_type: type of place to suggest
-    :param suggestions_mode: suggestions mode (e.g. "distance", "walking", "driving")
+    :param suggestions_mode: suggestions mode (e.g. "distance" or "walking")
     :return: tuple(object with suggestions / status message, status code)
     """
     group_members = get_available_members(request_id, group_id)["body"]["data"]
@@ -27,7 +27,10 @@ def get_suggestions(request_id, group_id, place_type, suggestions_mode):
     if suggestions_mode == "distance":
         ordered_places = order_places_by_distance(user_coordinates, places)
     else:
-        ordered_places = order_places_by_travel_time(user_coordinates, places, suggestions_mode)
-    return {"body": {"status": "success", "data": ordered_places}, "status_code": 200}
+        ordered_places = order_places_by_travel_time(user_coordinates,
+                                                     places,
+                                                     suggestions_mode)
+    return {"body": {"status": "success", "data": ordered_places}, 
+            "status_code": 200}
 
 
