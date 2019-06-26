@@ -55,7 +55,7 @@ def delete_user():
 @flask_jwt_extended.jwt_required
 def get_user_info():
     """
-    Get info for current user 
+    Get info for current user
     :return: HTTP response
     """
     user_id = flask_jwt_extended.get_jwt_identity()
