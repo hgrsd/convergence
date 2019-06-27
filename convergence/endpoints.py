@@ -1,10 +1,10 @@
 from flask import Blueprint, jsonify, request
 import flask_jwt_extended
-from . import groups, location, user, suggestions
+from . import events, location, user, suggestions
 from . import app
 
 user_bp = Blueprint("user", __name__)
-groups_bp = Blueprint("groups", __name__)
+events_bp = Blueprint("events", __name__)
 location_bp = Blueprint("locations", __name__)
 suggestions_bp = Blueprint("suggestions", __name__)
 
@@ -110,190 +110,190 @@ def update_location(lat, long):
     return jsonify(response["body"]), response["status_code"]
 
 
-# -- group endpoints:
-@groups_bp.route("/groups/<string:name>",
+# -- event endpoints:
+@events_bp.route("/events/<string:name>",
                  methods=["POST"])
 @flask_jwt_extended.jwt_required
-def create_group(name):
+def create_event(name):
     """
-    Create new group, owned by current user
-    :param name: group name
+    Create new event, owned by current user
+    :param name: event name
     :return: HTTP response
     """
     user_id = flask_jwt_extended.get_jwt_identity()
-    response = groups.create_group(user_id, name)
+    response = events.create_event(user_id, name)
     return jsonify(response["body"]), response["status_code"]
 
 
-@groups_bp.route("/groups/<int:group_id>",
+@events_bp.route("/events/<int:event_id>",
                  methods=["DELETE"])
 @flask_jwt_extended.jwt_required
-def delete_group(group_id):
+def delete_event(event_id):
     """
-    Delete group (requesting user must be group owner)
-    :param group_id: group to be deleted
+    Delete event (requesting user must be event owner)
+    :param event_id: event to be deleted
     :return: HTTP response
     """
     user_id = flask_jwt_extended.get_jwt_identity()
-    response = groups.delete_group(user_id, group_id)
+    response = events.delete_event(user_id, event_id)
     return jsonify(response["body"]), response["status_code"]
 
 
-@groups_bp.route("/groups/owned",
+@events_bp.route("/events/owned",
                  methods=["GET"])
 @flask_jwt_extended.jwt_required
-def owned_groups():
+def owned_events():
     """
-    Get groups owned by user
+    Get events owned by user
     :return: HTTP response
     """
     user_id = flask_jwt_extended.get_jwt_identity()
-    response = groups.get_owned_groups(user_id)
+    response = events.get_owned_events(user_id)
     return jsonify(response["body"]), response["status_code"]
 
 
-@groups_bp.route("/groups/user_group/<int:group_id>:<int:user_id>",
+@events_bp.route("/events/user_event/<int:event_id>:<int:user_id>",
                  methods=["POST"])
 @flask_jwt_extended.jwt_required
-def add_user_to_group(group_id, user_id):
+def add_user_to_event(event_id, user_id):
     """
-    Add user to group (requesting user must be group owner)
-    :param group_id: group to add user to
-    :param user_id: user to add to group
+    Add user to event (requesting user must be event owner)
+    :param event_id: event to add user to
+    :param user_id: user to add to event
     :return: HTTP response
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    response = groups.add_user_to_group(request_id, user_id, group_id)
+    response = events.add_user_to_event(request_id, user_id, event_id)
     return jsonify(response["body"]), response["status_code"]
 
 
-@groups_bp.route("/groups/user_group/<int:group_id>:<int:user_id>",
+@events_bp.route("/events/user_event/<int:event_id>:<int:user_id>",
                  methods=["DELETE"])
 @flask_jwt_extended.jwt_required
-def remove_user_from_group(group_id, user_id):
+def remove_user_from_event(event_id, user_id):
     """
-    Remove user from group (requesting user must be group owner)
-    :param group_id: group to remove user from
-    :param user_id: user to remove from group
+    Remove user from event (requesting user must be event owner)
+    :param event_id: event to remove user from
+    :param user_id: user to remove from event
     :return: HTTP response
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    response = groups.remove_user_from_group(request_id, user_id, group_id)
+    response = events.remove_user_from_event(request_id, user_id, event_id)
     return jsonify(response["body"]), response["status_code"]
 
 
-@groups_bp.route("/groups/<int:group_id>:<int:available>",
+@events_bp.route("/events/<int:event_id>:<int:available>",
                  methods=["GET"])
 @flask_jwt_extended.jwt_required
-def get_members(group_id, available):
+def get_members(event_id, available):
     """
-    Get list of group members (requesting user must be group member)
-    :param group_id: group to request members from
+    Get list of event members (requesting user must be event member)
+    :param event_id: event to request members from
     :param available: limit results to available members, 0 = False, 1 = True
     :return: HTTP response
     """
     user_id = flask_jwt_extended.get_jwt_identity()
     if available == 1:
-        response = groups.get_available_members(user_id, group_id)
+        response = events.get_available_members(user_id, event_id)
     else:
-        response = groups.get_members(user_id, group_id)
+        response = events.get_members(user_id, event_id)
     return jsonify(response["body"]), response["status_code"]
 
 
-@groups_bp.route("/groups",
+@events_bp.route("/events",
                  methods=["GET"])
 @flask_jwt_extended.jwt_required
-def get_groups():
+def get_events():
     """
-    Get groups of which requesting user is a member.
+    Get events of which requesting user is a member.
     :return: HTTP response
     """
     user_id = flask_jwt_extended.get_jwt_identity()
-    response = groups.get_groups(user_id)
+    response = events.get_events(user_id)
     return jsonify(response["body"]), response["status_code"]
 
 
 # -- suggestions endpoints:
-@suggestions_bp.route("/suggestions/distance/<int:group_id>:<string:place_type>",
+@suggestions_bp.route("/suggestions/distance/<int:event_id>:<string:place_type>",
                       methods=["GET"])
 @flask_jwt_extended.jwt_required
-def suggestions_distance(group_id, place_type):
+def suggestions_distance(event_id, place_type):
     """
     Get meeting place suggestions based on lowest average distance
-    as-the-crow-flies for group members.
-    :param group_id: group to request suggestions for
+    as-the-crow-flies for event members.
+    :param event_id: event to request suggestions for
     :param place_type: type of place
     :return: HTTP response
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    response = suggestions.get_suggestions(request_id, group_id,
+    response = suggestions.get_suggestions(request_id, event_id,
                                            place_type, "distance")
     return jsonify(response["body"]), response["status_code"]
 
 
-@suggestions_bp.route("/suggestions/transit/<int:group_id>:<string:place_type>",
+@suggestions_bp.route("/suggestions/transit/<int:event_id>:<string:place_type>",
                       methods=["GET"])
 @flask_jwt_extended.jwt_required
-def suggestions_transit(group_id, place_type):
+def suggestions_transit(event_id, place_type):
     """
-    Get meeting place suggestions based on lowest average travel time for group
+    Get meeting place suggestions based on lowest average travel time for event
     members, using public transport.
-    :param group_id: group to request suggestions for
+    :param event_id: event to request suggestions for
     :param place_type: type of places
     :return: HTTP response
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    response = suggestions.get_suggestions(request_id, group_id,
+    response = suggestions.get_suggestions(request_id, event_id,
                                            place_type, "transit")
     return jsonify(response["body"]), response["status_code"]
 
 
-@suggestions_bp.route("/suggestions/drive/<int:group_id>:<string:place_type>",
+@suggestions_bp.route("/suggestions/drive/<int:event_id>:<string:place_type>",
                       methods=["GET"])
 @flask_jwt_extended.jwt_required
-def suggestions_driving(group_id, place_type):
+def suggestions_driving(event_id, place_type):
     """
-    Get meeting place suggestions based on lowest average travel time for group
+    Get meeting place suggestions based on lowest average travel time for event
     members, driving.
-    :param group_id: group to request suggestions for
+    :param event_id: event to request suggestions for
     :param place_type: type of places
     :return: HTTP response
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    response = suggestions.get_suggestions(request_id, group_id,
+    response = suggestions.get_suggestions(request_id, event_id,
                                            place_type, "driving")
     return jsonify(response["body"]), response["status_code"]
 
 
-@suggestions_bp.route("/suggestions/walk/<int:group_id>:<string:place_type>",
+@suggestions_bp.route("/suggestions/walk/<int:event_id>:<string:place_type>",
                       methods=["GET"])
 @flask_jwt_extended.jwt_required
-def suggestions_walking(group_id, place_type):
+def suggestions_walking(event_id, place_type):
     """
-    Get meeting place suggestions based on lowest average travel time for group
+    Get meeting place suggestions based on lowest average travel time for event
     members, walking.
-    :param group_id: group to request suggestions for
+    :param event_id: event to request suggestions for
     :param place_type: type of places
     :return: HTTP response
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    response = suggestions.get_suggestions(request_id, group_id,
+    response = suggestions.get_suggestions(request_id, event_id,
                                            place_type, "walking")
     return jsonify(response["body"]), response["status_code"]
 
 
-@suggestions_bp.route("/suggestions/cycle/<int:group_id>:<string:place_type>",
+@suggestions_bp.route("/suggestions/cycle/<int:event_id>:<string:place_type>",
                       methods=["GET"])
 @flask_jwt_extended.jwt_required
-def suggestions_bicycling(group_id, place_type):
+def suggestions_bicycling(event_id, place_type):
     """
-    Get meeting place suggestions based on lowest average travel time for group
+    Get meeting place suggestions based on lowest average travel time for event
     members, cycling.
-    :param group_id: group to request suggestions for
+    :param event_id: event to request suggestions for
     :param place_type: type of places
     :return: HTTP response
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    response = suggestions.get_suggestions(request_id, group_id,
+    response = suggestions.get_suggestions(request_id, event_id,
                                            place_type, "bicycling")
     return jsonify(response["body"]), response["status_code"]
