@@ -20,8 +20,8 @@ if db_uri:
 db = SQLAlchemy(app)
 jwt = flask_jwt_extended.JWTManager(app)
 
-from .endpoints import groups_bp, location_bp, user_bp, suggestions_bp
+from .endpoints import events_bp, location_bp, user_bp, suggestions_bp
 app.register_blueprint(user_bp)
-app.register_blueprint(groups_bp)
+app.register_blueprint(events_bp)
 app.register_blueprint(location_bp)
 app.register_blueprint(suggestions_bp)

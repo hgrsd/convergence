@@ -51,34 +51,35 @@ def generate_places(n_places=2500, country_code="GB"):
     db.session.flush()
 
 
-def generate_groups(n_groups=25, total_users=100):
-    print(f"[>] Generating {n_groups} fake groups...")
-    for i in range(n_groups):
-        group = Group()
-        group.id = i
-        group.name = fake.domain_word()
-        group.owner = random.randint(1, total_users)
-        db.session.add(group)
+def generate_events(n_events=25, total_users=100):
+    print(f"[>] Generating {n_events} fake events...")
+    for i in range(n_events):
+        event = Event()
+        event.id = i
+        event.name = fake.domain_word()
+        event.owner = random.randint(1, total_users)
+        event.creation_date = fake.date_time()
+        db.session.add(event)
         db.session.flush()
-        # add owner of group to UserGroup
-        usergroup = UserGroup()
-        usergroup.group_id = group.id
-        usergroup.user_id = group.owner 
-        db.session.add(usergroup)
+        # add owner of event to UserEvent
+        userevent = UserEvent()
+        userevent.event_id = event.id
+        userevent.user_id = event.owner 
+        db.session.add(userevent)
         db.session.flush()
 
 
-def generate_usergroups(n_per_user=2, total_users=100, total_groups=25):
-    print(f"[>] Generating UserGroups, {n_per_user} groups per user for a total of {total_users} users...")
+def generate_userevents(n_per_user=2, total_users=100, total_events=25):
+    print(f"[>] Generating UserEvents, {n_per_user} events per user for a total of {total_users} users...")
     for i in range (total_users):
         for k in range(n_per_user):
-            usergroup = UserGroup()
-            usergroup.user_id = i
-            usergroup.group_id = random.randint(0, total_groups - 1)
-            # check if UserGroup already exists
-            if UserGroup.query.filter_by(user_id=i, group_id=usergroup.group_id).first():
+            userevent = UserEvent()
+            userevent.user_id = i
+            userevent.event_id = random.randint(0, total_events - 1)
+            # check if UserEvent already exists
+            if UserEvent.query.filter_by(user_id=i, event_id=userevent.event_id).first():
                 continue
-            db.session.add(usergroup)
+            db.session.add(userevent)
         db.session.flush()
 
 
@@ -119,8 +120,8 @@ with app.app_context():
     # Use the following testing data generation parameters:
     generate_users(n_users=100, password="testing", country_code="GB")
     generate_places(n_places=2500, country_code="GB")
-    generate_groups(n_groups=25)
-    generate_usergroups(n_per_user=2, total_users=100)
+    generate_events(n_events=25)
+    generate_userevents(n_per_user=2, total_users=100)
 
     print("[+] Generation complete.")
     print("[o] Committing to database.")

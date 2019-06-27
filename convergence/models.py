@@ -35,26 +35,26 @@ class User(db.Model):
                 "available": self.available}
 
 
-class Group(db.Model):
-    __tablename__ = "groups"
+class Event(db.Model):
+    __tablename__ = "events"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128))
     owner = db.Column(db.ForeignKey("users.id", ondelete="CASCADE"),
                       index=True)
-    __table_args__ = (db.UniqueConstraint("name", "owner"),)
+    creation_date = db.Column(db.DateTime)
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
-class UserGroup(db.Model):
-    __tablename__ = "usergroups"
+class UserEvent(db.Model):
+    __tablename__ = "userevents"
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.ForeignKey("users.id", ondelete="CASCADE"),
                         index=True)
-    group_id = db.Column(db.ForeignKey("groups.id", ondelete="CASCADE"),
+    event_id = db.Column(db.ForeignKey("events.id", ondelete="CASCADE"),
                          index=True)
-    __table_args__ = (db.UniqueConstraint("user_id", "group_id"),)
+    __table_args__ = (db.UniqueConstraint("user_id", "event_id"),)
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}

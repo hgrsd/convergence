@@ -1,24 +1,25 @@
 from . import db
-from .models import Group, UserGroup, User
+from .models import Event, UserEvent, User
 from sqlalchemy import exc
 
 
-def create_group(user_id, name):
+def create_event(user_id, name):
     """
-    Create new group.
-    :param user_id: the user creating the group
-    :param name: the name of the new group
+    Create new event.
+    :param user_id: the user creating the event
+    :param name: the name of the new event
     :return: dict object with body and status code
     """
-    group = Group(name=name, owner=user_id)
-    db.session.add(group)
+    event = Event(name=name, owner=user_id)
+    db.session.add(event)
     try:
         db.session.flush()
-    except exc.IntegrityError:
-        return {"body": {"error": {"message": "you already own a group with that name"}},
+    except:
+        db.session.rollback()
+        return {"body": {"error": {"message": "error writing to database"}},
                 "status_code": 400}
-    usergroup = UserGroup(user_id=user_id, group_id=group.id)
-    db.session.add(usergroup)
+    userevent = UserEvent(user_id=user_id, event_id=event.id)
+    db.session.add(userevent)
     try:
         db.session.commit()
     except:
@@ -28,16 +29,16 @@ def create_group(user_id, name):
     return {"body": {"status": "success"}, "status_code": 200}
 
 
-def delete_group(user_id, group_id):
+def delete_event(user_id, event_id):
     """
-    Delete a group.
-    :param user_id: user deleting the group (must be group owner)
-    :param group_id: group to be deleted
+    Delete a event.
+    :param user_id: user deleting the event (must be event owner)
+    :param event_id: event to be deleted
     :return: dict object with body and status code
     """
-    to_delete = Group.query.get(group_id)
+    to_delete = Event.query.get(event_id)
     if not to_delete:
-        return {"body": {"error": {"message": "group does not exist"}},
+        return {"body": {"error": {"message": "event does not exist"}},
                 "status_code": 400}
     if not to_delete.owner == user_id:
         return {"body": {"error": {"message": "permission denied"}},
@@ -52,25 +53,25 @@ def delete_group(user_id, group_id):
     return {"body": {"status": "success"}, "status_code": 200}
 
 
-def add_user_to_group(request_id, user_id, group_id):
+def add_user_to_event(request_id, user_id, event_id):
     """
-    Add user to a group.
-    :param request_id: user requesting operation (must be group owner)
-    :param user_id: user to be added to group
-    :param group_id: group to add user to
+    Add user to a event.
+    :param request_id: user requesting operation (must be event owner)
+    :param user_id: user to be added to event
+    :param event_id: event to add user to
     :return: dict object with body and status code
     """
-    if not Group.query.get(group_id):
-        return {"body": {"error": {"message": "group does not exist"}},
+    if not Event.query.get(event_id):
+        return {"body": {"error": {"message": "event does not exist"}},
                 "status_code": 400}
     if not User.query.get(user_id):
         return {"body": {"error": {"message": "user does not exist"}},
                 "status_code": 400}
-    if not Group.query.get(group_id).owner == request_id:
+    if not Event.query.get(event_id).owner == request_id:
         return {"body": {"error": {"message": "permission denied"}},
                 "status_code": 400}
-    usergroup = UserGroup(user_id=user_id, group_id=group_id)
-    db.session.add(usergroup)
+    userevent = UserEvent(user_id=user_id, event_id=event_id)
+    db.session.add(userevent)
     try:
         db.session.commit()
     except:
@@ -80,20 +81,20 @@ def add_user_to_group(request_id, user_id, group_id):
     return {"body": {"status": "success"}, "status_code": 200}
 
 
-def remove_user_from_group(request_id, user_id, group_id):
+def remove_user_from_event(request_id, user_id, event_id):
     """
-    Delete user from a group.
-    :param request_id: user requesting operation (must be group owner)
-    :param user_id: user to be deleted from group
-    :param group_id: group to delete user from
+    Delete user from a event.
+    :param request_id: user requesting operation (must be event owner)
+    :param user_id: user to be deleted from event
+    :param event_id: event to delete user from
     :return: dict object with body and status code
     """
-    to_delete = UserGroup.query.filter_by(user_id=user_id, group_id=group_id) \
+    to_delete = UserEvent.query.filter_by(user_id=user_id, event_id=event_id) \
                                .first()
     if not to_delete:
-        return {"body": {"error": {"message": "invalid group or member"}},
+        return {"body": {"error": {"message": "invalid event or member"}},
                 "status_code": 400}
-    if not Group.query.get(group_id).owner == request_id:
+    if not Event.query.get(event_id).owner == request_id:
         return {"body": {"error": {"message": "permission denied"}},
                 "status_code": 400}
     db.session.delete(to_delete)
@@ -106,19 +107,19 @@ def remove_user_from_group(request_id, user_id, group_id):
     return {"status": "success"}, 200
 
 
-def get_members(request_id, group_id):
+def get_members(request_id, event_id):
     """
-    Get members from group
-    :param request_id: user requesting operation (must be group member)
-    :param group_id: group of which members are requested
+    Get members from event
+    :param request_id: user requesting operation (must be event member)
+    :param event_id: event of which members are requested
     :return: dict object with body and status code
     """
-    if not UserGroup.query.filter_by(user_id=request_id, group_id=group_id):
+    if not UserEvent.query.filter_by(user_id=request_id, event_id=event_id).first():
         return {"body": {"error": {"message": "access denied"}},
                 "status_code": 400}
     users = db.session.query(User) \
-                      .join(UserGroup, User.id == UserGroup.user_id) \
-                      .filter(UserGroup.group_id == group_id) \
+                      .join(UserEvent, User.id == UserEvent.user_id) \
+                      .filter(UserEvent.event_id == event_id) \
                       .all()
     if not users:
         return {"body": {"status": "success", "data": []},
@@ -128,35 +129,35 @@ def get_members(request_id, group_id):
             "status_code": 200}
 
 
-def get_owned_groups(user_id):
+def get_owned_events(user_id):
     """
-    Get groups owned by user_id
+    Get events owned by user_id
     :param user_id: user requesting operation
-    :return list of groups (as dict) owned by user_id
+    :return list of events (as dict) owned by user_id
     """
-    groups_owned = Group.query.filter_by(owner=user_id).all()
-    if not groups_owned:
+    events_owned = Event.query.filter_by(owner=user_id).all()
+    if not events_owned:
         return {"body": {"status": "success", "data": []}, "status_code": 200}
     else:
         return {"body": {"status": "success",
-                "data": [group.as_dict() for group in groups_owned]},
+                "data": [event.as_dict() for event in events_owned]},
                 "status_code": 200}
 
 
-def get_available_members(request_id, group_id):
+def get_available_members(request_id, event_id):
     """
-    Get available members from group
-    :param request_id: user requesting operation (must be group member)
-    :param group_id: group of which members are requested
+    Get available members from event
+    :param request_id: user requesting operation (must be event member)
+    :param event_id: event of which members are requested
     :return: dict object with body and status code
     """
-    if not UserGroup.query.filter_by(user_id=request_id, group_id=group_id):
+    if not UserEvent.query.filter_by(user_id=request_id, event_id=event_id).first():
         return {"body": {"error": {"message": "access denied"}},
                 "status_code": 400}
     users = db.session.query(User) \
-                      .join(UserGroup, User.id == UserGroup.user_id) \
-                      .filter(UserGroup.group_id == group_id,
-                              User.available is True) \
+                      .join(UserEvent, User.id == UserEvent.user_id) \
+                      .filter(UserEvent.event_id == event_id,
+                              User.available == True) \
                       .all()
     if not users:
         return {"body": {"status": "success", "data": []},
@@ -166,19 +167,19 @@ def get_available_members(request_id, group_id):
             "status_code": 200}
 
 
-def get_groups(user_id):
+def get_events(user_id):
     """
-    Get groups of which user is a member.
+    Get events of which user is a member.
     :param user_id: user requesting operation
     :return: dict object with body and status code
     """
-    groups = db.session.query(Group) \
-                       .join(UserGroup, Group.id == UserGroup.group_id) \
-                       .filter(UserGroup.user_id == user_id) \
+    events = db.session.query(Event) \
+                       .join(UserEvent, Event.id == UserEvent.event_id) \
+                       .filter(UserEvent.user_id == user_id) \
                        .all()
-    if not groups:
-        return {"body": {"status": "success", "data": {"groups": []}},
+    if not events:
+        return {"body": {"status": "success", "data": {"events": []}},
                 "status_code": 200}
     return {"body": {"status": "success",
-            "data": [group.as_dict() for group in groups]},
+            "data": [event.as_dict() for event in events]},
             "status_code": 200}
