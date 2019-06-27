@@ -5,7 +5,7 @@ body, html {
 }
 
 .absolute-fill {
-	position: absolute;;
+	position: absolute;
 	top: 0;
 	right: 0;
 	bottom: 0;
@@ -16,41 +16,40 @@ body, html {
 	z-index: 1;
 	transition: all .5s;
 	pointer-events: none;
-}
 
-.view.prev {
-	opacity: 0;
-	transform: translateX(-50%);
-}
+	&.prev {
+		opacity: 0;
+		transform: translateX(-50%);
+	}
 
-.view.next {
-	opacity: 0;
-	transform: translateX(50%);
-}
+	&.next {
+		opacity: 0;
+		transform: translateX(50%);
+	}
 
-.view.active {
-	opacity: 1;
-	z-index: 2;
-	transform: translateX(0%);
-}
+	&.active {
+		opacity: 1;
+		z-index: 2;
+		transform: translateX(0%);
+	}
 
-.view .view-content {
-	pointer-events: auto;
+	.view-content {
+		pointer-events: auto;
+	}
 }
 
 .navbar {
 	opacity: 0;
 	transition: opacity .5s;
 	z-index: 3;
-}
 
-.navbar.active {
-	opacity: 1;
+	&.active {
+		opacity: 1;
+	}
 }
 
 .navbar-light .navbar-nav .nav-item>.nav-link {
 	min-width: 100px;
-	
 }
 
 #map-underlay {
