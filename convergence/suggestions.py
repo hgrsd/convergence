@@ -16,21 +16,19 @@ def get_suggestions(request_id, event_id, place_type, suggestions_mode):
     :return: tuple(object with suggestions / status message, status code)
     """
     event_members = get_available_members(request_id, event_id)["body"]["data"]
-    user_coordinates = [User.query.get(member["id"]).get_location() for member in event_members]
+    user_coordinates = [User.query.get(member["id"]).get_location()
+                        for member in event_members]
     centroid = find_centroid(user_coordinates)
     dist_from_centroid = mean_dist_from_centroid(user_coordinates, centroid)
     radius = int(dist_from_centroid / 4)
     places = get_places_around_centroid(centroid, radius, place_type)
     places = sift_places_by_rating(places)
     if not places:
-        return {"body": {"status": "success", "data": []}, "status_code": 200}
+        return []
     if suggestions_mode == "distance":
         ordered_places = order_places_by_distance(user_coordinates, places)
     else:
         ordered_places = order_places_by_travel_time(user_coordinates,
                                                      places,
                                                      suggestions_mode)
-    return {"body": {"status": "success", "data": ordered_places}, 
-            "status_code": 200}
-
-
+    return ordered_places

@@ -1,9 +1,10 @@
 import requests
 import time
 import math
-
 from urllib.parse import quote
+
 from . import app
+from .exceptions import ServerError
 
 GM_PLACES_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/" \
                 "json?location={:f},{:f}&radius={:d}&type={:s}&key={:s}"
@@ -26,6 +27,8 @@ def places_around_point(point, radius, place_type):
                                         radius, place_type,
                                         GM_API_KEY)
     response = requests.get(init_request).json()
+    if not response:
+        raise ServerError("Unable to reach Google Maps API (Places).")
     places = _json_extract_places(response)
     while "next_page_token" in response:
         time.sleep(1.5)
@@ -68,6 +71,8 @@ def distance_matrix(origins, destinations, mode):
                                             mode,
                                             GM_API_KEY)
         response = requests.get(request).json()
+        if not response:
+            raise ServerError("Unable to reach Google Maps API (Distance Matrix).")
         for i, row in enumerate(response["rows"]):
             if not matrix[i]:
                 matrix[i] = row["elements"]

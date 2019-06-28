@@ -3,10 +3,11 @@ convergence-server
 A REStful API service that helps you find the ideal place to meet.
 """
 
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 import flask_jwt_extended
 import os
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+
 
 app = Flask(__name__, instance_relative_config=True, static_url_path="/static")
 app.config.from_object("config")
@@ -20,8 +21,8 @@ if db_uri:
 db = SQLAlchemy(app)
 jwt = flask_jwt_extended.JWTManager(app)
 
-from .endpoints import events_bp, location_bp, user_bp, suggestions_bp
-app.register_blueprint(user_bp)
-app.register_blueprint(events_bp)
-app.register_blueprint(location_bp)
-app.register_blueprint(suggestions_bp)
+from . import endpoints
+from . import error_handling
+app.register_blueprint(endpoints.user_bp)
+app.register_blueprint(endpoints.events_bp)
+app.register_blueprint(endpoints.suggestions_bp)

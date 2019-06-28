@@ -19,7 +19,8 @@ def get_places_around_centroid(point, radius, place_type):
     :return: list of places (as dicts)
     """
     places_query = Place.query.filter(Place.within_range(point, radius))
-    places = [place.as_dict() for place in places_query if place_type in place.gm_types]
+    places = [place.as_dict() for place in places_query
+              if place_type in place.gm_types]
     if len(places) < 0.25 * MAX_PLACES:
         places = gmaps_api.places_around_point(point, radius, place_type)
         for place in places:
@@ -47,7 +48,8 @@ def order_places_by_distance(user_coordinates, places):
     :return: list of places (as dicts) in ascending order, with travel_total
             added as key for each place
     """
-    places_coordinates = [Point(place["lat"], place["long"]) for place in places]
+    places_coordinates = [Point(place["lat"], place["long"])
+                          for place in places]
     for place in places:
         place["travel_total"] = 0
     for user in user_coordinates:

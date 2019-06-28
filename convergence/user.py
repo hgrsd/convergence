@@ -1,8 +1,10 @@
-from flask import g
-import flask_jwt_extended
 from sqlalchemy import exc
+
+from . import location
 from . import db
 from .models import User
+from .exceptions import InvalidLogin, AccountDetailsError, UserNotFound, \
+                        DatabaseError, InvalidLocation
 
 
 def login(username, password):
@@ -10,16 +12,10 @@ def login(username, password):
     Login user
     :return dict object with body and status code
     """
-    if not username or not password:
-        return {"body": {"error": {"message": "please enter username and password"}},
-                "status_code": 400}
     user = User.query.filter_by(username=username).first()
     if not user or not user.verify_password(password):
-        return {"body": {"error": {"message": "invalid username or password"}},
-                "status_code": 400}
-    access_token = flask_jwt_extended.create_access_token(identity=user.id)
-    return {"body": {"access_token": access_token, "id": user.id},
-            "status_code": 200}
+        raise InvalidLogin("Incorrect username or password.")
+    return user.id
 
 
 def get_info(user_id):
@@ -28,7 +24,9 @@ def get_info(user_id):
     :return dict object with body and status code
     """
     user = User.query.get(user_id)
-    return {"body": user.full_info(), "status_code": 200}
+    if not user:
+        raise UserNotFound("Invalid user id.")
+    return user.full_info()
 
 
 def register_user(username, password):
@@ -37,8 +35,7 @@ def register_user(username, password):
     :return dict object with body and status code
     """
     if not username.isalnum():
-        return {"body": {"error": {"message": "username contains non-alphanumeric characters"}},
-                "status_code": 400}
+        raise AccountDetailsError("Username must be alphanumeric.")
     user = User(username=username, available=False)
     user.hash_password(password)
     db.session.add(user)
@@ -46,10 +43,8 @@ def register_user(username, password):
         db.session.commit()
     except exc.IntegrityError:
         db.session.rollback()
-        return {"body": {"error": {"message": "username exists already"}},
-                "status_code": 400}
-    return {"body": {"status": "success", "user_id": user.id},
-            "status_code": 200}
+        raise AccountDetailsError("Username exists already.")
+    return user.full_info()
 
 
 def delete_user(user_id):
@@ -59,17 +54,13 @@ def delete_user(user_id):
     """
     user = User.query.get(user_id)
     if not user:
-        return {"body": {"error": {"message": "invalid user id"}},
-                "status_code": 400}
+        raise UserNotFound("Invalid user id.")
     db.session.delete(user)
     try:
         db.session.commit()
     except:
         db.session.rollback()
-        return {"body": {"error": {"message": "error writing to database"}},
-                "status_code": 400}
-    return {"body": {"status": "success"},
-            "status_code": 200}
+        raise DatabaseError("Error writing to database.")
 
 
 def find_user(username):
@@ -79,11 +70,9 @@ def find_user(username):
     """
     user = User.query.filter_by(username=username).first()
     if not user:
-        return {"body": {"error": {"message": "username not found"}},
-                "status_code": 404}
+        return []
     else:
-        return {"body": {"status": "success", "data": user.basic_info()},
-                "status_code": 200}
+        return user.basic_info()
 
 
 def set_availability(user_id, availability):
@@ -100,6 +89,27 @@ def set_availability(user_id, availability):
         db.session.commit()
     except:
         db.session.rollback()
-        return {"body": {"error": {"message": "error updating database"}},
-                "status_code": 400}
-    return {"body": {"status": "success"}, "status_code": 200}
+        raise DatabaseError("Error writing to database.")
+    return user.full_info()
+
+
+def update_location(user_id, lat, long):
+    """
+    Update user location in database
+    :param user_id: user to update
+    :param lat: new latitude
+    :param long: new longitude
+    :return: tuple(status message, status code)
+    """
+    if (lat < location.MIN_LAT or lat > location.MAX_LAT
+            or long < location.MIN_LON or long > location.MAX_LON):
+        raise InvalidLocation("Invalid coordinates.")
+    user = User.query.filter_by(id=user_id).first()
+    user.last_seen_lat, user.last_seen_long = lat, long
+    db.session.add(user)
+    try:
+        db.session.commit()
+    except:
+        db.session.rollback()
+        raise DatabaseError("Error writing to database.")
+    return user.full_info()
