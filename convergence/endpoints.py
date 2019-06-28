@@ -1,6 +1,7 @@
-from flask import Blueprint, jsonify, request
 import flask_jwt_extended
-from . import events, location, user, suggestions
+from flask import Blueprint, jsonify, request
+
+from . import events, user, suggestions
 from . import app
 
 user_bp = Blueprint("user", __name__)
@@ -25,8 +26,8 @@ def register_user():
     """
     username = request.get_json()["username"]
     password = request.get_json()["password"]
-    response = user.register_user(username, password)
-    return jsonify(response["body"]), response["status_code"]
+    result = user.register_user(username, password)
+    return jsonify({"data": result}), 200
 
 
 @user_bp.route("/user/login",
@@ -35,23 +36,18 @@ def login():
     """
     Login user
     :return: HTTP response
-    """
-    username = request.get_json()["username"]
-    password = request.get_json()["password"]
 
-    login_result = user.login(username, password)
-    access_token = login_result["body"]["access_token"]
-
-    response = jsonify(login_result["body"])
-    """
     TODO: separate cookie-based JWT storage and response-based one.
     For security reasons, web app is not supposed to have direct access
     to the JWT and CSRF tokens.
     """
-    if access_token is not None:
-        flask_jwt_extended.set_access_cookies(response, access_token)
-
-    return response, login_result["status_code"]
+    username = request.get_json()["username"]
+    password = request.get_json()["password"]
+    user_id = user.login(username, password)
+    access_token = flask_jwt_extended.create_access_token(identity=user_id)
+    response = jsonify({"success": True})
+    flask_jwt_extended.set_access_cookies(response, access_token)
+    return response, 200
 
 
 @user_bp.route("/user",
@@ -63,8 +59,8 @@ def delete_user():
     :return: HTTP response
     """
     user_id = flask_jwt_extended.get_jwt_identity()
-    response = user.delete_user(user_id)
-    return jsonify(response["body"]), response["status_code"]
+    user.delete_user(user_id)
+    return jsonify({"success": True}), 200
 
 
 @user_bp.route("/user",
@@ -76,8 +72,8 @@ def get_user_info():
     :return: HTTP response
     """
     user_id = flask_jwt_extended.get_jwt_identity()
-    response = user.get_info(user_id)
-    return jsonify(response["body"]), response["status_code"]
+    result = user.get_info(user_id)
+    return jsonify({"data": result}), 200
 
 
 @user_bp.route("/user/<string:username>",
@@ -88,8 +84,8 @@ def find_user(username):
     Find user info by username
     :return: HTTP response
     """
-    response = user.find_user(username)
-    return jsonify(response["body"]), response["status_code"]
+    result = user.find_user(username)
+    return jsonify({"data": result}), 200
 
 
 @user_bp.route("/user/availability/<int:available>",
@@ -102,13 +98,12 @@ def set_availability(available):
     :return: HTTP response
     """
     user_id = flask_jwt_extended.get_jwt_identity()
-    response = user.set_availability(user_id, bool(available))
-    return jsonify(response["body"]), response["status_code"]
+    result = user.set_availability(user_id, bool(available))
+    return jsonify({"data": result}), 200
 
 
-# -- location endpoints:
-@location_bp.route("/loc/<float:lat>:<float:long>",
-                   methods=["PUT"])
+@user_bp.route("/user/location/<float:lat>:<float:long>",
+               methods=["PUT"])
 @flask_jwt_extended.jwt_required
 def update_location(lat, long):
     """
@@ -118,8 +113,8 @@ def update_location(lat, long):
     :return: HTTP response
     """
     user_id = flask_jwt_extended.get_jwt_identity()
-    response = location.update_location(user_id, lat, long)
-    return jsonify(response["body"]), response["status_code"]
+    result = user.update_location(user_id, lat, long)
+    return jsonify({"data": result}), 200
 
 
 # -- event endpoints:
@@ -133,8 +128,8 @@ def create_event(name):
     :return: HTTP response
     """
     user_id = flask_jwt_extended.get_jwt_identity()
-    response = events.create_event(user_id, name)
-    return jsonify(response["body"]), response["status_code"]
+    result = events.create_event(user_id, name)
+    return jsonify({"data": result}), 200
 
 
 @events_bp.route("/events/<int:event_id>",
@@ -147,8 +142,8 @@ def delete_event(event_id):
     :return: HTTP response
     """
     user_id = flask_jwt_extended.get_jwt_identity()
-    response = events.delete_event(user_id, event_id)
-    return jsonify(response["body"]), response["status_code"]
+    events.delete_event(user_id, event_id)
+    return jsonify({"success": True}), 200
 
 
 @events_bp.route("/events/owned",
@@ -160,8 +155,8 @@ def owned_events():
     :return: HTTP response
     """
     user_id = flask_jwt_extended.get_jwt_identity()
-    response = events.get_owned_events(user_id)
-    return jsonify(response["body"]), response["status_code"]
+    result = events.get_owned_events(user_id)
+    return jsonify({"data": result}), 200
 
 
 @events_bp.route("/events/user_event/<int:event_id>:<int:user_id>",
@@ -175,8 +170,8 @@ def add_user_to_event(event_id, user_id):
     :return: HTTP response
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    response = events.add_user_to_event(request_id, user_id, event_id)
-    return jsonify(response["body"]), response["status_code"]
+    events.add_user_to_event(request_id, user_id, event_id)
+    return jsonify({"success": True}), 200
 
 
 @events_bp.route("/events/user_event/<int:event_id>:<int:user_id>",
@@ -190,8 +185,8 @@ def remove_user_from_event(event_id, user_id):
     :return: HTTP response
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    response = events.remove_user_from_event(request_id, user_id, event_id)
-    return jsonify(response["body"]), response["status_code"]
+    events.remove_user_from_event(request_id, user_id, event_id)
+    return jsonify({"success": True}), 200
 
 
 @events_bp.route("/events/<int:event_id>:<int:available>",
@@ -206,11 +201,10 @@ def get_members(event_id, available):
     """
     user_id = flask_jwt_extended.get_jwt_identity()
     if available == 1:
-        response = events.get_available_members(user_id, event_id)
+        result = events.get_available_members(user_id, event_id)
     else:
-        response = events.get_members(user_id, event_id)
-    return jsonify(response["body"]), response["status_code"]
-
+        result = events.get_members(user_id, event_id)
+    return jsonify({"data": result}), 200
 
 @events_bp.route("/events",
                  methods=["GET"])
@@ -221,9 +215,8 @@ def get_events():
     :return: HTTP response
     """
     user_id = flask_jwt_extended.get_jwt_identity()
-    response = events.get_events(user_id)
-    return jsonify(response["body"]), response["status_code"]
-
+    result = events.get_events(user_id)
+    return jsonify({"data": result}), 200
 
 # -- suggestions endpoints:
 @suggestions_bp.route("/suggestions/distance/<int:event_id>:<string:place_type>",
@@ -238,10 +231,9 @@ def suggestions_distance(event_id, place_type):
     :return: HTTP response
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    response = suggestions.get_suggestions(request_id, event_id,
-                                           place_type, "distance")
-    return jsonify(response["body"]), response["status_code"]
-
+    result = suggestions.get_suggestions(request_id, event_id,
+                                         place_type, "distance")
+    return jsonify({"data": result}), 200
 
 @suggestions_bp.route("/suggestions/transit/<int:event_id>:<string:place_type>",
                       methods=["GET"])
@@ -255,10 +247,9 @@ def suggestions_transit(event_id, place_type):
     :return: HTTP response
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    response = suggestions.get_suggestions(request_id, event_id,
-                                           place_type, "transit")
-    return jsonify(response["body"]), response["status_code"]
-
+    result = suggestions.get_suggestions(request_id, event_id,
+                                         place_type, "transit")
+    return jsonify({"data": result}), 200
 
 @suggestions_bp.route("/suggestions/drive/<int:event_id>:<string:place_type>",
                       methods=["GET"])
@@ -272,10 +263,9 @@ def suggestions_driving(event_id, place_type):
     :return: HTTP response
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    response = suggestions.get_suggestions(request_id, event_id,
-                                           place_type, "driving")
-    return jsonify(response["body"]), response["status_code"]
-
+    result = suggestions.get_suggestions(request_id, event_id,
+                                         place_type, "driving")
+    return jsonify({"data": result}), 200
 
 @suggestions_bp.route("/suggestions/walk/<int:event_id>:<string:place_type>",
                       methods=["GET"])
@@ -289,10 +279,9 @@ def suggestions_walking(event_id, place_type):
     :return: HTTP response
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    response = suggestions.get_suggestions(request_id, event_id,
-                                           place_type, "walking")
-    return jsonify(response["body"]), response["status_code"]
-
+    result = suggestions.get_suggestions(request_id, event_id,
+                                         place_type, "walking")
+    return jsonify({"data": result}), 200
 
 @suggestions_bp.route("/suggestions/cycle/<int:event_id>:<string:place_type>",
                       methods=["GET"])
@@ -306,6 +295,6 @@ def suggestions_bicycling(event_id, place_type):
     :return: HTTP response
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    response = suggestions.get_suggestions(request_id, event_id,
-                                           place_type, "bicycling")
-    return jsonify(response["body"]), response["status_code"]
+    result = suggestions.get_suggestions(request_id, event_id,
+                                         place_type, "bicycling")
+    return jsonify({"data": result}), 200

@@ -1,9 +1,10 @@
-from . import db
-from .point import Point
 import math
 from passlib.apps import custom_app_context as pwd_context
 from sqlalchemy.ext.hybrid import hybrid_method
 from sqlalchemy import func
+
+from . import db
+from .point import Point
 
 
 class User(db.Model):

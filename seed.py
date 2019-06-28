@@ -1,6 +1,6 @@
 """ -- seed.py
 
-Seeds database for testing purposes using Faker library to generate data. 
+Seeds database for testing purposes using Faker library to generate data.
 
 Use: seed.py <db_name> <seed>
 
@@ -19,14 +19,12 @@ import sys
 import faker
 import random
 from flask_migrate import Migrate, migrate, upgrade, init
-from sqlalchemy import exc
 
 
 def generate_users(n_users=100, password="testing", country_code="GB"):
     print(f"[>] Generating {n_users} fake users, using country code {country_code}...")
     for i in range(n_users):
         user = User()
-        user.id = i 
         user.username = fake.user_name()
         user.hash_password(password)
         user.available = random.choice([False, True])
@@ -55,29 +53,28 @@ def generate_events(n_events=25, total_users=100):
     print(f"[>] Generating {n_events} fake events...")
     for i in range(n_events):
         event = Event()
-        event.id = i
         event.name = fake.domain_word()
-        event.owner = random.randint(1, total_users)
+        event.owner = random.choice(User.query.all()).id
         event.creation_date = fake.date_time()
         db.session.add(event)
         db.session.flush()
         # add owner of event to UserEvent
         userevent = UserEvent()
         userevent.event_id = event.id
-        userevent.user_id = event.owner 
+        userevent.user_id = event.owner
         db.session.add(userevent)
         db.session.flush()
 
 
 def generate_userevents(n_per_user=2, total_users=100, total_events=25):
     print(f"[>] Generating UserEvents, {n_per_user} events per user for a total of {total_users} users...")
-    for i in range (total_users):
+    for user in User.query.all():
         for k in range(n_per_user):
             userevent = UserEvent()
-            userevent.user_id = i
-            userevent.event_id = random.randint(0, total_events - 1)
+            userevent.user_id = user.id
+            userevent.event_id = random.choice(Event.query.all()).id
             # check if UserEvent already exists
-            if UserEvent.query.filter_by(user_id=i, event_id=userevent.event_id).first():
+            if UserEvent.query.filter_by(user_id=user.id, event_id=userevent.event_id).first():
                 continue
             db.session.add(userevent)
         db.session.flush()

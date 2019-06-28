@@ -1,0 +1,46 @@
+from flask import jsonify
+
+from . import exceptions
+from . import app
+
+
+@app.errorhandler(exceptions.LocationError)
+def location_error(error):
+    return jsonify({"error": {"type": type(error).__name__,
+                              "message": error.message}}), 400
+
+
+@app.errorhandler(exceptions.LoginError)
+def login_error(error):
+    return jsonify({"error": {"type": type(error).__name__,
+                              "message": error.message}}), 401
+
+
+@app.errorhandler(exceptions.AccountError)
+def username_error(error):
+    return jsonify({"error": {"type": type(error).__name__,
+                              "message": error.message}}), 400
+
+
+@app.errorhandler(exceptions.PermissionError)
+def permission_error(error):
+    return jsonify({"error": {"type": type(error).__name__,
+                              "message": error.message}}), 401
+
+
+@app.errorhandler(exceptions.NotFoundError)
+def not_found_error(error):
+    return jsonify({"error": {"type": type(error).__name__,
+                              "message": error.message}}), 404
+
+
+@app.errorhandler(exceptions.ServerError)
+def server_error(error):
+    return jsonify({"error": {"type": type(error).__name__,
+                              "message": error.message}}), 500
+
+
+@app.errorhandler(exceptions.DatabaseError)
+def database_error(error):
+    return jsonify({"error": {"type": type(error).__name__,
+                              "message": error.message}}), 500

@@ -3,7 +3,6 @@ import math
 
 class Point:
     """ Point class, used for coordinates"""
-
     def __init__(self, lat, long):
         self.lat = lat
         self.long = long

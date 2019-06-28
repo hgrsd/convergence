@@ -1,6 +1,10 @@
+import datetime
+
+from sqlalchemy.exc import IntegrityError
+
 from . import db
 from .models import Event, UserEvent, User
-from sqlalchemy import exc
+from .exceptions import DatabaseError, PermissionError, NotFoundError
 
 
 def create_event(user_id, name):
@@ -10,23 +14,23 @@ def create_event(user_id, name):
     :param name: the name of the new event
     :return: dict object with body and status code
     """
-    event = Event(name=name, owner=user_id)
+    event = Event(name=name, owner=user_id,
+                  creation_date=datetime.datetime.utcnow())
     db.session.add(event)
     try:
         db.session.flush()
-    except:
+    except IntegrityError:
         db.session.rollback()
-        return {"body": {"error": {"message": "error writing to database"}},
-                "status_code": 400}
+        raise DatabaseError("Error writing to database.")
     userevent = UserEvent(user_id=user_id, event_id=event.id)
     db.session.add(userevent)
     try:
         db.session.commit()
-    except:
+    except IntegrityError as e:
+        print(e._message)
         db.session.rollback()
-        return {"body": {"error": {"message": "error writing to database"}},
-                "status_code": 400}
-    return {"body": {"status": "success"}, "status_code": 200}
+        raise DatabaseError("Error writing to database.")
+    return event.as_dict()
 
 
 def delete_event(user_id, event_id):
@@ -38,19 +42,15 @@ def delete_event(user_id, event_id):
     """
     to_delete = Event.query.get(event_id)
     if not to_delete:
-        return {"body": {"error": {"message": "event does not exist"}},
-                "status_code": 400}
+        raise NotFoundError("Invalid event id.")
     if not to_delete.owner == user_id:
-        return {"body": {"error": {"message": "permission denied"}},
-                "status_code": 400}
+        raise PermissionError("Permission denied. Must be event owner.")
     db.session.delete(to_delete)
     try:
         db.session.commit()
     except:
         db.session.rollback()
-        return {"body": {"error": {"message": "error writing to database"}},
-                "status_code": 400}
-    return {"body": {"status": "success"}, "status_code": 200}
+        raise DatabaseError("Error writing to database.")
 
 
 def add_user_to_event(request_id, user_id, event_id):
@@ -61,24 +61,20 @@ def add_user_to_event(request_id, user_id, event_id):
     :param event_id: event to add user to
     :return: dict object with body and status code
     """
-    if not Event.query.get(event_id):
-        return {"body": {"error": {"message": "event does not exist"}},
-                "status_code": 400}
+    event = Event.query.get(event_id)
+    if not event:
+        raise NotFoundError("Invalid event id.")
     if not User.query.get(user_id):
-        return {"body": {"error": {"message": "user does not exist"}},
-                "status_code": 400}
-    if not Event.query.get(event_id).owner == request_id:
-        return {"body": {"error": {"message": "permission denied"}},
-                "status_code": 400}
+        raise NotFoundError("Invalid user id.")
+    if not event.owner == request_id:
+        raise PermissionError("Permission denied. Must be event owner.")
     userevent = UserEvent(user_id=user_id, event_id=event_id)
     db.session.add(userevent)
     try:
         db.session.commit()
     except:
         db.session.rollback()
-        return {"body": {"error": {"message": "error writing to database"}},
-                "status_code": 400}
-    return {"body": {"status": "success"}, "status_code": 200}
+        raise DatabaseError("Error writing to database.")
 
 
 def remove_user_from_event(request_id, user_id, event_id):
@@ -92,19 +88,15 @@ def remove_user_from_event(request_id, user_id, event_id):
     to_delete = UserEvent.query.filter_by(user_id=user_id, event_id=event_id) \
                                .first()
     if not to_delete:
-        return {"body": {"error": {"message": "invalid event or member"}},
-                "status_code": 400}
+        raise NotFoundError("Invalid group id or user id.")
     if not Event.query.get(event_id).owner == request_id:
-        return {"body": {"error": {"message": "permission denied"}},
-                "status_code": 400}
+        raise PermissionError("Permission denied. Must be event owner.")
     db.session.delete(to_delete)
     try:
         db.session.commit()
     except:
         db.session.rollback()
-        return {"body": {"error": {"message": "error writing to database"}},
-                "status_code": 400}
-    return {"status": "success"}, 200
+        raise DatabaseError("Error writing to database.")
 
 
 def get_members(request_id, event_id):
@@ -115,18 +107,14 @@ def get_members(request_id, event_id):
     :return: dict object with body and status code
     """
     if not UserEvent.query.filter_by(user_id=request_id, event_id=event_id).first():
-        return {"body": {"error": {"message": "access denied"}},
-                "status_code": 400}
+        raise PermissionError("Permission denied. Must be event member.")
     users = db.session.query(User) \
                       .join(UserEvent, User.id == UserEvent.user_id) \
                       .filter(UserEvent.event_id == event_id) \
                       .all()
     if not users:
-        return {"body": {"status": "success", "data": []},
-                "status_code": 200}
-    return {"body": {"status": "success",
-            "data": [user.basic_info() for user in users]},
-            "status_code": 200}
+        return []
+    return [user.basic_info() for user in users]
 
 
 def get_owned_events(user_id):
@@ -137,11 +125,9 @@ def get_owned_events(user_id):
     """
     events_owned = Event.query.filter_by(owner=user_id).all()
     if not events_owned:
-        return {"body": {"status": "success", "data": []}, "status_code": 200}
+        return []
     else:
-        return {"body": {"status": "success",
-                "data": [event.as_dict() for event in events_owned]},
-                "status_code": 200}
+        return [event.as_dict() for event in events_owned]
 
 
 def get_available_members(request_id, event_id):
@@ -152,19 +138,15 @@ def get_available_members(request_id, event_id):
     :return: dict object with body and status code
     """
     if not UserEvent.query.filter_by(user_id=request_id, event_id=event_id).first():
-        return {"body": {"error": {"message": "access denied"}},
-                "status_code": 400}
+        raise PermissionError("Permission denied. Must be event member.")
     users = db.session.query(User) \
                       .join(UserEvent, User.id == UserEvent.user_id) \
                       .filter(UserEvent.event_id == event_id,
                               User.available == True) \
                       .all()
     if not users:
-        return {"body": {"status": "success", "data": []},
-                "status_code": 200}
-    return {"body": {"status": "success",
-            "data": [user.basic_info() for user in users]},
-            "status_code": 200}
+        return []
+    return [user.basic_info() for user in users]
 
 
 def get_events(user_id):
@@ -178,8 +160,5 @@ def get_events(user_id):
                        .filter(UserEvent.user_id == user_id) \
                        .all()
     if not events:
-        return {"body": {"status": "success", "data": {"events": []}},
-                "status_code": 200}
-    return {"body": {"status": "success",
-            "data": [event.as_dict() for event in events]},
-            "status_code": 200}
+        return []
+    return [event.as_dict() for event in events]
