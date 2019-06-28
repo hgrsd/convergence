@@ -6,7 +6,6 @@ header = ""
 def main():
     session = requests.Session()
     login(session)
-    print(session.cookies)
     while True:
         mode = input("Menu:\n\t[u]ser\n\t[e]vents\n\t[s]uggestions\n\t[q]uit\n\n> ")
         if mode == "q":
