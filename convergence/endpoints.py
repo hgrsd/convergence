@@ -38,8 +38,20 @@ def login():
     """
     username = request.get_json()["username"]
     password = request.get_json()["password"]
-    response = user.login(username, password)
-    return jsonify(response["body"]), response["status_code"]
+
+    login_result = user.login(username, password)
+    access_token = login_result["body"]["access_token"]
+
+    response = jsonify(login_result["body"])
+    """
+    TODO: separate cookie-based JWT storage and response-based one.
+    For security reasons, web app is not supposed to have direct access
+    to the JWT and CSRF tokens.
+    """
+    if access_token is not None:
+        flask_jwt_extended.set_access_cookies(response, access_token)
+
+    return response, login_result["status_code"]
 
 
 @user_bp.route("/user",

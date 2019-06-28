@@ -10,15 +10,15 @@ export class ConvergenceService {
 	}
 
 	login(username, password) {
-		// temporary workaround for a lack of auth endpoint
-		// TODO: switch to proper auth when #17 is done
 		return ajax({
-			url: "/groups",
-			method: "GET",
+			url: "/user/login",
+			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
-				"Authorization": "Basic " + btoa(username + ":" + password),
-				"X-Requested-With": "XMLHttpRequest"
+			},
+			body: {
+				username,
+				password
 			}
 		});
 	}
