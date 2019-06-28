@@ -27,7 +27,7 @@ def register_user():
     username = request.get_json()["username"]
     password = request.get_json()["password"]
     result = user.register_user(username, password)
-    return jsonify({"status": "success", "data": result}), 200
+    return jsonify({"data": result}), 200
 
 
 @user_bp.route("/user/login",
@@ -46,7 +46,7 @@ def login():
     user_id = user.login(username, password)
     access_token = flask_jwt_extended.create_access_token(identity=user_id)
 
-    response = jsonify({"status": "success"})
+    response = jsonify({"success": True})
     flask_jwt_extended.set_access_cookies(response, access_token)
 
     return response, 200
@@ -62,7 +62,7 @@ def delete_user():
     """
     user_id = flask_jwt_extended.get_jwt_identity()
     user.delete_user(user_id)
-    return jsonify({"status": "success"}), 200
+    return jsonify({"success": True}), 200
 
 
 @user_bp.route("/user",
@@ -75,7 +75,7 @@ def get_user_info():
     """
     user_id = flask_jwt_extended.get_jwt_identity()
     result = user.get_info(user_id)
-    return jsonify({"status": "success", "data": result}), 200
+    return jsonify({"data": result}), 200
 
 
 @user_bp.route("/user/<string:username>",
@@ -87,7 +87,7 @@ def find_user(username):
     :return: HTTP response
     """
     result = user.find_user(username)
-    return jsonify({"status": "success", "data": result}), 200
+    return jsonify({"data": result}), 200
 
 
 @user_bp.route("/user/availability/<int:available>",
@@ -101,7 +101,7 @@ def set_availability(available):
     """
     user_id = flask_jwt_extended.get_jwt_identity()
     result = user.set_availability(user_id, bool(available))
-    return jsonify({"status": "success", "data": result}), 200
+    return jsonify({"data": result}), 200
 
 
 @user_bp.route("/user/location/<float:lat>:<float:long>",
@@ -116,7 +116,7 @@ def update_location(lat, long):
     """
     user_id = flask_jwt_extended.get_jwt_identity()
     result = user.update_location(user_id, lat, long)
-    return jsonify({"status": "success", "data": result}), 200
+    return jsonify({"data": result}), 200
 
 
 # -- event endpoints:
@@ -131,7 +131,7 @@ def create_event(name):
     """
     user_id = flask_jwt_extended.get_jwt_identity()
     result = events.create_event(user_id, name)
-    return jsonify({"status": "success", "data": result}), 200
+    return jsonify({"data": result}), 200
 
 
 @events_bp.route("/events/<int:event_id>",
@@ -145,7 +145,7 @@ def delete_event(event_id):
     """
     user_id = flask_jwt_extended.get_jwt_identity()
     events.delete_event(user_id, event_id)
-    return jsonify({"status": "success"}), 200
+    return jsonify({"success": True}), 200
 
 
 @events_bp.route("/events/owned",
@@ -158,7 +158,7 @@ def owned_events():
     """
     user_id = flask_jwt_extended.get_jwt_identity()
     result = events.get_owned_events(user_id)
-    return jsonify({"status": "success", "data": result}), 200
+    return jsonify({"data": result}), 200
 
 
 @events_bp.route("/events/user_event/<int:event_id>:<int:user_id>",
@@ -173,7 +173,7 @@ def add_user_to_event(event_id, user_id):
     """
     request_id = flask_jwt_extended.get_jwt_identity()
     events.add_user_to_event(request_id, user_id, event_id)
-    return jsonify({"status": "success"}), 200
+    return jsonify({"success": True}), 200
 
 
 @events_bp.route("/events/user_event/<int:event_id>:<int:user_id>",
@@ -188,7 +188,7 @@ def remove_user_from_event(event_id, user_id):
     """
     request_id = flask_jwt_extended.get_jwt_identity()
     events.remove_user_from_event(request_id, user_id, event_id)
-    return jsonify({"status": "success"}), 200
+    return jsonify({"success": True}), 200
 
 
 @events_bp.route("/events/<int:event_id>:<int:available>",
@@ -206,7 +206,7 @@ def get_members(event_id, available):
         result = events.get_available_members(user_id, event_id)
     else:
         result = events.get_members(user_id, event_id)
-    return jsonify({"status": "success", "data": result}), 200
+    return jsonify({"data": result}), 200
 
 @events_bp.route("/events",
                  methods=["GET"])
@@ -218,7 +218,7 @@ def get_events():
     """
     user_id = flask_jwt_extended.get_jwt_identity()
     result = events.get_events(user_id)
-    return jsonify({"status": "success", "data": result}), 200
+    return jsonify({"data": result}), 200
 
 # -- suggestions endpoints:
 @suggestions_bp.route("/suggestions/distance/<int:event_id>:<string:place_type>",
@@ -235,7 +235,7 @@ def suggestions_distance(event_id, place_type):
     request_id = flask_jwt_extended.get_jwt_identity()
     result = suggestions.get_suggestions(request_id, event_id,
                                          place_type, "distance")
-    return jsonify({"status": "success", "data": result}), 200
+    return jsonify({"data": result}), 200
 
 @suggestions_bp.route("/suggestions/transit/<int:event_id>:<string:place_type>",
                       methods=["GET"])
@@ -251,7 +251,7 @@ def suggestions_transit(event_id, place_type):
     request_id = flask_jwt_extended.get_jwt_identity()
     result = suggestions.get_suggestions(request_id, event_id,
                                          place_type, "transit")
-    return jsonify({"status": "success", "data": result}), 200
+    return jsonify({"data": result}), 200
 
 @suggestions_bp.route("/suggestions/drive/<int:event_id>:<string:place_type>",
                       methods=["GET"])
@@ -267,7 +267,7 @@ def suggestions_driving(event_id, place_type):
     request_id = flask_jwt_extended.get_jwt_identity()
     result = suggestions.get_suggestions(request_id, event_id,
                                          place_type, "driving")
-    return jsonify({"status": "success", "data": result}), 200
+    return jsonify({"data": result}), 200
 
 @suggestions_bp.route("/suggestions/walk/<int:event_id>:<string:place_type>",
                       methods=["GET"])
@@ -283,7 +283,7 @@ def suggestions_walking(event_id, place_type):
     request_id = flask_jwt_extended.get_jwt_identity()
     result = suggestions.get_suggestions(request_id, event_id,
                                          place_type, "walking")
-    return jsonify({"status": "success", "data": result}), 200
+    return jsonify({"data": result}), 200
 
 @suggestions_bp.route("/suggestions/cycle/<int:event_id>:<string:place_type>",
                       methods=["GET"])
@@ -299,4 +299,4 @@ def suggestions_bicycling(event_id, place_type):
     request_id = flask_jwt_extended.get_jwt_identity()
     result = suggestions.get_suggestions(request_id, event_id,
                                          place_type, "bicycling")
-    return jsonify({"status": "success", "data": result}), 200
+    return jsonify({"data": result}), 200

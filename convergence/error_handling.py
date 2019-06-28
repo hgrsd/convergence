@@ -4,49 +4,43 @@ from . import exceptions
 from . import app
 
 
-@app.errorhandler(exceptions.InvalidLocation)
+@app.errorhandler(exceptions.LocationError)
 def location_error(error):
-    return jsonify({"error": {"type": "InvalidLocation",
+    return jsonify({"error": {"type": type(error).__name__,
                               "message": error.message}}), 400
 
 
-@app.errorhandler(exceptions.InvalidLogin)
+@app.errorhandler(exceptions.LoginError)
 def login_error(error):
-    return jsonify({"error": {"type": "InvalidLogin",
+    return jsonify({"error": {"type": type(error).__name__,
                               "message": error.message}}), 401
 
 
-@app.errorhandler(exceptions.AccountDetailsError)
+@app.errorhandler(exceptions.AccountError)
 def username_error(error):
-    return jsonify({"error": {"type": "AccountDetailsError",
+    return jsonify({"error": {"type": type(error).__name__,
                               "message": error.message}}), 400
 
 
-@app.errorhandler(exceptions.PermissionDenied)
+@app.errorhandler(exceptions.PermissionError)
 def permission_error(error):
-    return jsonify({"error": {"type": "PermissionDenied",
+    return jsonify({"error": {"type": type(error).__name__,
                               "message": error.message}}), 401
 
 
-@app.errorhandler(exceptions.EventNotFound)
-def event_not_found_error(error):
-    return jsonify({"error": {"type": "EventNotFound",
-                              "message": error.message}}), 404
-
-
-@app.errorhandler(exceptions.UserNotFound)
-def user_not_found_error(error):
-    return jsonify({"error": {"type": "UserNotFound",
+@app.errorhandler(exceptions.NotFoundError)
+def not_found_error(error):
+    return jsonify({"error": {"type": type(error).__name__,
                               "message": error.message}}), 404
 
 
 @app.errorhandler(exceptions.ServerError)
 def server_error(error):
-    return jsonify({"error": {"type": "ServerError",
+    return jsonify({"error": {"type": type(error).__name__,
                               "message": error.message}}), 500
 
 
 @app.errorhandler(exceptions.DatabaseError)
 def database_error(error):
-    return jsonify({"error": {"type": "DatabaseError",
+    return jsonify({"error": {"type": type(error).__name__,
                               "message": error.message}}), 500

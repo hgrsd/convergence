@@ -3,8 +3,8 @@ from sqlalchemy import exc
 from . import location
 from . import db
 from .models import User
-from .exceptions import InvalidLogin, AccountDetailsError, UserNotFound, \
-                        DatabaseError, InvalidLocation
+from .exceptions import LoginError, AccountError, NotFoundError, \
+                        DatabaseError, LocationError
 
 
 def login(username, password):
@@ -14,7 +14,7 @@ def login(username, password):
     """
     user = User.query.filter_by(username=username).first()
     if not user or not user.verify_password(password):
-        raise InvalidLogin("Incorrect username or password.")
+        raise LoginError("Incorrect username or password.")
     return user.id
 
 
@@ -25,7 +25,7 @@ def get_info(user_id):
     """
     user = User.query.get(user_id)
     if not user:
-        raise UserNotFound("Invalid user id.")
+        raise NotFoundError("Invalid user id.")
     return user.full_info()
 
 
@@ -35,7 +35,7 @@ def register_user(username, password):
     :return dict object with body and status code
     """
     if not username.isalnum():
-        raise AccountDetailsError("Username must be alphanumeric.")
+        raise AccountError("Username must be alphanumeric.")
     user = User(username=username, available=False)
     user.hash_password(password)
     db.session.add(user)
@@ -43,7 +43,7 @@ def register_user(username, password):
         db.session.commit()
     except exc.IntegrityError:
         db.session.rollback()
-        raise AccountDetailsError("Username exists already.")
+        raise AccountError("Username exists already.")
     return user.full_info()
 
 
@@ -54,7 +54,7 @@ def delete_user(user_id):
     """
     user = User.query.get(user_id)
     if not user:
-        raise UserNotFound("Invalid user id.")
+        raise NotFoundError("Invalid user id.")
     db.session.delete(user)
     try:
         db.session.commit()
@@ -103,7 +103,7 @@ def update_location(user_id, lat, long):
     """
     if (lat < location.MIN_LAT or lat > location.MAX_LAT
             or long < location.MIN_LON or long > location.MAX_LON):
-        raise InvalidLocation("Invalid coordinates.")
+        raise LocationError("Invalid coordinates.")
     user = User.query.filter_by(id=user_id).first()
     user.last_seen_lat, user.last_seen_long = lat, long
     db.session.add(user)

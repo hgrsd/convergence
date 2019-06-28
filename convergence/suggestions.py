@@ -15,7 +15,7 @@ def get_suggestions(request_id, event_id, place_type, suggestions_mode):
     :param suggestions_mode: suggestions mode (e.g. "distance" or "walking")
     :return: tuple(object with suggestions / status message, status code)
     """
-    event_members = get_available_members(request_id, event_id)["body"]["data"]
+    event_members = get_available_members(request_id, event_id)
     user_coordinates = [User.query.get(member["id"]).get_location()
                         for member in event_members]
     centroid = find_centroid(user_coordinates)

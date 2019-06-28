@@ -1,4 +1,4 @@
-class InvalidLogin(Exception):
+class LoginError(Exception):
     """Invalid username and/or password at login"""
     def __init__(self, message):
         self.message = message
@@ -7,7 +7,7 @@ class InvalidLogin(Exception):
         return str(self.message)
 
 
-class AccountDetailsError(Exception):
+class AccountError(Exception):
     """E.g. Invalid or already-taken username at registration"""
     def __init__(self, message):
         self.message = message
@@ -16,7 +16,7 @@ class AccountDetailsError(Exception):
         return str(self.message)
 
 
-class PermissionDenied(Exception):
+class PermissionError(Exception):
     """Permission denied"""
     def __init__(self, message):
         self.message = message
@@ -25,8 +25,8 @@ class PermissionDenied(Exception):
         return str(self.message)
 
 
-class EventNotFound(Exception):
-    """Event does not exist"""
+class NotFoundError(Exception):
+    """Requested entity is not found"""
     def __init__(self, message):
         self.message = message
 
@@ -34,16 +34,7 @@ class EventNotFound(Exception):
         return str(self.message)
 
 
-class UserNotFound(Exception):
-    """User does not exist"""
-    def __init__(self, message):
-        self.message = message
-
-    def __str__(self):
-        return str(self.message)
-
-
-class InvalidLocation(Exception):
+class LocationError(Exception):
     """Invalid location coordinates"""
     def __init__(self, message):
         self.message = message

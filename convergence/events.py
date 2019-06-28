@@ -4,8 +4,7 @@ from sqlalchemy.exc import IntegrityError
 
 from . import db
 from .models import Event, UserEvent, User
-from .exceptions import DatabaseError, PermissionDenied, EventNotFound, \
-                        UserNotFound
+from .exceptions import DatabaseError, PermissionError, NotFoundError
 
 
 def create_event(user_id, name):
@@ -20,8 +19,7 @@ def create_event(user_id, name):
     db.session.add(event)
     try:
         db.session.flush()
-    except IntegrityError as e:
-        print("Hoi", e.statement)
+    except IntegrityError:
         db.session.rollback()
         raise DatabaseError("Error writing to database.")
     userevent = UserEvent(user_id=user_id, event_id=event.id)
@@ -44,9 +42,9 @@ def delete_event(user_id, event_id):
     """
     to_delete = Event.query.get(event_id)
     if not to_delete:
-        raise EventNotFound("Invalid event id.")
+        raise NotFoundError("Invalid event id.")
     if not to_delete.owner == user_id:
-        raise PermissionDenied("Permission denied. Must be event owner.")
+        raise PermissionError("Permission denied. Must be event owner.")
     db.session.delete(to_delete)
     try:
         db.session.commit()
@@ -65,11 +63,11 @@ def add_user_to_event(request_id, user_id, event_id):
     """
     event = Event.query.get(event_id)
     if not event:
-        raise EventNotFound("Invalid event id.")
+        raise NotFoundError("Invalid event id.")
     if not User.query.get(user_id):
-        raise UserNotFound("Invalid user id.")
+        raise NotFoundError("Invalid user id.")
     if not event.owner == request_id:
-        raise PermissionDenied("Permission denied. Must be event owner.")
+        raise PermissionError("Permission denied. Must be event owner.")
     userevent = UserEvent(user_id=user_id, event_id=event_id)
     db.session.add(userevent)
     try:
@@ -87,14 +85,12 @@ def remove_user_from_event(request_id, user_id, event_id):
     :param event_id: event to delete user from
     :return: dict object with body and status code
     """
-    event = Event.query.get(event_id)
-    if not event:
-        raise EventNotFound("Invalid event id.")
-    if not User.query.get(user_id):
-        raise UserNotFound("Invalid user id.")
-    if not event.owner == request_id:
-        raise PermissionDenied("Permission denied. Must be event owner.")
-    to_delete = UserEvent.query.filter_by(user_id=user_id, event_id=event_id)
+    to_delete = UserEvent.query.filter_by(user_id=user_id, event_id=event_id) \
+                               .first()
+    if not to_delete:
+        raise NotFoundError("Invalid group id or user id.")
+    if not Event.query.get(event_id).owner == request_id:
+        raise PermissionError("Permission denied. Must be event owner.")
     db.session.delete(to_delete)
     try:
         db.session.commit()
@@ -111,14 +107,13 @@ def get_members(request_id, event_id):
     :return: dict object with body and status code
     """
     if not UserEvent.query.filter_by(user_id=request_id, event_id=event_id).first():
-        raise PermissionDenied("Permission denied. Must be event member.")
+        raise PermissionError("Permission denied. Must be event member.")
     users = db.session.query(User) \
                       .join(UserEvent, User.id == UserEvent.user_id) \
                       .filter(UserEvent.event_id == event_id) \
                       .all()
     if not users:
-        return {"body": {"status": "success", "data": []},
-                "status_code": 200}
+        return []
     return [user.basic_info() for user in users]
 
 
@@ -143,11 +138,11 @@ def get_available_members(request_id, event_id):
     :return: dict object with body and status code
     """
     if not UserEvent.query.filter_by(user_id=request_id, event_id=event_id).first():
-        raise PermissionDenied("Permission denied. Must be event member.")
+        raise PermissionError("Permission denied. Must be event member.")
     users = db.session.query(User) \
                       .join(UserEvent, User.id == UserEvent.user_id) \
                       .filter(UserEvent.event_id == event_id,
-                              User.available is True) \
+                              User.available == True) \
                       .all()
     if not users:
         return []
