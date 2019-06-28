@@ -45,10 +45,8 @@ def login():
     password = request.get_json()["password"]
     user_id = user.login(username, password)
     access_token = flask_jwt_extended.create_access_token(identity=user_id)
-
     response = jsonify({"success": True})
     flask_jwt_extended.set_access_cookies(response, access_token)
-
     return response, 200
 
 
