@@ -12,7 +12,7 @@ def create_event(user_id, name):
     Create new event.
     :param user_id: the user creating the event
     :param name: the name of the new event
-    :return: dict object with body and status code
+    :return: event info as dict
     """
     event = Event(name=name, owner=user_id,
                   creation_date=datetime.datetime.utcnow())
@@ -38,7 +38,6 @@ def delete_event(user_id, event_id):
     Delete a event.
     :param user_id: user deleting the event (must be event owner)
     :param event_id: event to be deleted
-    :return: dict object with body and status code
     """
     to_delete = Event.query.get(event_id)
     if not to_delete:
@@ -59,7 +58,6 @@ def add_user_to_event(request_id, user_id, event_id):
     :param request_id: user requesting operation (must be event owner)
     :param user_id: user to be added to event
     :param event_id: event to add user to
-    :return: dict object with body and status code
     """
     event = Event.query.get(event_id)
     if not event:
@@ -83,7 +81,6 @@ def remove_user_from_event(request_id, user_id, event_id):
     :param request_id: user requesting operation (must be event owner)
     :param user_id: user to be deleted from event
     :param event_id: event to delete user from
-    :return: dict object with body and status code
     """
     to_delete = UserEvent.query.filter_by(user_id=user_id, event_id=event_id) \
                                .first()
@@ -104,9 +101,10 @@ def get_members(request_id, event_id):
     Get members from event
     :param request_id: user requesting operation (must be event member)
     :param event_id: event of which members are requested
-    :return: dict object with body and status code
+    :return: basic user info for all users in group
     """
-    if not UserEvent.query.filter_by(user_id=request_id, event_id=event_id).first():
+    if not UserEvent.query.filter_by(user_id=request_id, event_id=event_id) \
+                          .first():
         raise PermissionError("Permission denied. Must be event member.")
     users = db.session.query(User) \
                       .join(UserEvent, User.id == UserEvent.user_id) \
@@ -121,7 +119,7 @@ def get_owned_events(user_id):
     """
     Get events owned by user_id
     :param user_id: user requesting operation
-    :return list of events (as dict) owned by user_id
+    :return list of events which user owns
     """
     events_owned = Event.query.filter_by(owner=user_id).all()
     if not events_owned:
@@ -135,9 +133,10 @@ def get_available_members(request_id, event_id):
     Get available members from event
     :param request_id: user requesting operation (must be event member)
     :param event_id: event of which members are requested
-    :return: dict object with body and status code
+    :return: basic user info for all available users in group
     """
-    if not UserEvent.query.filter_by(user_id=request_id, event_id=event_id).first():
+    if not UserEvent.query.filter_by(user_id=request_id, event_id=event_id) \
+                          .first():
         raise PermissionError("Permission denied. Must be event member.")
     users = db.session.query(User) \
                       .join(UserEvent, User.id == UserEvent.user_id) \
@@ -153,7 +152,7 @@ def get_events(user_id):
     """
     Get events of which user is a member.
     :param user_id: user requesting operation
-    :return: dict object with body and status code
+    :return: list of events of which user is a member
     """
     events = db.session.query(Event) \
                        .join(UserEvent, Event.id == UserEvent.event_id) \

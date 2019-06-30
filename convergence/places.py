@@ -16,7 +16,7 @@ def get_places_around_centroid(point, radius, place_type):
     :param point: the centroid, of type Point
     :param radius: radius (in metres)
     :param place_type: type of place to be searched for
-    :return: list of places (as dicts)
+    :return: list of places aroind centroid
     """
     places_query = Place.query.filter(Place.within_range(point, radius))
     places = [place.as_dict() for place in places_query
@@ -44,8 +44,8 @@ def order_places_by_distance(user_coordinates, places):
     Return places sorted in ascending order by the sum of their distances
     to each user.
     :param user_coordinates: list of Points for relevant users
-    :param places: list of places (as dicts) to be ordered
-    :return: list of places (as dicts) in ascending order, with travel_total
+    :param places: list of places to be ordered
+    :return: list of places in ascending order, with travel_total
             added as key for each place
     """
     places_coordinates = [Point(place["lat"], place["long"])
@@ -64,9 +64,9 @@ def order_places_by_travel_time(user_coordinates, places, mode):
     Return places sorted in ascending order by the sum of the travel time,
     using specified mode of travel, from each user to each place.
     :param user_coordinates: list of Points for relevant users
-    :param places: list of places (as dicts) to be ordered
-    :param mode: mode of transportation, as string
-    :return: sorted list of places (as dicts)with travel_total added
+    :param places: list of places to be ordered
+    :param mode: mode of transportation
+    :return: sorted list of places with travel_total added
             as key for each place
     """
     places_coordinates = [Point(place["lat"],
@@ -87,8 +87,8 @@ def sift_places_by_rating(places):
     """
     Return MAX_PLACES-length list of places, sorted by rating in descending
     order if len(places) > MAX_PLACES
-    :param places: list of places (as dict)
-    :return: MAX_PLACES-length list of places (as dict), sorted by rating
+    :param places: list of places
+    :return: MAX_PLACES-length list of places, sorted by rating
     """
     if len(places) < MAX_PLACES:
         return places

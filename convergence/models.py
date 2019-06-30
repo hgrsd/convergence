@@ -76,6 +76,7 @@ class Place(db.Model):
 
     @hybrid_method
     def within_range(self, point, radius):
+        """Check whether point is within radius of self."""
         self_lat = math.radians(self.lat)
         self_long = math.radians(self.long)
         other_lat = math.radians(point[0])
@@ -87,7 +88,8 @@ class Place(db.Model):
         return dist < radius / 1000  # radius in metres, convert to km
 
     @within_range.expression
-    def distance_to(cls, point, radius):
+    def within_range(cls, point, radius):
+        """SQL-expression version of within_range"""
         self_lat = func.radians(cls.lat)
         self_long = func.radians(cls.long)
         other_lat = func.radians(point.lat)

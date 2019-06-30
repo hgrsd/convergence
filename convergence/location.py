@@ -11,8 +11,8 @@ MAX_LON = 180.0
 def find_centroid(coordinates):
     """
     Find centroid of list of coordinates
-    :param coordinates: list of coordinates, as Points
-    :return: centroid, as Point
+    :param coordinates: list of coordinates as Points
+    :return: centroid as Point
     """
     x_total, y_total, z_total = 0, 0, 0
     for coordinate in coordinates:

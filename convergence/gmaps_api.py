@@ -21,7 +21,7 @@ def places_around_point(point, radius, place_type):
     :param point: centre point, type Point
     :param radius: radius in metres
     :param place_type: place type to find
-    :return: list of places (as dicts)
+    :return: list of places around point
     """
     init_request = GM_PLACES_URL.format(point.lat, point.long,
                                         radius, place_type,
@@ -42,7 +42,12 @@ def places_around_point(point, radius, place_type):
 def distance_matrix(origins, destinations, mode):
     """
     Use Google Distance Matrix API to request distance matrix between origins
-    and destinations, using specified mode of transportation
+    and destinations, using specified mode of transportation.
+
+    Given that Google Distance Matrix API is limited in the number of elements
+    it can return in any single request, this function calculates how many
+    requests are needed to include all locations in the distance matrix
+    and places multiple requests.
     :param origins: list of Points
     :param destinations: list of Points
     :param mode: mode of transportation
@@ -56,7 +61,7 @@ def distance_matrix(origins, destinations, mode):
         cutoff = len(destinations) // no_requests * (i + 1)
         locations_string = ""
         for origin in origins:
-            if locations_string != "":
+            if locations_string != "":  # if not the first iteration
                 locations_string += "|"
             locations_string = locations_string + str(origin.lat) + "," \
                 + str(origin.long)
@@ -72,7 +77,7 @@ def distance_matrix(origins, destinations, mode):
                                             GM_API_KEY)
         response = requests.get(request).json()
         if not response:
-            raise ServerError("Unable to reach Google Maps API (Distance Matrix).")
+            raise ServerError("Unable to reach Google Maps API (Dist Matrix).")
         for i, row in enumerate(response["rows"]):
             if not matrix[i]:
                 matrix[i] = row["elements"]
@@ -87,7 +92,7 @@ def _json_extract_places(response_string):
     """
     Extract place information from Google Places API JSON object.
     :param response_string: response JSON object
-    :return: list of places (as dict)
+    :return: list of places with attributes
     """
     places = []
     for result in response_string["results"]:

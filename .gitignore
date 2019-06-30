@@ -3,9 +3,9 @@
 venv/
 instance/
 migrations/
-*.pyc
-.idea/*
-.vscode/*
+__pycache__/
+.idea/
+.vscode/
 
 # Frontend
 node_modules/

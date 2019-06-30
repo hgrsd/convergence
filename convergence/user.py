@@ -10,7 +10,7 @@ from .exceptions import LoginError, AccountError, NotFoundError, \
 def login(username, password):
     """
     Login user
-    :return dict object with body and status code
+    :return user_id
     """
     user = User.query.filter_by(username=username).first()
     if not user or not user.verify_password(password):
@@ -21,7 +21,7 @@ def login(username, password):
 def get_info(user_id):
     """
     Get full info about currently logged in user
-    :return dict object with body and status code
+    :return full info for current user
     """
     user = User.query.get(user_id)
     if not user:
@@ -32,7 +32,7 @@ def get_info(user_id):
 def register_user(username, password):
     """
     Register user.
-    :return dict object with body and status code
+    :return full info for registered user
     """
     if not username.isalnum():
         raise AccountError("Username must be alphanumeric.")
@@ -50,7 +50,6 @@ def register_user(username, password):
 def delete_user(user_id):
     """
     Delete user.
-    :return dict object with body and status code
     """
     user = User.query.get(user_id)
     if not user:
@@ -66,7 +65,7 @@ def delete_user(user_id):
 def find_user(username):
     """
     Return user info for username
-    :return user id
+    :return basic user info if found
     """
     user = User.query.filter_by(username=username).first()
     if not user:
@@ -80,7 +79,7 @@ def set_availability(user_id, availability):
     Set availability.
     :param user_id: user requesting operation
     :param availability: bool
-    :return: dict object with body and status code
+    :return: full user info
     """
     user = User.query.get(user_id)
     user.available = availability
@@ -96,10 +95,10 @@ def set_availability(user_id, availability):
 def update_location(user_id, lat, long):
     """
     Update user location in database
-    :param user_id: user to update
+    :param user_id: requesting user
     :param lat: new latitude
     :param long: new longitude
-    :return: tuple(status message, status code)
+    :return: full user info
     """
     if (lat < location.MIN_LAT or lat > location.MAX_LAT
             or long < location.MIN_LON or long > location.MAX_LON):

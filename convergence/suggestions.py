@@ -7,13 +7,13 @@ from .places import get_places_around_centroid, order_places_by_travel_time, \
 
 def get_suggestions(request_id, event_id, place_type, suggestions_mode):
     """
-    Calculate meeting place suggestions of place_type for a event, based on
-    specified mode of suggestions.
+    Calculate meeting place suggestions of place_type for an event, based on
+    requested suggestion mode.
     :param request_id: requesting user
-    :param event_id: specified event
+    :param event_id: event
     :param place_type: type of place to suggest
-    :param suggestions_mode: suggestions mode (e.g. "distance" or "walking")
-    :return: tuple(object with suggestions / status message, status code)
+    :param suggestions_mode: suggestions mode (e.g. "distance" or "transit")
+    :return: list of places in requested order (e.g. distance, transit time)
     """
     event_members = get_available_members(request_id, event_id)
     user_coordinates = [User.query.get(member["id"]).get_location()
