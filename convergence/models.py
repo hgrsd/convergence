@@ -1,5 +1,4 @@
 import math
-import sqlalchemy
 from passlib.apps import custom_app_context as pwd_context
 from sqlalchemy.ext.hybrid import hybrid_method
 from sqlalchemy import func
