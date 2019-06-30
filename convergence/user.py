@@ -12,7 +12,7 @@ def login(username, password):
     Login user
     :return user_id
     """
-    user = User.query.filter_by(username=username).first()
+    user = db.session.query(User).filter_by(username=username).first()
     if not user or not user.verify_password(password):
         raise LoginError("Incorrect username or password.")
     return user.id
@@ -23,7 +23,7 @@ def get_info(user_id):
     Get full info about currently logged in user
     :return full info for current user
     """
-    user = User.query.get(user_id)
+    user = db.session.query(User).get(user_id)
     if not user:
         raise NotFoundError("Invalid user id.")
     return user.full_info()
@@ -51,7 +51,7 @@ def delete_user(user_id):
     """
     Delete user.
     """
-    user = User.query.get(user_id)
+    user = db.session.query(User).get(user_id)
     if not user:
         raise NotFoundError("Invalid user id.")
     db.session.delete(user)
@@ -67,7 +67,7 @@ def find_user(username):
     Return user info for username
     :return basic user info if found
     """
-    user = User.query.filter_by(username=username).first()
+    user = db.session.query(User).filter_by(username=username).first()
     if not user:
         return []
     else:
@@ -81,7 +81,7 @@ def set_availability(user_id, availability):
     :param availability: bool
     :return: full user info
     """
-    user = User.query.get(user_id)
+    user = db.session.query(User).get(user_id)
     user.available = availability
     db.session.add(user)
     try:
@@ -103,7 +103,7 @@ def update_location(user_id, lat, long):
     if (lat < location.MIN_LAT or lat > location.MAX_LAT
             or long < location.MIN_LON or long > location.MAX_LON):
         raise LocationError("Invalid coordinates.")
-    user = User.query.filter_by(id=user_id).first()
+    user = db.session.query(User).filter_by(id=user_id).first()
     user.last_seen_lat, user.last_seen_long = lat, long
     db.session.add(user)
     try:

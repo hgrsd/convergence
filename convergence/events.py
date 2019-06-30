@@ -39,7 +39,7 @@ def delete_event(user_id, event_id):
     :param user_id: user deleting the event (must be event owner)
     :param event_id: event to be deleted
     """
-    to_delete = Event.query.get(event_id)
+    to_delete = db.session.query(Event).get(event_id)
     if not to_delete:
         raise NotFoundError("Invalid event id.")
     if not to_delete.owner == user_id:
@@ -59,10 +59,10 @@ def add_user_to_event(request_id, user_id, event_id):
     :param user_id: user to be added to event
     :param event_id: event to add user to
     """
-    event = Event.query.get(event_id)
+    event = db.session.query(Event).get(event_id)
     if not event:
         raise NotFoundError("Invalid event id.")
-    if not User.query.get(user_id):
+    if not db.session.query(User).get(user_id):
         raise NotFoundError("Invalid user id.")
     if not event.owner == request_id:
         raise PermissionError("Permission denied. Must be event owner.")
@@ -82,11 +82,12 @@ def remove_user_from_event(request_id, user_id, event_id):
     :param user_id: user to be deleted from event
     :param event_id: event to delete user from
     """
-    to_delete = UserEvent.query.filter_by(user_id=user_id, event_id=event_id) \
-                               .first()
+    to_delete = db.session.query(UserEvent).filter_by(user_id=user_id,
+                                                      event_id=event_id) \
+                                           .first()
     if not to_delete:
         raise NotFoundError("Invalid group id or user id.")
-    if not Event.query.get(event_id).owner == request_id:
+    if not db.session.query(Event).get(event_id).owner == request_id:
         raise PermissionError("Permission denied. Must be event owner.")
     db.session.delete(to_delete)
     try:
@@ -103,8 +104,9 @@ def get_members(request_id, event_id):
     :param event_id: event of which members are requested
     :return: basic user info for all users in group
     """
-    if not UserEvent.query.filter_by(user_id=request_id, event_id=event_id) \
-                          .first():
+    if not db.session.query(UserEvent).filter_by(user_id=request_id,
+                                                 event_id=event_id) \
+                                      .first():
         raise PermissionError("Permission denied. Must be event member.")
     users = db.session.query(User) \
                       .join(UserEvent, User.id == UserEvent.user_id) \
@@ -121,7 +123,7 @@ def get_owned_events(user_id):
     :param user_id: user requesting operation
     :return list of events which user owns
     """
-    events_owned = Event.query.filter_by(owner=user_id).all()
+    events_owned = db.session.query(Event).filter_by(owner=user_id).all()
     if not events_owned:
         return []
     else:
@@ -135,8 +137,9 @@ def get_available_members(request_id, event_id):
     :param event_id: event of which members are requested
     :return: basic user info for all available users in group
     """
-    if not UserEvent.query.filter_by(user_id=request_id, event_id=event_id) \
-                          .first():
+    if not db.session.query(UserEvent).filter_by(user_id=request_id,
+                                                 event_id=event_id) \
+                                      .first():
         raise PermissionError("Permission denied. Must be event member.")
     users = db.session.query(User) \
                       .join(UserEvent, User.id == UserEvent.user_id) \

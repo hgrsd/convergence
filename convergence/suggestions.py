@@ -1,3 +1,4 @@
+from . import db
 from .events import get_available_members
 from .models import User
 from .location import find_centroid, mean_dist_from_centroid
@@ -16,7 +17,7 @@ def get_suggestions(request_id, event_id, place_type, suggestions_mode):
     :return: list of places in requested order (e.g. distance, transit time)
     """
     event_members = get_available_members(request_id, event_id)
-    user_coordinates = [User.query.get(member["id"]).get_location()
+    user_coordinates = [db.session.query(User).get(member["id"]).get_location()
                         for member in event_members]
     centroid = find_centroid(user_coordinates)
     dist_from_centroid = mean_dist_from_centroid(user_coordinates, centroid)

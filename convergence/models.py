@@ -1,20 +1,25 @@
 import math
+import sqlalchemy
 from passlib.apps import custom_app_context as pwd_context
 from sqlalchemy.ext.hybrid import hybrid_method
 from sqlalchemy import func
+from sqlalchemy.ext import declarative
+from sqlalchemy import Column, Float, String, Integer, DateTime, \
+                       ForeignKey, UniqueConstraint, Boolean, ARRAY
 
-from . import db
 from .point import Point
 
+base = declarative.declarative_base()
 
-class User(db.Model):
+
+class User(base):
     __tablename__ = "users"
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(32), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128))
-    last_seen_lat = db.Column(db.Float)
-    last_seen_long = db.Column(db.Float)
-    available = db.Column(db.Boolean)
+    id = Column(Integer, primary_key=True)
+    username = Column(String(32), unique=True, nullable=False)
+    password_hash = Column(String(128))
+    last_seen_lat = Column(Float)
+    last_seen_long = Column(Float)
+    available = Column(Boolean)
 
     def hash_password(self, password):
         self.password_hash = pwd_context.encrypt(password)
@@ -36,43 +41,43 @@ class User(db.Model):
                 "available": self.available}
 
 
-class Event(db.Model):
+class Event(base):
     __tablename__ = "events"
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(128))
-    owner = db.Column(db.ForeignKey("users.id", ondelete="CASCADE"),
-                      index=True)
-    creation_date = db.Column(db.DateTime)
+    id = Column(Integer, primary_key=True)
+    name = Column(String(128))
+    owner = Column(ForeignKey("users.id", ondelete="CASCADE"),
+                   index=True)
+    creation_date = Column(DateTime)
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
-class UserEvent(db.Model):
+class UserEvent(base):
     __tablename__ = "userevents"
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.ForeignKey("users.id", ondelete="CASCADE"),
-                        index=True)
-    event_id = db.Column(db.ForeignKey("events.id", ondelete="CASCADE"),
-                         index=True)
-    __table_args__ = (db.UniqueConstraint("user_id", "event_id"),)
+    id = Column(Integer, primary_key=True)
+    user_id = Column(ForeignKey("users.id", ondelete="CASCADE"),
+                     index=True)
+    event_id = Column(ForeignKey("events.id", ondelete="CASCADE"),
+                      index=True)
+    __table_args__ = (UniqueConstraint("user_id", "event_id"),)
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
-class Place(db.Model):
+class Place(base):
     __tablename__ = "places"
-    id = db.Column(db.Integer, primary_key=True)
-    gm_id = db.Column(db.String(), unique=True)
-    name = db.Column(db.String(128), index=True)
-    lat = db.Column(db.Float)
-    long = db.Column(db.Float)
-    gm_price = db.Column(db.Integer)
-    gm_rating = db.Column(db.Float)
-    gm_types = db.Column(db.ARRAY(db.String()))
-    address = db.Column(db.String(128))
-    timestamp = db.Column(db.DateTime)
+    id = Column(Integer, primary_key=True)
+    gm_id = Column(String(), unique=True)
+    name = Column(String(128), index=True)
+    lat = Column(Float)
+    long = Column(Float)
+    gm_price = Column(Integer)
+    gm_rating = Column(Float)
+    gm_types = Column(ARRAY(String()))
+    address = Column(String(128))
+    timestamp = Column(DateTime)
 
     @hybrid_method
     def within_range(self, point, radius):
