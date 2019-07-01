@@ -11,6 +11,8 @@ class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(32), unique=True, nullable=False)
+    email = db.Column(db.String(254), unique=True, nullable=False)
+    phone_number = db.Column(db.String(15), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
     last_seen_lat = db.Column(db.Float)
     last_seen_long = db.Column(db.Float)
@@ -31,6 +33,7 @@ class User(db.Model):
     def full_info(self):
         """ Return all info except for password hash """
         return {"id": self.id, "username": self.username,
+                "email": self.email,
                 "last_seen_lat": self.last_seen_lat,
                 "last_seen_long": self.last_seen_long,
                 "available": self.available}

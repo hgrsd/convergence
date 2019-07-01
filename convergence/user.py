@@ -29,21 +29,22 @@ def get_info(user_id):
     return user.full_info()
 
 
-def register_user(username, password):
+def register_user(username, password, email, phone_number):
     """
     Register user.
     :return full info for registered user
     """
     if not username.isalnum():
         raise AccountError("Username must be alphanumeric.")
-    user = User(username=username, available=False)
+    user = User(username=username, email=email,
+                phone_number=phone_number, available=False)
     user.hash_password(password)
     db.session.add(user)
     try:
         db.session.commit()
     except exc.IntegrityError:
         db.session.rollback()
-        raise AccountError("Username exists already.")
+        raise AccountError("Username or email exists already.")
     return user.full_info()
 
 
