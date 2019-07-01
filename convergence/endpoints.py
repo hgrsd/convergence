@@ -90,20 +90,6 @@ def find_user(username):
     return jsonify({"data": result}), 200
 
 
-@user_bp.route("/user/availability/<int:available>",
-               methods=["PUT"])
-@flask_jwt_extended.jwt_required
-def set_availability(available):
-    """
-    Update current user"s availability
-    :param available: 0 = False, 1 = True
-    :return: HTTP response
-    """
-    user_id = flask_jwt_extended.get_jwt_identity()
-    result = user.set_availability(user_id, bool(available))
-    return jsonify({"data": result}), 200
-
-
 @user_bp.route("/user/location/<float:lat>:<float:long>",
                methods=["PUT"])
 @flask_jwt_extended.jwt_required
@@ -191,21 +177,17 @@ def remove_user_from_event(event_id, user_id):
     return jsonify({"success": True}), 200
 
 
-@events_bp.route("/events/<int:event_id>:<int:available>",
+@events_bp.route("/events/<int:event_id>",
                  methods=["GET"])
 @flask_jwt_extended.jwt_required
-def get_members(event_id, available):
+def get_members(event_id):
     """
     Get list of event members (requesting user must be event member)
     :param event_id: event to request members from
-    :param available: limit results to available members, 0 = False, 1 = True
     :return: HTTP response
     """
     user_id = flask_jwt_extended.get_jwt_identity()
-    if available == 1:
-        result = events.get_available_members(user_id, event_id)
-    else:
-        result = events.get_members(user_id, event_id)
+    result = events.get_members(user_id, event_id)
     return jsonify({"data": result}), 200
 
 @events_bp.route("/events",

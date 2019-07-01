@@ -28,15 +28,13 @@ def main():
             elif event_mode == "g":
                 get_event_members(session)
         elif mode == "u":
-            user_mode = input("[n]ew, [d]elete, [f]ind, [s]witch, [a]vailability, set [l]ocation, [i]nfo, [q]uit\n> ")
+            user_mode = input("[n]ew, [d]elete, [f]ind, [s]witch, set [l]ocation, [i]nfo, [q]uit\n> ")
             if user_mode == "n":
                 new_user(session)
             elif user_mode == "d":
                 delete_user(session)
             elif user_mode == "s":
                 login(session)
-            elif user_mode == "a":
-                set_availability(session)
             elif user_mode == "f":
                 find_user(session)
             elif user_mode == "l":
@@ -92,8 +90,7 @@ def remove_user_from_event(session):
 
 def get_event_members(session):
     event_id = input("Event id: ")
-    available = int(input("Available members only? 0=No, 1=Yes: "))
-    response = session.get(f"http://localhost:5000/events/{event_id}:{available}", cookies=session.cookies, headers=header).json()
+    response = session.get(f"http://localhost:5000/events/{event_id}", cookies=session.cookies, headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
 
@@ -132,12 +129,6 @@ def login(session):
     if "error" not in response:
         csrf_token = session.cookies['csrf_access_token']
         header = {"X-CSRF-TOKEN": csrf_token}
-    print(json.dumps(response, sort_keys=True, indent=4))
-
-
-def set_availability(session):
-    availability = input("Set availability, 0=unavailable, 1=available: ")
-    response = session.put(f"http://localhost:5000/user/availability/{availability}", cookies=session.cookies, headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
 
