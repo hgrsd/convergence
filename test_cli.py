@@ -57,7 +57,6 @@ def main():
 
 def create_event(session):
     name = input("Event name: ")
-    print(session.cookies)
     response = session.post(f"http://localhost:5000/events/{name}", cookies=session.cookies, headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 

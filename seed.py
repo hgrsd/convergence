@@ -18,7 +18,8 @@ import os
 import sys
 import faker
 import random
-from flask_migrate import Migrate, migrate, upgrade, init
+from convergence.convergence_db import ConvergenceDB
+from convergence.models import *
 
 
 def generate_users(n_users=100, password="testing", country_code="GB"):
@@ -55,7 +56,7 @@ def generate_events(n_events=25, total_users=100):
     for i in range(n_events):
         event = Event()
         event.name = fake.domain_word()
-        event.owner = random.choice(User.query.all()).id
+        event.owner = random.choice(db.session.query(User).all()).id
         event.creation_date = fake.date_time()
         db.session.add(event)
         db.session.flush()
@@ -69,13 +70,13 @@ def generate_events(n_events=25, total_users=100):
 
 def generate_userevents(n_per_user=2, total_users=100, total_events=25):
     print(f"[>] Generating UserEvents, {n_per_user} events per user for a total of {total_users} users...")
-    for user in User.query.all():
+    for user in db.session.query(User).all():
         for k in range(n_per_user):
             userevent = UserEvent()
             userevent.user_id = user.id
-            userevent.event_id = random.choice(Event.query.all()).id
+            userevent.event_id = random.choice(db.session.query(Event).all()).id
             # check if UserEvent already exists
-            if UserEvent.query.filter_by(user_id=user.id, event_id=userevent.event_id).first():
+            if db.session.query(UserEvent).filter_by(user_id=user.id, event_id=userevent.event_id).first():
                 continue
             db.session.add(userevent)
         db.session.flush()
@@ -97,39 +98,25 @@ random.seed(seed)
 fake = faker.Faker("en-GB")
 fake.seed(seed)
 db_address = f"postgresql://localhost/{db_name}"
-os.environ["SQLALCHEMY_DATABASE_URI"] = db_address
+print("[o] Initialising database...")
+db = ConvergenceDB(db_address)
+db.create_tables()
+print("[+] Initial database setup complete.\n")
 
-from convergence import app, db
-from convergence.models import *
+# Use the following testing data generation parameters:
+generate_users(n_users=100, password="testing", country_code="GB")
+generate_places(n_places=2500, country_code="GB")
+generate_events(n_events=25)
+generate_userevents(n_per_user=2, total_users=100)
 
-with app.app_context():
-    migrate_instance = Migrate(app, db, directory=f"migrations_{db_name}")
-    # Generate & apply database schema
-    print("[o] Initialising database...")
-
-    if not os.path.isdir(f"./migrations_{db_name}"):
-        init(directory=f"migrations_{db_name}")
-    print("[o] Making migrations...")
-    migrate(directory=f"migrations_{db_name}")
-    print("[o] Applying migrations...")
-    upgrade(directory=f"migrations_{db_name}")
-    print("[+] Initial database setup complete.\n")
-
-    # Use the following testing data generation parameters:
-    generate_users(n_users=100, password="testing", country_code="GB")
-    generate_places(n_places=2500, country_code="GB")
-    generate_events(n_events=25)
-    generate_userevents(n_per_user=2, total_users=100)
-
-    print("[+] Generation complete.")
-    print("[o] Committing to database.")
-    try:
-        db.session.commit()
-        print("[+] Database write completed. Script finished.")
-        print(f"\tFolder migrations_{db_name} can be safely deleted.")
-        print(f"\tSeed used: {seed}. Please note for reproducibility.")
-    except:
-        print("[-] Error writing to database.")
-        sys.exit(1)
-    else:
-        sys.exit(0)
+print("[+] Generation complete.")
+print("[o] Committing to database.")
+try:
+    db.session.commit()
+    print("[+] Database write completed. Script finished.")
+    print(f"\tSeed used: {seed}. Please note for reproducibility.")
+except:
+    print("[-] Error writing to database.")
+    sys.exit(1)
+else:
+    sys.exit(0)

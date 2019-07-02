@@ -18,7 +18,8 @@ def get_places_around_centroid(point, radius, place_type):
     :param place_type: type of place to be searched for
     :return: list of places aroind centroid
     """
-    places_query = Place.query.filter(Place.within_range(point, radius))
+    places_query = db.session.query(Place) \
+                             .filter(Place.within_range(point, radius))
     places = [place.as_dict() for place in places_query
               if place_type in place.gm_types]
     if len(places) < 0.25 * MAX_PLACES:
