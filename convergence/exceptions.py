@@ -1,3 +1,12 @@
+class InvalidRequestError(Exception):
+    """Invalid request"""
+    def __init__(self, message):
+        self.message = message
+
+    def __str__(self):
+        return str(self.message)
+
+
 class LoginError(Exception):
     """Invalid username and/or password at login"""
     def __init__(self, message):

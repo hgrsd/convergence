@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify, request
 
 from . import events, user, suggestions
 from . import app
+from . import validators
 
 user_bp = Blueprint("user", __name__)
 events_bp = Blueprint("events", __name__)
@@ -10,7 +11,7 @@ location_bp = Blueprint("locations", __name__)
 suggestions_bp = Blueprint("suggestions", __name__)
 
 
-# -- web interface
+# -- web interface:
 @app.route("/",
            methods=['GET'])
 def root():
@@ -19,6 +20,7 @@ def root():
 # -- user endpoints:
 @user_bp.route("/user",
                methods=["POST"])
+@validators.validate_json(["username", "password", "email", "phone_number"])
 def register_user():
     """
     Register new user
@@ -34,6 +36,7 @@ def register_user():
 
 @user_bp.route("/user/login",
                methods=["POST"])
+@validators.validate_json(["username", "password"])
 def login():
     """
     Login user

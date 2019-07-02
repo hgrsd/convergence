@@ -4,7 +4,7 @@ from sqlalchemy.ext.hybrid import hybrid_method
 from sqlalchemy import func
 from sqlalchemy.ext import declarative
 from sqlalchemy import Column, Float, String, Integer, DateTime, \
-                       ForeignKey, UniqueConstraint, Boolean, ARRAY
+                       ForeignKey, UniqueConstraint, ARRAY
 
 from .point import Point
 

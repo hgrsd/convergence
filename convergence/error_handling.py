@@ -4,6 +4,11 @@ from . import exceptions
 from . import app
 
 
+@app.errorhandler(exceptions.InvalidRequestError)
+def invalid_request_error(error):
+    return error_to_response(error), 400
+
+
 @app.errorhandler(exceptions.LocationError)
 def location_error(error):
     return error_to_response(error), 400
