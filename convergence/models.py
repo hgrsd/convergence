@@ -13,13 +13,13 @@ base = declarative.declarative_base()
 
 class User(base):
     __tablename__ = "users"
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(32), unique=True, nullable=False)
-    email = db.Column(db.String(254), unique=True, nullable=False)
-    phone_number = db.Column(db.String(25), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128))
-    last_seen_lat = db.Column(db.Float)
-    last_seen_long = db.Column(db.Float)
+    id = Column(Integer, primary_key=True)
+    username = Column(String(32), unique=True, nullable=False)
+    email = Column(String(254), unique=True, nullable=False)
+    phone_number = Column(String(25), unique=True, nullable=False)
+    password_hash = Column(String(128))
+    last_seen_lat = Column(Float)
+    last_seen_long = Column(Float)
 
     def hash_password(self, password):
         self.password_hash = pwd_context.hash(password)
