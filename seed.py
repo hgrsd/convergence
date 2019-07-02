@@ -27,8 +27,9 @@ def generate_users(n_users=100, password="testing", country_code="GB"):
     for i in range(n_users):
         user = User()
         user.username = fake.user_name()
+        user.email = fake.ascii_email()
+        user.phone_number = fake.phone_number()
         user.hash_password(password)
-        user.available = random.choice([False, True])
         user.last_seen_lat, user.last_seen_long = fake.local_latlng(country_code=country_code, coords_only=True)
         db.session.add(user)
     db.session.flush()

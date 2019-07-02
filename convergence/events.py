@@ -130,27 +130,6 @@ def get_owned_events(user_id):
         return [event.as_dict() for event in events_owned]
 
 
-def get_available_members(request_id, event_id):
-    """
-    Get available members from event
-    :param request_id: user requesting operation (must be event member)
-    :param event_id: event of which members are requested
-    :return: basic user info for all available users in group
-    """
-    if not db.session.query(UserEvent).filter_by(user_id=request_id,
-                                                 event_id=event_id) \
-                                      .first():
-        raise PermissionError("Permission denied. Must be event member.")
-    users = db.session.query(User) \
-                      .join(UserEvent, User.id == UserEvent.user_id) \
-                      .filter(UserEvent.event_id == event_id,
-                              User.available == True) \
-                      .all()
-    if not users:
-        return []
-    return [user.basic_info() for user in users]
-
-
 def get_events(user_id):
     """
     Get events of which user is a member.

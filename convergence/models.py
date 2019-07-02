@@ -13,15 +13,16 @@ base = declarative.declarative_base()
 
 class User(base):
     __tablename__ = "users"
-    id = Column(Integer, primary_key=True)
-    username = Column(String(32), unique=True, nullable=False)
-    password_hash = Column(String(128))
-    last_seen_lat = Column(Float)
-    last_seen_long = Column(Float)
-    available = Column(Boolean)
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(32), unique=True, nullable=False)
+    email = db.Column(db.String(254), unique=True, nullable=False)
+    phone_number = db.Column(db.String(25), unique=True, nullable=False)
+    password_hash = db.Column(db.String(128))
+    last_seen_lat = db.Column(db.Float)
+    last_seen_long = db.Column(db.Float)
 
     def hash_password(self, password):
-        self.password_hash = pwd_context.encrypt(password)
+        self.password_hash = pwd_context.hash(password)
 
     def verify_password(self, password):
         return pwd_context.verify(password, self.password_hash)
@@ -35,9 +36,10 @@ class User(base):
     def full_info(self):
         """ Return all info except for password hash """
         return {"id": self.id, "username": self.username,
+                "email": self.email,
+                "phone": self.phone_number,
                 "last_seen_lat": self.last_seen_lat,
-                "last_seen_long": self.last_seen_long,
-                "available": self.available}
+                "last_seen_long": self.last_seen_long}
 
 
 class Event(base):
