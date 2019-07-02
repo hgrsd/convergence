@@ -1,10 +1,10 @@
-from . import db
-from .events import get_members
-from .models import User
-from .location import find_centroid, mean_dist_from_centroid
-from .places import get_places_around_centroid, order_places_by_travel_time, \
-                    order_places_by_distance, sift_places_by_rating
+import math
 
+from . import location
+from . import places
+from . import db
+from . import events
+from .models import User
 
 def get_suggestions(request_id, event_id, place_type, suggestions_mode):
     """
@@ -16,20 +16,23 @@ def get_suggestions(request_id, event_id, place_type, suggestions_mode):
     :param suggestions_mode: suggestions mode (e.g. "distance" or "transit")
     :return: list of places in requested order (e.g. distance, transit time)
     """
-    event_members = get_members(request_id, event_id)
-    user_coordinates = [db.session.query(User).get(member["id"]).get_location()
-                        for member in event_members]
-    centroid = find_centroid(user_coordinates)
-    dist_from_centroid = mean_dist_from_centroid(user_coordinates, centroid)
-    radius = int(dist_from_centroid / 4)
-    places = get_places_around_centroid(centroid, radius, place_type)
-    places = sift_places_by_rating(places)
-    if not places:
+    member_ids = [member["id"] for member
+                  in events.get_members(request_id, event_id)]
+    users = db.session.query(User).filter(User.id.in_(member_ids)).all()
+    user_coordinates = [user.get_location() for user in users]
+    centroid = location.find_centroid(user_coordinates)
+    dist_from_centroid = location.mean_dist_from_centroid(user_coordinates,
+                                                          centroid)
+    radius = math.ceil(dist_from_centroid) / 4
+    potential_places = places.get_places_around_centroid(centroid,
+                                                         radius,
+                                                         place_type)
+    if not potential_places:
         return []
+    sifted_places = places.sift_places_by_rating(potential_places)
     if suggestions_mode == "distance":
-        ordered_places = order_places_by_distance(user_coordinates, places)
+        return places.order_places_by_distance(user_coordinates, sifted_places)
     else:
-        ordered_places = order_places_by_travel_time(user_coordinates,
-                                                     places,
-                                                     suggestions_mode)
-    return ordered_places
+        return places.order_places_by_travel_time(user_coordinates,
+                                                  sifted_places,
+                                                  suggestions_mode)

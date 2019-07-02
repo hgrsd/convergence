@@ -1,9 +1,11 @@
 import flask_jwt_extended
 from flask import Blueprint, jsonify, request
 
-from . import events, user, suggestions
 from . import app
 from . import validators
+from . import events
+from . import user
+from . import suggestions
 
 user_bp = Blueprint("user", __name__)
 events_bp = Blueprint("events", __name__)

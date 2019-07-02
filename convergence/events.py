@@ -1,5 +1,4 @@
 import datetime
-
 from sqlalchemy.exc import IntegrityError
 
 from . import db
@@ -50,6 +49,7 @@ def delete_event(user_id, event_id):
     except:
         db.session.rollback()
         raise DatabaseError("Error writing to database.")
+    return None
 
 
 def add_user_to_event(request_id, user_id, event_id):
@@ -73,6 +73,7 @@ def add_user_to_event(request_id, user_id, event_id):
     except:
         db.session.rollback()
         raise DatabaseError("Error writing to database.")
+    return None
 
 
 def remove_user_from_event(request_id, user_id, event_id):
@@ -95,6 +96,7 @@ def remove_user_from_event(request_id, user_id, event_id):
     except:
         db.session.rollback()
         raise DatabaseError("Error writing to database.")
+    return None
 
 
 def get_members(request_id, event_id):
@@ -126,8 +128,7 @@ def get_owned_events(user_id):
     events_owned = db.session.query(Event).filter_by(owner=user_id).all()
     if not events_owned:
         return []
-    else:
-        return [event.as_dict() for event in events_owned]
+    return [event.as_dict() for event in events_owned]
 
 
 def get_events(user_id):

@@ -1,5 +1,6 @@
-from Flask import request
+from flask import request
 from functools import wraps
+
 from .exceptions import InvalidRequestError
 
 
