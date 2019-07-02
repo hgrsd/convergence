@@ -97,7 +97,12 @@ def get_event_members(session):
 def new_user(session):
     username = input("Username: ")
     password = input("Password (careful, plain text): ")
-    response = session.post("http://localhost:5000/user", json={"username": username, "password": password}).json()
+    email = input("Email: ")
+    phone = input("Phone number: ")
+    response = session.post("http://localhost:5000/user", json={"username": username, 
+                                                                "password": password,
+                                                                "email": email,
+                                                                "phone_number": phone}).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
 

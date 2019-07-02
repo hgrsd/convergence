@@ -18,7 +18,7 @@ class User(db.Model):
     last_seen_long = db.Column(db.Float)
 
     def hash_password(self, password):
-        self.password_hash = pwd_context.encrypt(password)
+        self.password_hash = pwd_context.hash(password)
 
     def verify_password(self, password):
         return pwd_context.verify(password, self.password_hash)
@@ -33,6 +33,7 @@ class User(db.Model):
         """ Return all info except for password hash """
         return {"id": self.id, "username": self.username,
                 "email": self.email,
+                "phone": self.phone_number,
                 "last_seen_lat": self.last_seen_lat,
                 "last_seen_long": self.last_seen_long}
 
