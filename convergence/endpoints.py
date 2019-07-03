@@ -31,7 +31,7 @@ def register_user():
     """
     username = request.get_json()["username"]
     password = request.get_json()["password"]
-    email = request.get_json()["email"]
+    email = request.get_json()["email"].lower()
     phone_number = request.get_json()["phone_number"]
     result = user.register_user(username, password, email, phone_number)
     return jsonify({"data": result}), 200
