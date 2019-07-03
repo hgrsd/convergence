@@ -137,10 +137,15 @@ def get_events(user_id):
     :param user_id: user requesting operation
     :return: list of events of which user is a member
     """
-    events = db.session.query(Event) \
-                       .join(UserEvent, Event.id == UserEvent.event_id) \
-                       .filter(UserEvent.user_id == user_id) \
-                       .all()
-    if not events:
+    query_result = db.session.query(User, Event) \
+                             .join(Event, User.event) \
+                             .join(UserEvent) \
+                             .filter(UserEvent.user_id == user_id) \
+                             .all()
+    if not query_result:
         return []
-    return [event.as_dict() for event in events]
+    events = []
+    for i, entry in enumerate(query_result):
+        events.append(entry[1].as_dict())
+        events[i]["owner_name"] = entry[0].username
+    return events

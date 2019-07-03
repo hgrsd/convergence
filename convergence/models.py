@@ -20,6 +20,9 @@ class User(base):
     last_seen_lat = sa.Column(sa.Float)
     last_seen_long = sa.Column(sa.Float)
 
+    userevent = sa.orm.relation("UserEvent")
+    event = sa.orm.relation("Event")
+
     def hash_password(self, password):
         self.password_hash = pwd_context.hash(password)
 
@@ -48,6 +51,8 @@ class Event(base):
     owner = sa.Column(sa.ForeignKey("users.id", ondelete="CASCADE"),
                       index=True)
     creation_date = sa.Column(sa.DateTime)
+
+    userevent = sa.orm.relation("UserEvent")
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
