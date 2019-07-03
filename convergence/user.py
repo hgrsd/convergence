@@ -80,7 +80,7 @@ def update_location(user_id, lat, long):
     :param user_id: requesting user
     :param lat: new latitude
     :param long: new longitude
-    :return: full user info
+    :return: location info
     """
     if (lat < location.MIN_LAT or lat > location.MAX_LAT
             or long < location.MIN_LON or long > location.MAX_LON):
@@ -93,4 +93,4 @@ def update_location(user_id, lat, long):
     except:
         db.session.rollback()
         raise exceptions.DatabaseError("Error writing to database.")
-    return user.full_info()
+    return user.get_location()

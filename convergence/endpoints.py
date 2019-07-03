@@ -19,6 +19,7 @@ suggestions_bp = Blueprint("suggestions", __name__)
 def root():
     return app.send_static_file('index.html')
 
+
 # -- user endpoints:
 @user_bp.route("/user",
                methods=["POST"])
@@ -26,7 +27,7 @@ def root():
 def register_user():
     """
     Register new user
-    :return: HTTP response
+    :return: new user's full info
     """
     username = request.get_json()["username"]
     password = request.get_json()["password"]
@@ -41,8 +42,8 @@ def register_user():
 @validators.validate_json(["username", "password"])
 def login():
     """
-    Login user
-    :return: HTTP response
+    Login user, set access cookie (JWT + CSRF token)
+    :return: user id
 
     TODO: separate cookie-based JWT storage and response-based one.
     For security reasons, web app is not supposed to have direct access
@@ -52,7 +53,7 @@ def login():
     password = request.get_json()["password"]
     user_id = user.login(username, password)
     access_token = flask_jwt_extended.create_access_token(identity=user_id)
-    response = jsonify({"success": True})
+    response = jsonify({"data": {"user_id": user_id}})
     flask_jwt_extended.set_access_cookies(response, access_token)
     return response, 200
 
@@ -63,7 +64,7 @@ def login():
 def delete_user():
     """
     Delete current user
-    :return: HTTP response
+    :return: success status
     """
     user_id = flask_jwt_extended.get_jwt_identity()
     user.delete_user(user_id)
@@ -76,7 +77,7 @@ def delete_user():
 def get_user_info():
     """
     Get info for current user
-    :return: HTTP response
+    :return: full user info
     """
     user_id = flask_jwt_extended.get_jwt_identity()
     result = user.get_info(user_id)
@@ -89,7 +90,7 @@ def get_user_info():
 def find_user(username):
     """
     Find user info by username
-    :return: HTTP response
+    :return: basic user info
     """
     result = user.find_user(username)
     return jsonify({"data": result}), 200
@@ -103,7 +104,7 @@ def update_location(lat, long):
     Update current user"s location
     :param lat: current latitude, float
     :param long: current longitude, float
-    :return: HTTP response
+    :return: updated location info
     """
     user_id = flask_jwt_extended.get_jwt_identity()
     result = user.update_location(user_id, lat, long)
@@ -118,7 +119,7 @@ def create_event(name):
     """
     Create new event, owned by current user
     :param name: event name
-    :return: HTTP response
+    :return: new event info
     """
     user_id = flask_jwt_extended.get_jwt_identity()
     result = events.create_event(user_id, name)
@@ -132,7 +133,7 @@ def delete_event(event_id):
     """
     Delete event (requesting user must be event owner)
     :param event_id: event to be deleted
-    :return: HTTP response
+    :return: success status
     """
     user_id = flask_jwt_extended.get_jwt_identity()
     events.delete_event(user_id, event_id)
@@ -145,7 +146,7 @@ def delete_event(event_id):
 def owned_events():
     """
     Get events owned by user
-    :return: HTTP response
+    :return: event info for all owned events
     """
     user_id = flask_jwt_extended.get_jwt_identity()
     result = events.get_owned_events(user_id)
@@ -160,7 +161,7 @@ def add_user_to_event(event_id, user_id):
     Add user to event (requesting user must be event owner)
     :param event_id: event to add user to
     :param user_id: user to add to event
-    :return: HTTP response
+    :return: success status
     """
     request_id = flask_jwt_extended.get_jwt_identity()
     events.add_user_to_event(request_id, user_id, event_id)
@@ -175,7 +176,7 @@ def remove_user_from_event(event_id, user_id):
     Remove user from event (requesting user must be event owner)
     :param event_id: event to remove user from
     :param user_id: user to remove from event
-    :return: HTTP response
+    :return: success status
     """
     request_id = flask_jwt_extended.get_jwt_identity()
     events.remove_user_from_event(request_id, user_id, event_id)
@@ -189,7 +190,7 @@ def get_members(event_id):
     """
     Get list of event members (requesting user must be event member)
     :param event_id: event to request members from
-    :return: HTTP response
+    :return: basic info for all members of event
     """
     user_id = flask_jwt_extended.get_jwt_identity()
     result = events.get_members(user_id, event_id)
@@ -201,7 +202,7 @@ def get_members(event_id):
 def get_events():
     """
     Get events of which requesting user is a member.
-    :return: HTTP response
+    :return: even info for all user's events
     """
     user_id = flask_jwt_extended.get_jwt_identity()
     result = events.get_events(user_id)
@@ -217,7 +218,7 @@ def suggestions_distance(event_id, place_type):
     as-the-crow-flies for event members.
     :param event_id: event to request suggestions for
     :param place_type: type of place
-    :return: HTTP response
+    :return: list of Places ordered by avg distance
     """
     request_id = flask_jwt_extended.get_jwt_identity()
     result = suggestions.get_suggestions(request_id, event_id,
@@ -233,7 +234,7 @@ def suggestions_transit(event_id, place_type):
     members, using public transport.
     :param event_id: event to request suggestions for
     :param place_type: type of places
-    :return: HTTP response
+    :return: list of Places ordered by avg transit time
     """
     request_id = flask_jwt_extended.get_jwt_identity()
     result = suggestions.get_suggestions(request_id, event_id,
@@ -249,7 +250,7 @@ def suggestions_driving(event_id, place_type):
     members, driving.
     :param event_id: event to request suggestions for
     :param place_type: type of places
-    :return: HTTP response
+    :return: list of Places ordered by avg driving time
     """
     request_id = flask_jwt_extended.get_jwt_identity()
     result = suggestions.get_suggestions(request_id, event_id,
@@ -265,7 +266,7 @@ def suggestions_walking(event_id, place_type):
     members, walking.
     :param event_id: event to request suggestions for
     :param place_type: type of places
-    :return: HTTP response
+    :return: list of Places ordered by avg walking time
     """
     request_id = flask_jwt_extended.get_jwt_identity()
     result = suggestions.get_suggestions(request_id, event_id,
@@ -281,7 +282,7 @@ def suggestions_bicycling(event_id, place_type):
     members, cycling.
     :param event_id: event to request suggestions for
     :param place_type: type of places
-    :return: HTTP response
+    :return: list of Places ordered by avg cycling time
     """
     request_id = flask_jwt_extended.get_jwt_identity()
     result = suggestions.get_suggestions(request_id, event_id,
