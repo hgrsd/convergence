@@ -57,7 +57,7 @@ def generate_events(n_events=25, total_users=100):
         event = Event()
         event.name = fake.domain_word()
         event.owner = random.choice(db.session.query(User).all()).id
-        event.creation_date = fake.date_time()
+        event.creation_date = fake.past_datetime(start_date="-7d", tzinfo=None)
         db.session.add(event)
         db.session.flush()
         # add owner of event to UserEvent
