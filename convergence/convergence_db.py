@@ -9,6 +9,7 @@ class ConvergenceDB:
         """Set up engine and session"""
         self.engine = sqlalchemy.create_engine(db_url)
         self.base = models.base
+        self.metadata = models.base.metadata
         SessionMaker = sqlalchemy.orm.sessionmaker(bind=self.engine)
         self.session = SessionMaker()
 
