@@ -33,6 +33,11 @@ def invite_user_to_event(request_id, user_id, event_id):
 
 
 def get_invitations(user_id):
+    """
+    Get all pending invitations for user
+    :param user_id: id of requesting user
+    :return: list of pending invitations with user and event info
+    """
     event_owner = sa.alias(User)
     inviter = sa.alias(User)
     query_result = db.session.query(Event,
