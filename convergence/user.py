@@ -1,4 +1,4 @@
-from sqlalchemy import exc
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 
 from . import location
 from . import db
@@ -41,7 +41,7 @@ def register_user(username, password, email, phone_number):
     db.session.add(user)
     try:
         db.session.commit()
-    except exc.IntegrityError:
+    except IntegrityError:
         db.session.rollback()
         raise exceptions.AccountError("Username or email exists already.")
     return user.full_info()
@@ -57,9 +57,9 @@ def delete_user(user_id):
     db.session.delete(user)
     try:
         db.session.commit()
-    except:
+    except SQLAlchemyError as e:
         db.session.rollback()
-        raise exceptions.DatabaseError("Error writing to database.")
+        raise exceptions.DatabaseError(f"Error: {e.message}")
 
 
 def find_user(username):
@@ -90,7 +90,7 @@ def update_location(user_id, lat, long):
     db.session.add(user)
     try:
         db.session.commit()
-    except:
+    except SQLAlchemyError as e:
         db.session.rollback()
-        raise exceptions.DatabaseError("Error writing to database.")
+        raise exceptions.DatabaseError(f"Error: {e.message}")
     return user.get_location()

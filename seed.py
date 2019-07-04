@@ -55,15 +55,15 @@ def generate_events(n_events=25, total_users=100):
     print(f"[>] Generating {n_events} fake events...")
     for i in range(n_events):
         event = Event()
-        event.name = fake.domain_word()
-        event.owner = random.choice(db.session.query(User).all()).id
+        event.event_name = fake.domain_word()
+        event.event_owner_id = random.choice(db.session.query(User).all()).id
         event.creation_date = fake.past_datetime(start_date="-7d", tzinfo=None)
         db.session.add(event)
         db.session.flush()
         # add owner of event to UserEvent
         userevent = UserEvent()
         userevent.event_id = event.id
-        userevent.user_id = event.owner
+        userevent.user_id = event.event_owner_id
         db.session.add(userevent)
         db.session.flush()
 

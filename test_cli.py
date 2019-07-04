@@ -2,17 +2,18 @@ import json
 import requests
 
 header = ""
+user_id = ""
 
 
 def main():
     session = requests.Session()
     login(session)
     while True:
-        mode = input("Menu:\n\t[u]ser\n\t[e]vents\n\t[s]uggestions\n\t[q]uit\n\n> ")
+        mode = input("Menu:\n\t[u]ser\n\t[e]vents\n\t[i]nvites\n\t[s]uggestions\n\t[q]uit\n\n> ")
         if mode == "q":
             break
         elif mode == "e":
-            event_mode = input("[c]urrent user's events, [o]wned events, [n]ew, [d]elete, [a]dd user, [r]emove user, [g]et members, [q]uit event menu: ")
+            event_mode = input("[c]urrent user's events, [o]wned events, [n]ew, [d]elete, [i]nvite user, [r]emove user, [l]eave event, [g]et members, [q]uit event menu: ")
             if event_mode == "n":
                 create_event(session)
             elif event_mode == "o":
@@ -21,12 +22,20 @@ def main():
                 get_events(session)
             elif event_mode == "d":
                 delete_event(session)
-            elif event_mode == "a":
-                add_user_to_event(session)
+            elif event_mode == "i":
+                invite_user_to_event(session)
             elif event_mode == "r":
                 remove_user_from_event(session)
             elif event_mode == "g":
                 get_event_members(session)
+            elif event_mode == "l":
+                leave_event(session)
+        elif mode == "i":
+            invite_mode = input("[p]ending invitations, [r]espond to invitation")
+            if invite_mode == "p":
+                get_invitations(session)
+            elif invite_mode == "r":
+                respond_to_invitation(session)
         elif mode == "u":
             user_mode = input("[n]ew, [d]elete, [f]ind, [s]witch, set [l]ocation, [i]nfo, [q]uit\n> ")
             if user_mode == "n":
@@ -67,10 +76,22 @@ def delete_event(session):
     print(json.dumps(response, sort_keys=True, indent=4))
 
 
-def add_user_to_event(session):
+def invite_user_to_event(session):
     event_id = input("Event id: ")
     user_id = input("User id: ")
-    response = session.post(f"http://localhost:5000/events/user_event/{event_id}:{user_id}", cookies=session.cookies, headers=header).json()
+    response = session.post(f"http://localhost:5000/events/invite/{event_id}:{user_id}", cookies=session.cookies, headers=header).json()
+    print(json.dumps(response, sort_keys=True, indent=4))
+
+
+def get_invitations(session):
+    response = session.get(f"http://localhost:5000/events/invite", cookies=session.cookies, headers=header).json()
+    print(json.dumps(response, sort_keys=True, indent=4))
+
+
+def respond_to_invitation(session):
+    invitation_id = input("Invitation id: ")
+    action = "accept" if input("Accept (y/n): ").lower() == "y" else "reject"
+    response = session.post(f"http://localhost:5000/events/invite/{invitation_id}/{action}", cookies=session.cookies, headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
 
@@ -78,6 +99,12 @@ def find_user(session):
     user = input("Username: ")
     response = session.get(f"http://localhost:5000/user/{user}", cookies=session.cookies, headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
+
+
+def leave_event(session):
+    event_id = input("Event id: ")
+    response = session.delete(f"http://localhost:5000/events/user_event/{event_id}:{user_id}", cookies=session.cookies, headers=header).json()
+    print(json.dumps(response, sort_keys=True, indent=4))    
 
 
 def remove_user_from_event(session):
@@ -127,12 +154,14 @@ def get_events(session):
 
 def login(session):
     global header
+    global user_id
     username = input("Username: ")
     password = input("Password: ")
     response = session.post("http://localhost:5000/user/login", json={"username": username, "password": password}).json()
     if "error" not in response:
         csrf_token = session.cookies['csrf_access_token']
         header = {"X-CSRF-TOKEN": csrf_token}
+        user_id = response["data"]["user_id"]
     print(json.dumps(response, sort_keys=True, indent=4))
 
 

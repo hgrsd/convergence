@@ -6,6 +6,7 @@ from . import validators
 from . import events
 from . import user
 from . import suggestions
+from . import invite
 
 user_bp = Blueprint("user", __name__)
 events_bp = Blueprint("events", __name__)
@@ -153,18 +154,57 @@ def owned_events():
     return jsonify({"data": result}), 200
 
 
-@events_bp.route("/events/user_event/<int:event_id>:<int:user_id>",
+@events_bp.route("/events/invite",
+                 methods=["GET"])
+@flask_jwt_extended.jwt_required
+def get_invitations():
+    """
+    Get pending invitations for current user
+    :return: pending invitations
+    """
+    request_id = flask_jwt_extended.get_jwt_identity()
+    result = invite.get_invitations(request_id)
+    return jsonify({"data": result}), 200
+
+
+@events_bp.route("/events/invite/<int:event_id>:<int:user_id>",
                  methods=["POST"])
 @flask_jwt_extended.jwt_required
-def add_user_to_event(event_id, user_id):
+def invite_user_to_event(event_id, user_id):
     """
-    Add user to event (requesting user must be event owner)
-    :param event_id: event to add user to
-    :param user_id: user to add to event
+    Invite user to event (requesting user must be event owner)
+    :param event_id: event to invite user to
+    :param user_id: user to invite to event
     :return: success status
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    events.add_user_to_event(request_id, user_id, event_id)
+    invite.invite_user_to_event(request_id, user_id, event_id)
+    return jsonify({"success": True}), 200
+
+
+@events_bp.route("/events/invite/<int:invite_id>/accept",
+                 methods=["POST"])
+@flask_jwt_extended.jwt_required
+def accept_invitation(invite_id):
+    """
+    Accept specified pending invitation
+    :return: event info for accepted invitation
+    """
+    request_id = flask_jwt_extended.get_jwt_identity()
+    result = invite.respond_to_invitation(request_id, invite_id, True)
+    return jsonify({"data": result}), 200
+
+
+@events_bp.route("/events/invite/<int:invite_id>/reject",
+                 methods=["POST"])
+@flask_jwt_extended.jwt_required
+def reject_invitation(invite_id):
+    """
+    Reject specified pending invitation
+    :return: success status
+    """
+    request_id = flask_jwt_extended.get_jwt_identity()
+    invite.respond_to_invitation(request_id, invite_id, False)
     return jsonify({"success": True}), 200
 
 
@@ -173,13 +213,17 @@ def add_user_to_event(event_id, user_id):
 @flask_jwt_extended.jwt_required
 def remove_user_from_event(event_id, user_id):
     """
-    Remove user from event (requesting user must be event owner)
+    Remove user from event (requesting user must be event owner) or
+    leave event (if request_id == user_id).
     :param event_id: event to remove user from
     :param user_id: user to remove from event
     :return: success status
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    events.remove_user_from_event(request_id, user_id, event_id)
+    if request_id == user_id:
+        events.leave_event(request_id, event_id)
+    else:
+        events.remove_user_from_event(request_id, user_id, event_id)
     return jsonify({"success": True}), 200
 
 
@@ -196,6 +240,7 @@ def get_members(event_id):
     result = events.get_members(user_id, event_id)
     return jsonify({"data": result}), 200
 
+
 @events_bp.route("/events",
                  methods=["GET"])
 @flask_jwt_extended.jwt_required
@@ -207,6 +252,7 @@ def get_events():
     user_id = flask_jwt_extended.get_jwt_identity()
     result = events.get_events(user_id)
     return jsonify({"data": result}), 200
+
 
 # -- suggestions endpoints:
 @suggestions_bp.route("/suggestions/distance/<int:event_id>:<string:place_type>",
@@ -225,6 +271,7 @@ def suggestions_distance(event_id, place_type):
                                          place_type, "distance")
     return jsonify({"data": result}), 200
 
+
 @suggestions_bp.route("/suggestions/transit/<int:event_id>:<string:place_type>",
                       methods=["GET"])
 @flask_jwt_extended.jwt_required
@@ -240,6 +287,7 @@ def suggestions_transit(event_id, place_type):
     result = suggestions.get_suggestions(request_id, event_id,
                                          place_type, "transit")
     return jsonify({"data": result}), 200
+
 
 @suggestions_bp.route("/suggestions/drive/<int:event_id>:<string:place_type>",
                       methods=["GET"])
@@ -257,6 +305,7 @@ def suggestions_driving(event_id, place_type):
                                          place_type, "driving")
     return jsonify({"data": result}), 200
 
+
 @suggestions_bp.route("/suggestions/walk/<int:event_id>:<string:place_type>",
                       methods=["GET"])
 @flask_jwt_extended.jwt_required
@@ -272,6 +321,7 @@ def suggestions_walking(event_id, place_type):
     result = suggestions.get_suggestions(request_id, event_id,
                                          place_type, "walking")
     return jsonify({"data": result}), 200
+
 
 @suggestions_bp.route("/suggestions/cycle/<int:event_id>:<string:place_type>",
                       methods=["GET"])
