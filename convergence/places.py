@@ -1,4 +1,4 @@
-from sqlalchemy import exc
+from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
 
 from . import db
@@ -35,7 +35,7 @@ def get_places_around_centroid(point, radius, place_type):
             db.session.add(place_entry)
         try:
             db.session.commit()
-        except exc.IntegrityError:
+        except SQLAlchemyError:
             db.session.rollback()
     return places
 
