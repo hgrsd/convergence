@@ -28,7 +28,7 @@ def invite_user_to_event(request_id, user_id, event_id):
         db.session.commit()
     except SQLAlchemyError as e:
         db.session.rollback()
-        raise exceptions.DatabaseError(f"Error: {e.message}")
+        raise exceptions.DatabaseError(f"Error: {str(e)}")
     return None
 
 
@@ -82,5 +82,5 @@ def respond_to_invitation(request_id, invite_id, accept):
         db.session.commit()
     except SQLAlchemyError as e:
         db.session.rollback()
-        raise exceptions.DatabaseError(f"Error: {e.message}")
+        raise exceptions.DatabaseError(f"Error: {str(e)}")
     return db.session.query(Event).get(event_id).as_dict() if accept else None

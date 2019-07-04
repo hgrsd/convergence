@@ -59,7 +59,7 @@ def delete_user(user_id):
         db.session.commit()
     except SQLAlchemyError as e:
         db.session.rollback()
-        raise exceptions.DatabaseError(f"Error: {e.message}")
+        raise exceptions.DatabaseError(f"Error: {str(e)}")
 
 
 def find_user(username):
@@ -92,5 +92,5 @@ def update_location(user_id, lat, long):
         db.session.commit()
     except SQLAlchemyError as e:
         db.session.rollback()
-        raise exceptions.DatabaseError(f"Error: {e.message}")
+        raise exceptions.DatabaseError(f"Error: {str(e)}")
     return user.get_location()

@@ -20,14 +20,14 @@ def create_event(user_id, name):
         db.session.flush()
     except SQLAlchemyError as e:
         db.session.rollback()
-        raise exceptions.DatabaseError(f"Error: {e.message}")
+        raise exceptions.DatabaseError(f"Error: {str(e)}")
     userevent = UserEvent(user_id=user_id, event_id=event.id)
     db.session.add(userevent)
     try:
         db.session.commit()
     except SQLAlchemyError as e:
         db.session.rollback()
-        raise exceptions.DatabaseError(f"Error: {e.message}")
+        raise exceptions.DatabaseError(f"Error: {str(e)}")
     return event.as_dict()
 
 
@@ -47,7 +47,7 @@ def delete_event(user_id, event_id):
         db.session.commit()
     except SQLAlchemyError as e:
         db.session.rollback()
-        raise exceptions.DatabaseError(f"Error: {e.message}")
+        raise exceptions.DatabaseError(f"Error: {str(e)}")
     return None
 
 
@@ -69,7 +69,7 @@ def add_user_to_event(user_id, event_id):
         db.session.commit()
     except SQLAlchemyError as e:
         db.session.rollback()
-        raise exceptions.DatabaseError(f"Error: {e.message}")
+        raise exceptions.DatabaseError(f"Error: {str(e)}")
     return None
 
 
@@ -91,7 +91,7 @@ def leave_event(request_id, event_id):
         db.session.commit()
     except SQLAlchemyError as e:
         db.session.rollback()
-        raise exceptions.DatabaseError(f"Error: {e.message}")
+        raise exceptions.DatabaseError(f"Error: {str(e)}")
     return None
 
 
@@ -114,7 +114,7 @@ def remove_user_from_event(request_id, user_id, event_id):
         db.session.commit()
     except SQLAlchemyError as e:
         db.session.rollback()
-        raise exceptions.DatabaseError(f"Error: {e.message}")
+        raise exceptions.DatabaseError(f"Error: {str(e)}")
     return None
 
 
