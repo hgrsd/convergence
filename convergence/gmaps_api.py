@@ -2,7 +2,6 @@ import requests
 import time
 import math
 from urllib.parse import quote
-
 from . import app
 from .exceptions import ServerError
 
@@ -11,6 +10,7 @@ GM_PLACES_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/" \
 GM_TRAVEL_TIME_URL = "https://maps.googleapis.com/maps/api/distancematrix/" \
                      "json?origins={:s}&destinations={:s}&mode={:s}&key={:s}"
 GM_API_KEY = app.config.get("GM_API_KEY")
+
 DISTANCE_MATRIX_MAX_ELEMENTS = 100
 
 
@@ -57,22 +57,14 @@ def distance_matrix(origins, destinations, mode):
                             / DISTANCE_MATRIX_MAX_ELEMENTS)
     matrix = [None] * len(origins)
     for i in range(no_requests):
-        start = 0 + i * (len(destinations) // no_requests)
+        start = i * (len(destinations) // no_requests)
         cutoff = len(destinations) // no_requests * (i + 1)
-        locations_string = ""
-        for origin in origins:
-            if locations_string != "":  # if not the first iteration
-                locations_string += "|"
-            locations_string = locations_string + str(origin.lat) + "," \
-                + str(origin.long)
-        places_string = ""
-        for destination in destinations[start:cutoff]:
-            if places_string != "":
-                places_string += "|"
-            places_string = places_string + str(destination.lat) + "," \
-                + str(destination.long)
-        request = GM_TRAVEL_TIME_URL.format(quote(locations_string),
-                                            quote(places_string),
+        origins_strings = [",".join([str(origin.lat), str(origin.long)])
+                           for origin in origins]
+        dest_strings = [",".join([str(dest.lat), str(dest.long)])
+                        for dest in destinations[start:cutoff]]
+        request = GM_TRAVEL_TIME_URL.format(quote("|".join(origins_strings)),
+                                            quote("|".join(dest_strings)),
                                             mode,
                                             GM_API_KEY)
         response = requests.get(request).json()
@@ -83,8 +75,8 @@ def distance_matrix(origins, destinations, mode):
                 matrix[i] = row["elements"]
             else:
                 matrix[i].extend(row["elements"])
-        if no_requests > 1:
-            time.sleep(2)
+        if i < no_requests - 1:
+            time.sleep(1.5)
     return matrix
 
 

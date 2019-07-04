@@ -6,7 +6,8 @@ from . import gmaps_api
 from .models import Place
 from .location import Point
 
-MAX_PLACES = 10
+MIN_PLACES_FROM_DATABASE = 4
+MAX_PLACES_PER_SUGGESTION = 10
 
 
 def get_places_around_centroid(point, radius, place_type):
@@ -22,7 +23,7 @@ def get_places_around_centroid(point, radius, place_type):
                              .filter(Place.within_range(point, radius))
     places = [place.as_dict() for place in places_query
               if place_type in place.gm_types]
-    if len(places) < 0.25 * MAX_PLACES:
+    if len(places) < MIN_PLACES_FROM_DATABASE:
         places = gmaps_api.places_around_point(point, radius, place_type)
         for place in places:
             place_entry = Place(name=place["name"], gm_id=place["gm_id"],
@@ -37,6 +38,8 @@ def get_places_around_centroid(point, radius, place_type):
             db.session.commit()
         except SQLAlchemyError:
             db.session.rollback()
+    if len(places) > MAX_PLACES_PER_SUGGESTION:
+        places = sort_places_by_rating(places)[:MAX_PLACES_PER_SUGGESTION]
     return places
 
 
@@ -84,18 +87,14 @@ def order_places_by_travel_time(user_coordinates, places, mode):
     return ordered_places
 
 
-def sift_places_by_rating(places):
+def sort_places_by_rating(places):
     """
-    Return MAX_PLACES-length list of places, sorted by rating in descending
-    order if len(places) > MAX_PLACES
+    Return list of places, sorted by ranking (highest to lowest)
     :param places: list of places
-    :return: MAX_PLACES-length list of places, sorted by rating
+    :return: list of places, sorted by rating
     """
-    if len(places) < MAX_PLACES:
-        return places
-    else:
-        for place in places:
-            if not place["gm_rating"]:
-                place["gm_rating"] = 1
-        places = sorted(places, key=lambda x: x["gm_rating"], reverse=True)
-        return places[:MAX_PLACES]
+    for place in places:
+        if not place["gm_rating"]:
+            place["gm_rating"] = 1
+    places = sorted(places, key=lambda x: x["gm_rating"], reverse=True)
+    return places
