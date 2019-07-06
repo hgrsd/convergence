@@ -1,13 +1,13 @@
 const path = require("path");
 
 module.exports = {
-	entry: ["./src/index.js", "./style/index.scss"],
+	entry: ["./src/index.jsx", "./style/index.scss"],
 	output: {
 		filename: "app.js",
 		path: path.resolve(__dirname, "dist")
 	},
 	resolve: {
-		extensions: [".js"]
+		extensions: [".js", ".jsx"]
 	},
 	mode: "production",
 	module: {
@@ -26,12 +26,12 @@ module.exports = {
 				loader: "sass-loader"
 			}]
 		}, {
-			test: /.js$/,
+			test: /.jsx?$/,
 			exclude: /node_modules/,
 			use: {
 				loader: "babel-loader",
 				options: {
-					presets: ["@babel/preset-env"]
+					presets: ["@babel/preset-env", "@babel/preset-react"]
 				}
 			}
 		}]

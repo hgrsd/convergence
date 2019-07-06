@@ -6,6 +6,9 @@ migrations/
 __pycache__/
 .idea/
 .vscode/
+migrations_convergence/
+
+*.pyc
 
 # Frontend
 node_modules/
