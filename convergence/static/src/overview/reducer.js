@@ -39,7 +39,7 @@ export function overviewReducer(state = initialState, action) {
 			};
 			// TODO: sort by and display event planned date instead of created date
 			result.pendingEvents.sort((l, r) => {
-				return new Date(l.created_date) - new Date(r.created_date);
+				return new Date(l.creation_date) - new Date(r.creation_date);
 			});
 			return result;
 		case EVENT_EDIT_START:
