@@ -1,20 +1,85 @@
 import React from "react";
+import { Link, Switch, Route } from "react-router-dom";
 import { SmallSpinner } from "../common";
-import { NavbarView } from "./navbar";
+import { NavbarView, EditEventView } from "./index.js";
 
-// TODO: replace or remove placeholder images on each card
-// TODO: format event date instead of creation date
-// TODO: localize static strings
-// TODO: display "no current events" label
-// TODO: move "Events" title to the nav bar
 export class OverviewView extends React.Component {
 	componentWillMount() {
 		this.props.overviewLoadStart();
 	}
 
 	render() {
+		return (
+			<div>
+				<NavbarView />
+				<div className="container">
+					<Switch>
+						<Route
+							exact
+							path="/event/new"
+							render={props => (
+								<EditEventView
+									eventSaveStart={this.props.eventSaveStart}
+									eventEditSuccess={this.props.eventEditSuccess}
+								/>
+							)}
+						/>
+						<Route
+							path="/"
+							render={props => (
+								<EventList
+									isLoadingEvents={this.props.isLoadingEvents}
+									pendingEvents={this.props.pendingEvents}
+								/>
+							)}
+						/>
+					</Switch>
+				</div>
+			</div>
+		);
+	}
+}
+
+export class EventCard extends React.Component {
+	render() {
+		const event = this.props.event;
+		return (
+			<div className="col-12 col-md-6 col-lg-4">
+				<div className="card m-1 event-card">
+					<img
+						src={`//lorempixel.com/200/200/nightlife/${(event.id % 9) + 1}`}
+						className="card-img-top"
+					/>
+					<div className="card-body">
+						<div className="d-flex">
+							<h5 className="flex-fill card-title">{event.name}</h5>
+							<small className="text-muted">
+								{formatRelativeDate(new Date(), new Date(event.creation_date))}
+							</small>
+						</div>
+						<p className="card-text"></p>
+						<p className="card-text text-right">
+							<a className="card-link" href="#">
+								Details
+							</a>
+						</p>
+					</div>
+				</div>
+			</div>
+		);
+	}
+}
+
+// TODO: replace or remove placeholder images on each card
+// TODO: format event date instead of creation date
+// TODO: localize static strings
+// TODO: display "no current events" label
+// TODO: move "Events" title to the nav bar
+// TODO: move event list classes into a separate file
+export class EventList extends React.Component {
+	render() {
 		let content = null;
-		
+
 		if (this.props.isLoadingEvents) {
 			content = (
 				<div className="text-muted row justify-content-center">
@@ -24,33 +89,8 @@ export class OverviewView extends React.Component {
 				</div>
 			);
 		} else {
-			const now = new Date();
 			const listItems = this.props.pendingEvents.map((e, i) => {
-				const size = Math.floor(Math.random() * 2 + 1);
-				return (
-					<div className="col-12 col-md-6 col-lg-4" key={e.id}>
-						<div className="card m-1 event-card">
-							<img
-								src={`//lorempixel.com/200/200/nightlife/${(e.id % 9) + 1}`}
-								className="card-img-top"
-							/>
-							<div className="card-body">
-								<div className="d-flex">
-									<h5 className="flex-fill card-title">{e.name}</h5>
-									<small className="text-muted">
-										{formatRelativeDate(now, new Date(e.creation_date))}
-									</small>
-								</div>
-								<p className="card-text"></p>
-								<p className="card-text text-right">
-									<a className="card-link" href="#">
-										Details
-									</a>
-								</p>
-							</div>
-						</div>
-					</div>
-				);
+				return <EventCard event={e} key={e.id}/>;
 			});
 
 			const newEventCard = (
@@ -68,9 +108,12 @@ export class OverviewView extends React.Component {
 								</h5>
 							</div>
 							<h2 className="card-text text-center">
-								<a className="card-link btn btn-light btn-lg" href="#">
+								<Link
+									to="event/new"
+									className="card-link btn btn-light btn-lg"
+									href="#">
 									<i className="far fa-calendar-plus"></i>
-								</a>
+								</Link>
 							</h2>
 						</div>
 					</div>
@@ -78,24 +121,18 @@ export class OverviewView extends React.Component {
 			);
 
 			content = (
-				<div className="row justify-content-center">
-					<div className="col-12 col-sm-10">
-						<h4>Events:</h4>
-						<div className="row no-gutters">
-							{newEventCard}
-							{listItems}
-						</div>
+				<div>
+					<h4>Events:</h4>
+
+					<div className="row no-gutters">
+						{newEventCard}
+						{listItems}
 					</div>
 				</div>
 			);
 		}
 
-		return (
-			<div>
-				<NavbarView />
-				<div className="container my-1">{content}</div>
-			</div>
-		);
+		return content;
 	}
 }
 

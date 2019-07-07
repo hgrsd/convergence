@@ -52,7 +52,7 @@ export class ConvergenceService {
 		return axios.get("/events");
 	}
 
-	createEvent(name) {
-		return axios.post(`/event/${name}`);
+	createEvent(event) {
+		return axios.post(`/events/${event.name}`);
 	}
 }
