@@ -5,7 +5,6 @@ from sqlalchemy.ext.hybrid import hybrid_method
 from sqlalchemy.ext import declarative
 from passlib.apps import custom_app_context as pwd_context
 
-from .point import Point
 
 base = declarative.declarative_base()
 
@@ -13,12 +12,12 @@ base = declarative.declarative_base()
 class User(base):
     __tablename__ = "users"
     id = sa.Column(sa.Integer, primary_key=True)
-    username = sa.Column(sa.String(32), unique=True, nullable=False)
     email = sa.Column(sa.String(254), unique=True, nullable=False)
-    phone_number = sa.Column(sa.String(25), unique=True, nullable=False)
+    screen_name = sa.Column(sa.String(32), nullable=False)
     password_hash = sa.Column(sa.String(128))
-    last_seen_lat = sa.Column(sa.Float)
-    last_seen_long = sa.Column(sa.Float)
+    phone = sa.Column(sa.String(25))
+    latitude = sa.Column(sa.Float)
+    longitude = sa.Column(sa.Float)
 
     events = sa.orm.relationship("Event", backref="event_owners")
     userevents = sa.orm.relationship("UserEvent", backref="users")
@@ -30,18 +29,19 @@ class User(base):
         return pwd_context.verify(password, self.password_hash)
 
     def basic_info(self):
-        return {"id": self.id, "username": self.username}
+        return {"id": self.id, "email": self.email,
+                "screen_name": self.screen_name}
 
     def get_location(self):
-        return Point(self.last_seen_lat, self.last_seen_long)
+        return self.latitude, self.longitude
 
     def full_info(self):
         """ Return all info except for password hash """
-        return {"id": self.id, "username": self.username,
+        return {"id": self.id, "screen_name": self.screen_name,
                 "email": self.email,
-                "phone": self.phone_number,
-                "last_seen_lat": self.last_seen_lat,
-                "last_seen_long": self.last_seen_long}
+                "phone": self.phone,
+                "latitude": self.latitude,
+                "longitude": self.longitude}
 
 
 class Event(base):

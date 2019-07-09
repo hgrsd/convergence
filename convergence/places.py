@@ -26,14 +26,14 @@ def get_places_around_centroid(point, radius, place_type):
     if len(places) < MIN_PLACES_FROM_DATABASE:
         places = gmaps_api.places_around_point(point, radius, place_type)
         for place in places:
-            place_entry = Place(name=place["name"], gm_id=place["gm_id"],
-                                lat=place["lat"], long=place["long"],
-                                address=place["address"],
-                                gm_price=place["price_level"],
-                                gm_rating=place["gm_rating"],
-                                gm_types=place["types"],
-                                timestamp=datetime.utcnow())
-            db.session.add(place_entry)
+            record = Place(name=place["name"], gm_id=place["gm_id"],
+                           lat=place["lat"], long=place["long"],
+                           address=place["address"],
+                           gm_price=place["price_level"],
+                           gm_rating=place["gm_rating"],
+                           gm_types=place["types"],
+                           timestamp=datetime.utcnow())
+            db.session.add(record)
         try:
             db.session.commit()
         except SQLAlchemyError:

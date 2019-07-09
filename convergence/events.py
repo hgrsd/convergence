@@ -167,5 +167,5 @@ def get_events(user_id):
     events = []
     for i, entry in enumerate(query_result):
         events.append(entry[1].as_dict())
-        events[i]["owner_name"] = entry[0].username
+        events[i]["owner_name"] = entry[0].screen_name
     return events

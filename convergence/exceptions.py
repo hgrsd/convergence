@@ -16,8 +16,8 @@ class LoginError(Exception):
         return str(self.message)
 
 
-class AccountError(Exception):
-    """E.g. Invalid or already-taken username at registration"""
+class InputError(Exception):
+    """Invalid input given by user"""
     def __init__(self, message):
         self.message = message
 
