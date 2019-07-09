@@ -5,6 +5,7 @@ from . import places
 from . import db
 from . import events
 from .models import User
+from .point import Point
 
 MEAN_DIST_TO_RADIUS_RATIO = 0.25
 
@@ -21,11 +22,11 @@ def get_suggestions(request_id, event_id, place_type, suggestions_mode):
     """
     ids = [member["id"] for member in events.get_members(request_id, event_id)]
     users = db.session.query(User).filter(User.id.in_(ids)).all()
-    user_coordinates = [user.get_location() for user in users]
+    user_coordinates = [Point(*user.get_location()) for user in users]
     centroid = location.find_centroid(user_coordinates)
     mean_dist = location.mean_dist_from_centroid(user_coordinates,
                                                  centroid)
-    radius = math.ceil(mean_dist) * MEAN_DIST_TO_RADIUS_RATIO
+    radius = math.ceil(mean_dist * MEAN_DIST_TO_RADIUS_RATIO)
     potential_places = places.get_places_around_centroid(centroid,
                                                          radius,
                                                          place_type)

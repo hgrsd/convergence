@@ -19,7 +19,7 @@ def login_error(error):
     return error_to_response(error), 401
 
 
-@app.errorhandler(exceptions.AccountError)
+@app.errorhandler(exceptions.InputError)
 def username_error(error):
     return error_to_response(error), 400
 

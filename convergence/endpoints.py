@@ -24,23 +24,26 @@ def root():
 # -- user endpoints:
 @user_bp.route("/user",
                methods=["POST"])
-@validators.validate_json(["username", "password", "email", "phone_number"])
+@validators.contains_json_keys(["screen_name", "password", "email"])
 def register_user():
     """
     Register new user
     :return: new user's full info
     """
-    username = request.get_json()["username"]
+    screen_name = request.get_json()["screen_name"]
     password = request.get_json()["password"]
     email = request.get_json()["email"].lower()
-    phone_number = request.get_json()["phone_number"]
-    result = user.register_user(username, password, email, phone_number)
+    if "phone" in request.json.keys():
+        phone = request.get_json()["phone"]  # optional
+    else:
+        phone = None
+    result = user.register_user(email, password, screen_name, phone)
     return jsonify({"data": result}), 200
 
 
 @user_bp.route("/user/login",
                methods=["POST"])
-@validators.validate_json(["username", "password"])
+@validators.contains_json_keys(["email", "password"])
 def login():
     """
     Login user, set access cookie (JWT + CSRF token)
@@ -50,9 +53,9 @@ def login():
     For security reasons, web app is not supposed to have direct access
     to the JWT and CSRF tokens.
     """
-    username = request.get_json()["username"]
+    email = request.get_json()["email"]
     password = request.get_json()["password"]
-    user_id = user.login(username, password)
+    user_id = user.login(email, password)
     access_token = flask_jwt_extended.create_access_token(identity=user_id)
     response = jsonify({"data": {"user_id": user_id}})
     flask_jwt_extended.set_access_cookies(response, access_token)
@@ -97,7 +100,7 @@ def find_user(username):
     return jsonify({"data": result}), 200
 
 
-@user_bp.route("/user/location/<float:lat>:<float:long>",
+@user_bp.route("/user/location/<float(signed=True):lat>:<float(signed=True):long>",
                methods=["PUT"])
 @flask_jwt_extended.jwt_required
 def update_location(lat, long):

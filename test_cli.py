@@ -96,8 +96,8 @@ def respond_to_invitation(session):
 
 
 def find_user(session):
-    user = input("Username: ")
-    response = session.get(f"http://localhost:5000/user/{user}", cookies=session.cookies, headers=header).json()
+    email = input("Email: ")
+    response = session.get(f"http://localhost:5000/user/{email}", cookies=session.cookies, headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
 
@@ -121,14 +121,14 @@ def get_event_members(session):
 
 
 def new_user(session):
-    username = input("Username: ")
-    password = input("Password (careful, plain text): ")
     email = input("Email: ")
+    password = input("Password (careful, plain text): ")
+    screen_name = input("Screen name: ")
     phone = input("Phone number: ")
-    response = session.post("http://localhost:5000/user", json={"username": username, 
+    response = session.post("http://localhost:5000/user", json={"email": email, 
                                                                 "password": password,
-                                                                "email": email,
-                                                                "phone_number": phone}).json()
+                                                                "screen_name": screen_name,
+                                                                "phone": phone}).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
 
@@ -155,9 +155,9 @@ def get_events(session):
 def login(session):
     global header
     global user_id
-    username = input("Username: ")
+    email = input("Email: ")
     password = input("Password: ")
-    response = session.post("http://localhost:5000/user/login", json={"username": username, "password": password}).json()
+    response = session.post("http://localhost:5000/user/login", json={"email": email, "password": password}).json()
     if "error" not in response:
         csrf_token = session.cookies['csrf_access_token']
         header = {"X-CSRF-TOKEN": csrf_token}

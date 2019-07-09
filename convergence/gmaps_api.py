@@ -58,7 +58,7 @@ def distance_matrix(origins, destinations, mode):
     matrix = [None] * len(origins)
     for i in range(no_requests):
         start = i * (len(destinations) // no_requests)
-        cutoff = len(destinations) // no_requests * (i + 1)
+        cutoff = start + len(destinations) // no_requests
         origins_strings = [",".join([str(origin.lat), str(origin.long)])
                            for origin in origins]
         dest_strings = [",".join([str(dest.lat), str(dest.long)])
