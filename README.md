@@ -36,7 +36,7 @@ manage.py db upgrade
 ```Python
 SECRET_KEY = 'your secret key here'  # Flask secret key
 SQLALCHEMY_TRACK_MODIFICATIONS = False 
-SQLALCHEMY_DATABASE_URI = "postgresql://localhost/convergence"  # PostgresQL database URL
+DB_URL = "postgresql://localhost/convergence"  # PostgresQL database URL
 GM_API_KEY = "APIKEY"  # Your google API key
 ```
 
