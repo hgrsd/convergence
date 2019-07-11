@@ -12,7 +12,8 @@ from . import convergence_db
 app = Flask(__name__, instance_relative_config=True, static_url_path="/static")
 app.config.from_object("config")
 app.config.from_pyfile("config.py")
-db = convergence_db.ConvergenceDB(app.config["SQLALCHEMY_DATABASE_URI"])
+db_url = app.config["DB_URL"]
+db = convergence_db.ConvergenceDB(db_url)
 jwt = flask_jwt_extended.JWTManager(app)
 
 from . import endpoints
