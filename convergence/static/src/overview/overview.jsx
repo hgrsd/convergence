@@ -30,6 +30,8 @@ export class OverviewView extends React.Component {
 								<EventList
 									isLoadingEvents={this.props.isLoadingEvents}
 									pendingEvents={this.props.pendingEvents}
+									eventLeaveStart={this.props.eventLeaveStart}
+									eventDeleteStart={this.props.eventDeleteStart}
 								/>
 							)}
 						/>
@@ -43,6 +45,30 @@ export class OverviewView extends React.Component {
 export class EventCard extends React.Component {
 	render() {
 		const event = this.props.event;
+		let leaveButton = null;
+
+		if (event.isOwned) {
+			leaveButton = (
+				<button
+					disabled={event.isDeleting}
+					className="card-link btn btn-light text-danger"
+					href="#"
+					onClick={() => this.props.eventDeleteStart(event.id)}>
+					Delete
+				</button>
+			);
+		} else {
+			leaveButton = (
+				<button
+					disabled={event.isLeaving}
+					className="card-link btn btn-light text-danger"
+					href="#"
+					onClick={() => this.props.eventLeaveStart(event.id)}>
+					Leave
+				</button>
+			);
+		}
+
 		return (
 			<div className="col-12 col-md-6 col-lg-4">
 				<div className="card m-1 event-card">
@@ -59,7 +85,8 @@ export class EventCard extends React.Component {
 						</div>
 						<p className="card-text"></p>
 						<p className="card-text text-right">
-							<a className="card-link" href="#">
+							{leaveButton}
+							<a className="card-link btn btn-light" href="#">
 								Details
 							</a>
 						</p>
@@ -90,7 +117,14 @@ export class EventList extends React.Component {
 			);
 		} else {
 			const listItems = this.props.pendingEvents.map((e, i) => {
-				return <EventCard event={e} key={e.id}/>;
+				return (
+					<EventCard
+						event={e}
+						key={e.id}
+						eventLeaveStart={this.props.eventLeaveStart}
+						eventDeleteStart={this.props.eventDeleteStart}
+					/>
+				);
 			});
 
 			const newEventCard = (

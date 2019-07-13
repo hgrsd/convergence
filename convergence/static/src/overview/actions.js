@@ -9,9 +9,15 @@ export const EVENT_EDIT_SUCCESS = "EVENT_EDIT_SUCCESS";
 export const EVENT_SAVE_START = "EVENT_SAVE_START";
 export const EVENT_SAVE_SUCCESS = "EVENT_SAVE_SUCCESS";
 export const EVENT_SAVE_FAILURE = "EVENT_SAVE_FAILURE";
+export const EVENT_LEAVE_START = "EVENT_LEAVE_START";
+export const EVENT_LEAVE_SUCCESS = "EVENT_LEAVE_SUCCESS";
+export const EVENT_LEAVE_FAILURE = "EVENT_LEAVE_FAILURE";
+export const EVENT_DELETE_START = "EVENT_DELETE_START";
+export const EVENT_DELETE_SUCCESS = "EVENT_DELETE_SUCCESS";
+export const EVENT_DELETE_FAILURE = "EVENT_DELETE_FAILURE";
 
 export function overviewLoadStart() {
-	return dispatch => {
+	return (dispatch, getState) => {
 		dispatch({
 			type: OVERVIEW_LOAD_START
 		});
@@ -20,7 +26,7 @@ export function overviewLoadStart() {
 
 		service.getEvents().then(
 			resp => {
-				dispatch(overviewLoadSuccess(resp.data.data));
+				dispatch(overviewLoadSuccess(resp.data.data, getState().login.userId));
 				return resp;
 			},
 			err => {
@@ -30,10 +36,11 @@ export function overviewLoadStart() {
 	};
 }
 
-export function overviewLoadSuccess(events) {
+export function overviewLoadSuccess(events, userId) {
 	return {
 		type: OVERVIEW_LOAD_SUCCESS,
-		events
+		events,
+		userId
 	};
 }
 
@@ -98,5 +105,71 @@ export function eventEditSuccess() {
 			type: EVENT_EDIT_SUCCESS
 		});
 		history.goBack();
+	};
+}
+
+export function eventLeaveStart(eventId) {
+	return (dispatch, getState) => {
+		dispatch({
+			type: EVENT_LEAVE_START,
+			eventId
+		});
+
+		let service = new ConvergenceService();
+		service.leaveEvent(eventId, getState().login.userId).then(
+			resp => {
+				dispatch(eventLeaveSuccess(eventId));
+			},
+			err => {
+				dispatch(eventLeaveFailure(eventId));
+			}
+		);
+	};
+}
+
+export function eventLeaveSuccess(eventId) {
+	return {
+		type: EVENT_LEAVE_SUCCESS,
+		eventId
+	};
+}
+
+export function eventLeaveFailure(eventId) {
+	return {
+		type: EVENT_LEAVE_FAILURE,
+		eventId
+	};
+}
+
+export function eventDeleteStart(eventId) {
+	return (dispatch, getState) => {
+		dispatch({
+			type: EVENT_DELETE_START,
+			eventId
+		});
+
+		let service = new ConvergenceService();
+		service.deleteEvent(eventId, getState().login.userId).then(
+			resp => {
+				dispatch(eventDeleteSuccess(eventId));
+			},
+			err => {
+				dispatch(eventDeleteFailure(eventId));
+			}
+		);
+	};
+}
+
+export function eventDeleteSuccess(eventId) {
+	return {
+		type: EVENT_DELETE_SUCCESS,
+		eventId
+	};
+}
+
+export function eventDeleteFailure(eventId) {
+	return {
+		type: EVENT_DELETE_FAILURE,
+		eventId
 	};
 }

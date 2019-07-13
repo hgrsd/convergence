@@ -37,14 +37,18 @@ export class ConvergenceService {
 	}
 
 	login(username, password) {
-		return axios.post("/user/login", { email: username, password }).then(resp => {
-			setCsrfToken(getCookie(CSRF_COOKIE_NAME));
-		});
+		return axios
+			.post("/user/login", { email: username, password })
+			.then(resp => {
+				setCsrfToken(getCookie(CSRF_COOKIE_NAME));
+				return resp;
+			});
 	}
 
 	register(username, password) {
 		return axios.post("/user", { username, password }).then(resp => {
 			setCsrfToken(getCookie(CSRF_COOKIE_NAME));
+			return resp;
 		});
 	}
 
@@ -54,5 +58,13 @@ export class ConvergenceService {
 
 	createEvent(event) {
 		return axios.post(`/events/${event.name}`);
+	}
+
+	deleteEvent(eventId) {
+		return axios.delete(`/events/${eventId}`);
+	}
+
+	leaveEvent(eventId, userId) {
+		return axios.delete(`/events/user_event/${eventId}:${userId}`);
 	}
 }
