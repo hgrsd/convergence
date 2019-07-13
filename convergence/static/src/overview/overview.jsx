@@ -52,7 +52,7 @@ export class EventCard extends React.Component {
 					/>
 					<div className="card-body">
 						<div className="d-flex">
-							<h5 className="flex-fill card-title">{event.name}</h5>
+							<h5 className="flex-fill card-title">{event.event_name}</h5>
 							<small className="text-muted">
 								{formatRelativeDate(new Date(), new Date(event.creation_date))}
 							</small>

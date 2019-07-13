@@ -37,7 +37,7 @@ export class ConvergenceService {
 	}
 
 	login(username, password) {
-		return axios.post("/user/login", { username, password }).then(resp => {
+		return axios.post("/user/login", { email: username, password }).then(resp => {
 			setCsrfToken(getCookie(CSRF_COOKIE_NAME));
 		});
 	}
