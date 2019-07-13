@@ -10,6 +10,9 @@ class Point:
     def __str__(self):
         return f"{self.lat}, {self.long}"
 
+    def __eq__(self, other):
+        return self.lat == other.lat and self.long == other.long
+
     def distance_to(self, other):
         """
         Return distance between this and other Point
