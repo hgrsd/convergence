@@ -60,7 +60,7 @@ export function registerStart(username, password) {
 				history.push("/home");
 			},
 			err => {
-				dispatch(loginFailure(err.response.data.error.message));
+				dispatch(registerFailure(err.response.data.error.message));
 			}
 		);
 	};

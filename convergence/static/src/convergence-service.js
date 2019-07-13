@@ -46,10 +46,11 @@ export class ConvergenceService {
 	}
 
 	register(username, password) {
-		return axios.post("/user", { username, password }).then(resp => {
-			setCsrfToken(getCookie(CSRF_COOKIE_NAME));
-			return resp;
-		});
+		return axios
+			.post("/user", { email: username, screen_name: username, password })
+			.then(resp => {
+				setCsrfToken(getCookie(CSRF_COOKIE_NAME));
+			});
 	}
 
 	getEvents() {
