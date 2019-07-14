@@ -4,7 +4,9 @@ import {
 	eventEditStart,
 	eventEditSuccess,
 	eventSaveStart,
-	eventSaveSuccess
+	eventSaveSuccess,
+	eventLeaveStart,
+	eventDeleteStart
 } from "./actions";
 import { OverviewView } from "./overview";
 
@@ -28,6 +30,12 @@ function mapDispatchToProps(dispatch) {
 		},
 		eventSaveSuccess: () => {
 			dispatch(eventSaveSuccess());
+		},
+		eventLeaveStart: (eventId) => {
+			dispatch(eventLeaveStart(eventId));
+		},
+		eventDeleteStart: (eventId) => {
+			dispatch(eventDeleteStart(eventId));
 		}
 	};
 }

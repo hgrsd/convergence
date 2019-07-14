@@ -20,8 +20,8 @@ export function loginStart(username, password) {
 
 		let service = new ConvergenceService();
 		service.login(username, password).then(
-			() => {
-				dispatch(loginSuccess());
+			resp => {
+				dispatch(loginSuccess(resp.data.data.user_id));
 				history.push("/home");
 			},
 			err => {
@@ -31,9 +31,10 @@ export function loginStart(username, password) {
 	};
 }
 
-export function loginSuccess() {
+export function loginSuccess(userId) {
 	return {
-		type: LOGIN_SUCCESS
+		type: LOGIN_SUCCESS,
+		userId
 	};
 }
 
