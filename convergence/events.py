@@ -40,7 +40,7 @@ def delete_event(user_id, event_id):
     to_delete = db.session.query(Event).get(event_id)
     if not to_delete:
         raise exceptions.NotFoundError("Invalid event id.")
-    if not to_delete.owner == user_id:
+    if not to_delete.event_owner_id == user_id:
         raise exceptions.PermissionError("Permission denied.")
     db.session.delete(to_delete)
     try:
