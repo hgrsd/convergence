@@ -15,6 +15,8 @@ def invite_user_to_event(request_id, user_id, event_id):
     :param user_id: user to be invited to event
     :param event_id: event to add user to
     """
+    if request_id == user_id:
+        raise exceptions.InvalidRequestError("Cannot invite yourself.")
     event = event_store.get_event_by_id(event_id)
     if not event or not event.event_owner_id == request_id:
         raise exceptions.NotFoundError("Invalid event id.")

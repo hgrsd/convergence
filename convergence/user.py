@@ -34,7 +34,7 @@ def register_user(email, password, screen_name, phone):
     Register user.
     :return full info for registered user
     """
-    if not 0 < len(screen_name) < 32:
+    if not 0 < len(screen_name) <= 64:
         raise exceptions.InputError("Invalid screen name")
     if not validators.is_email_format(email):
         raise exceptions.InputError("Invalid email address.")
@@ -57,6 +57,7 @@ def delete_user(user_id):
     if not user:
         raise exceptions.NotFoundError("Invalid user id.")
     user_store.delete_user(user)
+    return None
 
 
 def find_user(email):
@@ -79,8 +80,8 @@ def update_location(user_id, lat, long):
     :param long: new longitude
     :return: location info
     """
-    if not location.MIN_LAT < lat < location.MAX_LAT \
-            or not location.MIN_LON < long < location.MAX_LON:
+    if not location.MIN_LAT <= lat <= location.MAX_LAT \
+            or not location.MIN_LON <= long <= location.MAX_LON:
         raise exceptions.LocationError("Invalid coordinates.")
     user = user_store.get_user_by_id(user_id)
     if not user:

@@ -40,7 +40,7 @@ class TestFindCentroid(unittest.TestCase):
         point_c = point.Point(49.258071, 4.310359)  # near Reims, FR
         point_d = point.Point(49.258071, 4.310359)  # near Reims, FR
         coordinates = [point_a, point_b, point_c, point_d]
-        self.assertEqual(location.find_centroid(coordinates), 
+        self.assertEqual(location.find_centroid(coordinates),
                          point_a)
 
 

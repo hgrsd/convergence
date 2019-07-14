@@ -22,15 +22,18 @@ def contains_json_keys(keys):
 
 
 def is_email_format(input):
-    """Returns true if input looks like a valid email address"""
-    if len(input) > 254:  # max number of characters according to RFC3696
+    """
+    Returns true if input looks like a valid email address
+    Note: this is a basic check
+    @TODO: Replace with confirmation email
+    """
+    if not isinstance(input, str) or len(input) > 254:
         return False
     return re.fullmatch(r"[^@]+@[^@]+\.[^@]{2,}", input) is not None
 
 
 def is_phone_format(input):
-    """
-    Returns true if input looks like a valid phone number
-    This does not actually verify the validity of the address
-    """
-    return re.fullmatch(r"^\+*[0-9\-\s()]+", input) is not None
+    """ Returns true if input looks like a valid phone number"""
+    if not isinstance(input, str):
+        return False
+    return re.fullmatch(r"^\+*[0-9\-\s()]{7,}", input) is not None
