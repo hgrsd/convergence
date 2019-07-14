@@ -1,10 +1,10 @@
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+from convergence import location
+from convergence import exceptions
+from convergence import validators
+from convergence.models import User
+from convergence.repo import UserStore
 
-from . import location
-from . import db
-from . import exceptions
-from . import validators
-from .models import User
+user_store = UserStore()
 
 
 def login(email, password):
@@ -12,7 +12,7 @@ def login(email, password):
     Login user
     :return user_id
     """
-    user = db.session.query(User).filter_by(email=email).first()
+    user = user_store.get_user_by_email(email)
     if not user or not user.verify_password(password):
         raise exceptions.LoginError("Incorrect email address or password.")
     return user.id
@@ -23,7 +23,7 @@ def get_info(user_id):
     Get full info about currently logged in user
     :return full info for current user
     """
-    user = db.session.query(User).get(user_id)
+    user = user_store.get_user_by_id(user_id)
     if not user:
         raise exceptions.NotFoundError("Invalid user id.")
     return user.full_info()
@@ -45,12 +45,7 @@ def register_user(email, password, screen_name, phone):
     user = User(screen_name=screen_name, email=email,
                 phone=phone)
     user.hash_password(password)
-    db.session.add(user)
-    try:
-        db.session.commit()
-    except IntegrityError:
-        db.session.rollback()
-        raise exceptions.InputError("User with this email exists already.")
+    user_store.add_user(user)
     return user.full_info()
 
 
@@ -58,15 +53,10 @@ def delete_user(user_id):
     """
     Delete user.
     """
-    user = db.session.query(User).get(user_id)
+    user = user_store.get_user_by_id(user_id)
     if not user:
         raise exceptions.NotFoundError("Invalid user id.")
-    db.session.delete(user)
-    try:
-        db.session.commit()
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        raise exceptions.DatabaseError(f"Error: {str(e)}")
+    user_store.delete_user(user)
 
 
 def find_user(email):
@@ -74,7 +64,7 @@ def find_user(email):
     Return user info for email
     :return basic user info if found
     """
-    user = db.session.query(User).filter_by(email=email).first()
+    user = user_store.get_user_by_email(email)
     if not user:
         return []
     else:
@@ -92,13 +82,9 @@ def update_location(user_id, lat, long):
     if not location.MIN_LAT < lat < location.MAX_LAT \
             or not location.MIN_LON < long < location.MAX_LON:
         raise exceptions.LocationError("Invalid coordinates.")
-    user = db.session.query(User).get(user_id)
+    user = user_store.get_user_by_id(user_id)
     if not user:
         raise exceptions.NotFoundError("Invalid user id.")
     user.latitude, user.longitude = lat, long
-    try:
-        db.session.commit()
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        raise exceptions.DatabaseError(f"Error: {str(e)}")
+    user_store.commit_changes()
     return user.get_location()

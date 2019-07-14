@@ -1,7 +1,7 @@
 from flask import jsonify
 
-from . import exceptions
-from . import app
+from convergence import exceptions
+from convergence import app
 
 
 @app.errorhandler(exceptions.InvalidRequestError)

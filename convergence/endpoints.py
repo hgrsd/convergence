@@ -1,12 +1,12 @@
 import flask_jwt_extended
 from flask import Blueprint, jsonify, request
 
-from . import app
-from . import validators
-from . import events
-from . import user
-from . import suggestions
-from . import invite
+from convergence import app
+from convergence import validators
+from convergence import events
+from convergence import user
+from convergence import suggestions
+from convergence import invite
 
 user_bp = Blueprint("user", __name__)
 events_bp = Blueprint("events", __name__)

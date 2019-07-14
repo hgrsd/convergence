@@ -10,10 +10,13 @@ class ConvergenceDB:
         self.engine = sqlalchemy.create_engine(db_url)
         self.base = models.base
         self.metadata = models.base.metadata
-        SessionMaker = sqlalchemy.orm.sessionmaker(bind=self.engine)
-        self.session = SessionMaker()
+        self._SessionMaker = sqlalchemy.orm.sessionmaker(bind=self.engine)
 
-    def create_tables(self):
-        """Create tables used in models.py"""
+    def initialise_tables(self):
+        """Initialise all tables defined in models.py"""
+        session = self.create_session()
         self.base.metadata.create_all(self.engine)
-        self.session.commit()
+        session.commit()
+
+    def create_session(self):
+        return self._SessionMaker()
