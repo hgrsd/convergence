@@ -1,10 +1,10 @@
 import math
 
-from . import location
-from . import places
-from . import events
-from .point import Point
-from .repositories import UserStore
+from convergence import location
+from convergence import places
+from convergence import events
+from convergence.point import Point
+from convergence.repo import UserStore
 
 MEAN_DIST_TO_RADIUS_RATIO = 0.25
 

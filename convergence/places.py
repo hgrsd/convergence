@@ -1,9 +1,9 @@
 from datetime import datetime
 
-from . import gmaps_api
-from .models import Place
-from .location import Point
-from .repositories import PlaceStore
+from convergence import gmaps_api
+from convergence.models import Place
+from convergence.location import Point
+from convergence.repo import PlaceStore
 
 MIN_PLACES_FROM_DATABASE = 4
 MAX_PLACES_PER_SUGGESTION = 10

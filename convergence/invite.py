@@ -1,7 +1,7 @@
-from . import events
-from . import exceptions
-from .models import UserInvite
-from .repositories import UserInviteStore, EventStore, UserStore
+from convergence import events
+from convergence import exceptions
+from convergence.models import UserInvite
+from convergence.repo import UserInviteStore, EventStore, UserStore
 
 userinvite_store = UserInviteStore()
 event_store = EventStore()
@@ -16,16 +16,14 @@ def invite_user_to_event(request_id, user_id, event_id):
     :param event_id: event to add user to
     """
     event = event_store.get_event_by_id(event_id)
-    if not event:
+    if not event or not event.event_owner_id == request_id:
         raise exceptions.NotFoundError("Invalid event id.")
     if not user_store.get_user_by_id(user_id):
         raise exceptions.NotFoundError("Invalid user id.")
-    if not event.event_owner_id == request_id:
-        raise exceptions.PermissionError("Permission denied.")
     userinvite = UserInvite(inviter_id=request_id, invitee_id=user_id,
                             event_id=event_id)
     userinvite_store.add_userinvite(userinvite)
-    return None
+    return userinvite.as_dict()
 
 
 def get_invitations(user_id):
@@ -55,11 +53,9 @@ def respond_to_invitation(request_id, invite_id, accept):
     :return: None if accept is False, Event info if accept is True
     """
     userinvite = userinvite_store.get_invitation_by_id(invite_id)
-    if not userinvite:
+    if not userinvite or not userinvite.invitee_id == request_id:
         raise exceptions.NotFoundError("Invite not found.")
-    if not userinvite.invitee_id == request_id:
-        raise exceptions.PermissionError("Permission denied.")
-    if accept is True:
+    if accept:
         user_id = userinvite.invitee_id
         event_id = userinvite.event_id
         events.add_user_to_event(user_id, event_id)

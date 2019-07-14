@@ -2,8 +2,9 @@ import requests
 import time
 import math
 from urllib.parse import quote
-from . import app
-from .exceptions import ServerError
+
+from convergence import app
+from convergence.exceptions import ServerError
 
 GM_PLACES_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/" \
                 "json?location={:f},{:f}&radius={:d}&type={:s}&key={:s}"

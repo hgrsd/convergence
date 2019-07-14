@@ -19,5 +19,4 @@ class ConvergenceDB:
         session.commit()
 
     def create_session(self):
-        session = self._SessionMaker()
-        return session
+        return self._SessionMaker()

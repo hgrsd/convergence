@@ -1,8 +1,8 @@
 import datetime
 
-from . import exceptions
-from .repositories import EventStore, UserStore, UserEventStore
-from .models import Event, UserEvent
+from convergence import exceptions
+from convergence.repo import EventStore, UserStore, UserEventStore
+from convergence.models import Event, UserEvent
 
 event_store = EventStore()
 user_store = UserStore()
@@ -31,10 +31,8 @@ def delete_event(user_id, event_id):
     :param event_id: event to be deleted
     """
     to_delete = event_store.get_event_by_id(event_id)
-    if not to_delete:
+    if not to_delete or not to_delete.event_owner_id == user_id:
         raise exceptions.NotFoundError("Invalid event id.")
-    if not to_delete.owner == user_id:
-        raise exceptions.PermissionError("Permission denied.")
     event_store.delete_event(to_delete)
     return None
 
@@ -47,13 +45,11 @@ def add_user_to_event(user_id, event_id):
     :param event_id: event to add user to
     """
     event = event_store.get_event_by_id(event_id)
-    if not event:
-        raise exceptions.NotFoundError("Invalid event id.")
-    if not user_store.get_user_by_id(user_id):
-        raise exceptions.NotFoundError("Invalid user id.")
+    if not event or not user_store.get_user_by_id(user_id):
+        raise exceptions.NotFoundError("Invalid user id or event id.")
     userevent = UserEvent(user_id=user_id, event_id=event_id)
     userevent_store.add_userevent(userevent)
-    return None
+    return userevent.as_dict()
 
 
 def leave_event(request_id, event_id):
@@ -64,7 +60,7 @@ def leave_event(request_id, event_id):
     """
     to_delete = userevent_store.get_userevent(request_id, event_id)
     if not to_delete:
-        raise exceptions.NotFoundError("Invalid group or user not a member.")
+        raise exceptions.NotFoundError("Invalid user id or event id.")
     if request_id == event_store.get_owner_id(event_id):
         raise exceptions.InvalidRequestError("Cannot leave owned event.")
     userevent_store.delete_userevent(to_delete)
@@ -80,9 +76,9 @@ def remove_user_from_event(request_id, user_id, event_id):
     """
     to_delete = userevent_store.get_userevent(user_id, event_id)
     if not to_delete:
-        raise exceptions.NotFoundError("Invalid group id or user id.")
+        raise exceptions.NotFoundError("Invalid user id or event id.")
     if request_id != event_store.get_owner_id(event_id):
-        raise exceptions.PermissionError("Permission denied.")
+        raise exceptions.NotFoundError("Invalid user id or event id.")
     userevent_store.delete_userevent(to_delete)
     return None
 
@@ -95,7 +91,7 @@ def get_members(request_id, event_id):
     :return: basic user info for all users in group
     """
     if not userevent_store.get_userevent(request_id, event_id):
-        raise exceptions.PermissionError("Permission denied.")
+        raise exceptions.NotFoundError("Invalid user id or event id.")
     users = userevent_store.get_users_by_event(event_id)
     if not users:
         return []
