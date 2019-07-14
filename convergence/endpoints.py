@@ -38,7 +38,10 @@ def register_user():
     else:
         phone = None
     result = user.register_user(email, password, screen_name, phone)
-    return jsonify({"data": result}), 200
+    response = jsonify({"data": result})
+    access_token = flask_jwt_extended.create_access_token(identity=result["id"])
+    flask_jwt_extended.set_access_cookies(response, access_token)
+    return response, 200
 
 
 @user_bp.route("/user/login",
@@ -56,8 +59,8 @@ def login():
     email = request.get_json()["email"]
     password = request.get_json()["password"]
     user_id = user.login(email, password)
-    access_token = flask_jwt_extended.create_access_token(identity=user_id)
     response = jsonify({"data": {"user_id": user_id}})
+    access_token = flask_jwt_extended.create_access_token(identity=user_id)
     flask_jwt_extended.set_access_cookies(response, access_token)
     return response, 200
 
