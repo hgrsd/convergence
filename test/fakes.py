@@ -1,5 +1,39 @@
 import datetime
-from convergence.models import Event, User, UserInvite
+from convergence.models import Event, User, UserInvite, UserEvent
+
+
+def get_fake_userevent(user_id, event_id):
+    return UserEvent(
+        user_id=user_id,
+        event_id=event_id
+    )
+
+
+def get_fake_events_by_owner(owner_id):
+    return [
+        Event(
+            id=1,
+            event_name="Fake Event",
+            event_owner_id=owner_id,
+            creation_date=datetime.datetime.utcnow()
+        ),
+        Event(
+            id=2,
+            event_name="Fake Event Two",
+            event_owner_id=owner_id,
+            creation_date=datetime.datetime.utcnow()
+        )
+    ]
+
+
+def get_fake_events_by_user(owner_id):
+    events = [get_fake_event(1), get_fake_event(2)]
+    users = [get_fake_user_by_id(3), get_fake_user_by_id(3)]
+    return tuple(zip(users, events))
+
+
+def get_fake_users_by_event(event_id):
+    return [get_fake_user_by_id(1), get_fake_user_by_id(2)]
 
 
 def get_fake_event(event_id):

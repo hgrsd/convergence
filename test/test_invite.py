@@ -23,7 +23,7 @@ class TestInviteUser(unittest.TestCase):
         userinvite = invite.invite_user_to_event(3, 9, 4)
         self.assertEqual(userinvite["inviter_id"], 3)
         self.assertEqual(userinvite["invitee_id"], 9)
-        self.assertEqual(userinvite["event_id"], 4)    
+        self.assertEqual(userinvite["event_id"], 4)  
 
     @patch.object(invite, "userinvite_store")
     @patch.object(invite, "user_store")

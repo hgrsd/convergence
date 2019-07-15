@@ -69,5 +69,6 @@ class TestPointMethods(unittest.TestCase):
                          point_b.distance_to(point_a))
         self.assertEqual(point_a.distance_to(point_a), 0)
 
+
 if __name__ == "__main__":
     unittest.main()

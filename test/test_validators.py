@@ -48,7 +48,7 @@ class TestIsEmailFormat(unittest.TestCase):
         self.assertTrue(validators.is_email_format("test@case.123.co.uk"))
         self.assertTrue(validators.is_email_format("test@case.99.org"))
         self.assertTrue(validators.is_email_format("t1133est@case.com"))
-    
+
     def test_is_email_format_false(self):
         self.assertFalse(validators.is_email_format(None))
         self.assertFalse(validators.is_email_format(""))

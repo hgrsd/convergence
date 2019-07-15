@@ -6,7 +6,7 @@ from convergence.location import Point
 from convergence.repo import PlaceStore
 
 MIN_PLACES_FROM_DATABASE = 4
-MAX_PLACES_PER_SUGGESTION = 10
+
 
 place_store = PlaceStore()
 
@@ -26,27 +26,29 @@ def get_places_around_centroid(point, radius, place_type):
     if len(places) < MIN_PLACES_FROM_DATABASE:
         places = gmaps_api.places_around_point(point, radius, place_type)
         for place in places:
-            new_record = Place(name=place["name"], gm_id=place["gm_id"],
-                               lat=place["lat"], long=place["long"],
-                               address=place["address"],
-                               gm_price=place["price_level"],
-                               gm_rating=place["gm_rating"],
-                               gm_types=place["types"],
-                               timestamp=datetime.utcnow())
-            place_store.add_place(new_record)
-    if len(places) > MAX_PLACES_PER_SUGGESTION:
-        places = sort_places_by_rating(places)[:MAX_PLACES_PER_SUGGESTION]
+            place_store.add_place(
+                Place(
+                    name=place["name"],
+                    gm_id=place["gm_id"],
+                    lat=place["lat"],
+                    long=place["long"],
+                    address=place["address"],
+                    gm_price=place["price_level"],
+                    gm_rating=place["gm_rating"],
+                    gm_types=place["types"],
+                    timestamp=datetime.utcnow()
+                )
+            )
     return places
 
 
-def order_places_by_distance(user_coordinates, places):
+def get_distance_for_places(user_coordinates, places):
     """
-    Return places sorted in ascending order by the sum of their distances
-    to each user.
+    Calculate distance between each user and each place, add them
+    up to calculate total distance for each place.
     :param user_coordinates: list of Points for relevant users
-    :param places: list of places to be ordered
-    :return: list of places in ascending order, with travel_total
-            added as key for each place
+    :param places: list of places
+    :return: list of places with added travel_total key
     """
     places_coordinates = [Point(place["lat"], place["long"])
                           for place in places]
@@ -55,32 +57,35 @@ def order_places_by_distance(user_coordinates, places):
     for user in user_coordinates:
         for i, place in enumerate(places_coordinates):
             places[i]["travel_total"] += user.distance_to(place)
-    ordered_places = sorted(places, key=lambda x: x["travel_total"])
-    return ordered_places
+    return places
 
 
-def order_places_by_travel_time(user_coordinates, places, mode):
+def get_travel_time_for_places(user_coordinates, places, mode):
     """
-    Return places sorted in ascending order by the sum of the travel time,
-    using specified mode of travel, from each user to each place.
+    Query Google Distance Matrix API for travel times for each user
+    to each place, and calculate total travel time for each place.
     :param user_coordinates: list of Points for relevant users
-    :param places: list of places to be ordered
+    :param places: list of places
     :param mode: mode of transportation
-    :return: sorted list of places with travel_total added
-            as key for each place
+    :return: list of places with added travel_total key
     """
     places_coordinates = [Point(place["lat"],
                           place["long"]) for place in places]
-    dist_matrix = gmaps_api.distance_matrix(user_coordinates,
-                                            places_coordinates,
-                                            mode)
+    dist_matrix = gmaps_api.distance_matrix(
+        user_coordinates,
+        places_coordinates,
+        mode
+    )
     for place in places:
         place["travel_total"] = 0
     for row in dist_matrix:
         for i, place in enumerate(row):
             places[i]["travel_total"] += place["duration"]["value"]
-    ordered_places = sorted(places, key=lambda x: x["travel_total"])
-    return ordered_places
+    return places
+
+
+def sort_places_by_travel_total(places):
+    return sorted(places, key=lambda x: x["travel_total"])
 
 
 def sort_places_by_rating(places):
