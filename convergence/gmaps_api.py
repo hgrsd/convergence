@@ -91,12 +91,15 @@ def _json_extract_places(response_string):
     for result in response_string["results"]:
         if "permanently_closed" in result:
             continue
-        lat = result["geometry"]["location"]["lat"]
-        long = result["geometry"]["location"]["lng"]
-        name = result["name"]
-        types = result["types"]
-        address = result["vicinity"]
-        gm_id = result["place_id"]
+        try:
+            lat = result["geometry"]["location"]["lat"]
+            long = result["geometry"]["location"]["lng"]
+            name = result["name"]
+            types = result["types"]
+            address = result["vicinity"]
+            gm_id = result["place_id"]
+        except KeyError:
+            continue
         try:
             price_level = result["price_level"]
         except KeyError:

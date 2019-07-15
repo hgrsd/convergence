@@ -16,6 +16,9 @@ def find_centroid(coordinates):
     """
     x_total, y_total, z_total = 0, 0, 0
     for coordinate in coordinates:
+        if not MIN_LAT <= coordinate.lat <= MAX_LAT or \
+           not MIN_LON <= coordinate.long <= MAX_LON:
+            raise ValueError("Invalid coordinates.")
         lat = math.radians(float(coordinate.lat))
         lon = math.radians(float(coordinate.long))
         x_total += math.cos(lat) * math.cos(lon)

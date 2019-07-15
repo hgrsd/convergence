@@ -24,14 +24,14 @@ def create_event(user_id, name):
     return event.as_dict()
 
 
-def delete_event(user_id, event_id):
+def delete_event(request_id, event_id):
     """
     Delete a event.
     :param user_id: user deleting the event (must be event owner)
     :param event_id: event to be deleted
     """
     to_delete = event_store.get_event_by_id(event_id)
-    if not to_delete or not to_delete.event_owner_id == user_id:
+    if not to_delete or not to_delete.event_owner_id == request_id:
         raise exceptions.NotFoundError("Invalid event id.")
     event_store.delete_event(to_delete)
     return None
@@ -79,6 +79,8 @@ def remove_user_from_event(request_id, user_id, event_id):
         raise exceptions.NotFoundError("Invalid user id or event id.")
     if request_id != event_store.get_owner_id(event_id):
         raise exceptions.NotFoundError("Invalid user id or event id.")
+    if user_id == event_store.get_owner_id(event_id):
+        raise exceptions.InvalidRequestError("Cannot remove event owner.")
     userevent_store.delete_userevent(to_delete)
     return None
 

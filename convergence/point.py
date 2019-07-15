@@ -1,14 +1,25 @@
 import math
 
+from convergence import location
+
 
 class Point:
     """ Point class, used for coordinates"""
     def __init__(self, lat, long):
-        self.lat = lat
-        self.long = long
+        try:
+            self.lat = float(lat)
+            self.long = float(long)
+        except ValueError:
+            raise TypeError("Coordinates must be numerical.")
+        if not location.MIN_LAT <= self.lat <= location.MAX_LAT or \
+           not location.MIN_LON <= self.long <= location.MAX_LON:
+            raise ValueError("Invalid location coordinates.")
 
     def __str__(self):
-        return f"{self.lat}, {self.long}"
+        return f"{self.lat:.6f}, {self.long:.6f}"
+
+    def __eq__(self, other):
+        return self.lat == other.lat and self.long == other.long
 
     def distance_to(self, other):
         """

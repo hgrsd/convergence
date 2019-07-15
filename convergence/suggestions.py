@@ -7,6 +7,7 @@ from convergence.point import Point
 from convergence.repo import UserStore
 
 MEAN_DIST_TO_RADIUS_RATIO = 0.25
+MAX_PLACES_PER_SUGGESTION = 10
 
 user_store = UserStore()
 
@@ -33,10 +34,19 @@ def get_suggestions(request_id, event_id, place_type, suggestions_mode):
                                                          place_type)
     if not potential_places:
         return []
+    if len(potential_places) > MAX_PLACES_PER_SUGGESTION:
+        potential_places = places.sort_places_by_rating(
+            potential_places
+        )[:MAX_PLACES_PER_SUGGESTION]
     if suggestions_mode == "distance":
-        return places.order_places_by_distance(user_coordinates,
-                                               potential_places)
+        potential_places = places.get_distance_for_places(
+            user_coordinates,
+            potential_places
+        )
     else:
-        return places.order_places_by_travel_time(user_coordinates,
-                                                  potential_places,
-                                                  suggestions_mode)
+        potential_places = places.get_travel_time_for_places(
+            user_coordinates,
+            potential_places,
+            suggestions_mode
+        )
+    return places.sort_places_by_travel_total(potential_places)
