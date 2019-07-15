@@ -32,7 +32,10 @@ class Point:
         other_lat = math.radians(other.lat)
         other_long = math.radians(other.long)
         R = 6371
-        dist = math.acos(math.sin(self_lat) * math.sin(other_lat)
-                         + math.cos(self_lat) * math.cos(other_lat)
-                         * math.cos(self_long - other_long)) * R
+        dist = math.acos(
+            math.sin(self_lat) * math.sin(other_lat)
+            + math.cos(self_lat) * math.cos(other_lat)
+            * math.cos(self_long - other_long)
+        ) * R
+
         return dist * 1000

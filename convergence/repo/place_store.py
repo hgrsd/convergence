@@ -19,7 +19,8 @@ class PlaceStore(Store):
         :return: list of Place objects
         """
         return self.session.query(Place) \
-                           .filter(Place.within_range(point, radius))
+                           .filter(Place.within_range(point, radius)) \
+                           .all()
 
     def add_place(self, place):
         """

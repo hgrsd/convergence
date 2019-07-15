@@ -22,8 +22,7 @@ def root():
 
 
 # -- user endpoints:
-@user_bp.route("/user",
-               methods=["POST"])
+@user_bp.route("/user", methods=["POST"])
 @validators.contains_json_keys(["screen_name", "password", "email"])
 def register_user():
     """
@@ -39,13 +38,14 @@ def register_user():
         phone = None
     result = user.register_user(email, password, screen_name, phone)
     response = jsonify({"data": result})
-    access_token = flask_jwt_extended.create_access_token(identity=result["id"])
+    access_token = flask_jwt_extended.create_access_token(
+        identity=result["id"]
+    )
     flask_jwt_extended.set_access_cookies(response, access_token)
     return response, 200
 
 
-@user_bp.route("/user/login",
-               methods=["POST"])
+@user_bp.route("/user/login", methods=["POST"])
 @validators.contains_json_keys(["email", "password"])
 def login():
     """
@@ -65,8 +65,7 @@ def login():
     return response, 200
 
 
-@user_bp.route("/user",
-               methods=["DELETE"])
+@user_bp.route("/user", methods=["DELETE"])
 @flask_jwt_extended.jwt_required
 def delete_user():
     """
@@ -78,8 +77,7 @@ def delete_user():
     return jsonify({"success": True}), 200
 
 
-@user_bp.route("/user",
-               methods=["GET"])
+@user_bp.route("/user", methods=["GET"])
 @flask_jwt_extended.jwt_required
 def get_user_info():
     """
@@ -91,8 +89,7 @@ def get_user_info():
     return jsonify({"data": result}), 200
 
 
-@user_bp.route("/user/<string:username>",
-               methods=["GET"])
+@user_bp.route("/user/<string:username>", methods=["GET"])
 @flask_jwt_extended.jwt_required
 def find_user(username):
     """
@@ -103,8 +100,10 @@ def find_user(username):
     return jsonify({"data": result}), 200
 
 
-@user_bp.route("/user/location/<float(signed=True):lat>:<float(signed=True):long>",
-               methods=["PUT"])
+@user_bp.route(
+    "/user/location/<float(signed=True):lat>:<float(signed=True):long>",
+    methods=["PUT"]
+)
 @flask_jwt_extended.jwt_required
 def update_location(lat, long):
     """
@@ -119,8 +118,7 @@ def update_location(lat, long):
 
 
 # -- event endpoints:
-@events_bp.route("/events/<string:name>",
-                 methods=["POST"])
+@events_bp.route("/events/<string:name>", methods=["POST"])
 @flask_jwt_extended.jwt_required
 def create_event(name):
     """
@@ -133,8 +131,7 @@ def create_event(name):
     return jsonify({"data": result}), 200
 
 
-@events_bp.route("/events/<int:event_id>",
-                 methods=["DELETE"])
+@events_bp.route("/events/<int:event_id>", methods=["DELETE"])
 @flask_jwt_extended.jwt_required
 def delete_event(event_id):
     """
@@ -147,8 +144,7 @@ def delete_event(event_id):
     return jsonify({"success": True}), 200
 
 
-@events_bp.route("/events/owned",
-                 methods=["GET"])
+@events_bp.route("/events/owned", methods=["GET"])
 @flask_jwt_extended.jwt_required
 def owned_events():
     """
@@ -160,8 +156,7 @@ def owned_events():
     return jsonify({"data": result}), 200
 
 
-@events_bp.route("/events/invite",
-                 methods=["GET"])
+@events_bp.route("/events/invite", methods=["GET"])
 @flask_jwt_extended.jwt_required
 def get_invitations():
     """
@@ -173,8 +168,10 @@ def get_invitations():
     return jsonify({"data": result}), 200
 
 
-@events_bp.route("/events/invite/<int:event_id>:<int:user_id>",
-                 methods=["POST"])
+@events_bp.route(
+    "/events/invite/<int:event_id>:<int:user_id>",
+    methods=["POST"]
+)
 @flask_jwt_extended.jwt_required
 def invite_user_to_event(event_id, user_id):
     """
@@ -188,8 +185,10 @@ def invite_user_to_event(event_id, user_id):
     return jsonify({"success": True}), 200
 
 
-@events_bp.route("/events/invite/<int:invite_id>/accept",
-                 methods=["POST"])
+@events_bp.route(
+    "/events/invite/<int:invite_id>/accept",
+    methods=["POST"]
+)
 @flask_jwt_extended.jwt_required
 def accept_invitation(invite_id):
     """
@@ -201,8 +200,10 @@ def accept_invitation(invite_id):
     return jsonify({"data": result}), 200
 
 
-@events_bp.route("/events/invite/<int:invite_id>/reject",
-                 methods=["POST"])
+@events_bp.route(
+    "/events/invite/<int:invite_id>/reject",
+    methods=["POST"]
+)
 @flask_jwt_extended.jwt_required
 def reject_invitation(invite_id):
     """
@@ -214,8 +215,10 @@ def reject_invitation(invite_id):
     return jsonify({"success": True}), 200
 
 
-@events_bp.route("/events/user_event/<int:event_id>:<int:user_id>",
-                 methods=["DELETE"])
+@events_bp.route(
+    "/events/user_event/<int:event_id>:<int:user_id>",
+    methods=["DELETE"]
+)
 @flask_jwt_extended.jwt_required
 def remove_user_from_event(event_id, user_id):
     """
@@ -233,8 +236,7 @@ def remove_user_from_event(event_id, user_id):
     return jsonify({"success": True}), 200
 
 
-@events_bp.route("/events/<int:event_id>",
-                 methods=["GET"])
+@events_bp.route("/events/<int:event_id>", methods=["GET"])
 @flask_jwt_extended.jwt_required
 def get_members(event_id):
     """
@@ -247,8 +249,7 @@ def get_members(event_id):
     return jsonify({"data": result}), 200
 
 
-@events_bp.route("/events",
-                 methods=["GET"])
+@events_bp.route("/events", methods=["GET"])
 @flask_jwt_extended.jwt_required
 def get_events():
     """
@@ -261,8 +262,10 @@ def get_events():
 
 
 # -- suggestions endpoints:
-@suggestions_bp.route("/suggestions/distance/<int:event_id>:<string:place_type>",
-                      methods=["GET"])
+@suggestions_bp.route(
+    "/suggestions/distance/<int:event_id>:<string:place_type>",
+    methods=["GET"]
+)
 @flask_jwt_extended.jwt_required
 def suggestions_distance(event_id, place_type):
     """
@@ -273,13 +276,19 @@ def suggestions_distance(event_id, place_type):
     :return: list of Places ordered by avg distance
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    result = suggestions.get_suggestions(request_id, event_id,
-                                         place_type, "distance")
+    result = suggestions.get_suggestions(
+        request_id,
+        event_id,
+        place_type,
+        "distance"
+    )
     return jsonify({"data": result}), 200
 
 
-@suggestions_bp.route("/suggestions/transit/<int:event_id>:<string:place_type>",
-                      methods=["GET"])
+@suggestions_bp.route(
+    "/suggestions/transit/<int:event_id>:<string:place_type>",
+    methods=["GET"]
+)
 @flask_jwt_extended.jwt_required
 def suggestions_transit(event_id, place_type):
     """
@@ -290,13 +299,19 @@ def suggestions_transit(event_id, place_type):
     :return: list of Places ordered by avg transit time
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    result = suggestions.get_suggestions(request_id, event_id,
-                                         place_type, "transit")
+    result = suggestions.get_suggestions(
+        request_id,
+        event_id,
+        place_type,
+        "transit"
+    )
     return jsonify({"data": result}), 200
 
 
-@suggestions_bp.route("/suggestions/drive/<int:event_id>:<string:place_type>",
-                      methods=["GET"])
+@suggestions_bp.route(
+    "/suggestions/drive/<int:event_id>:<string:place_type>",
+    methods=["GET"]
+)
 @flask_jwt_extended.jwt_required
 def suggestions_driving(event_id, place_type):
     """
@@ -307,13 +322,19 @@ def suggestions_driving(event_id, place_type):
     :return: list of Places ordered by avg driving time
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    result = suggestions.get_suggestions(request_id, event_id,
-                                         place_type, "driving")
+    result = suggestions.get_suggestions(
+        request_id,
+        event_id,
+        place_type,
+        "driving"
+    )
     return jsonify({"data": result}), 200
 
 
-@suggestions_bp.route("/suggestions/walk/<int:event_id>:<string:place_type>",
-                      methods=["GET"])
+@suggestions_bp.route(
+    "/suggestions/walk/<int:event_id>:<string:place_type>",
+    methods=["GET"]
+)
 @flask_jwt_extended.jwt_required
 def suggestions_walking(event_id, place_type):
     """
@@ -324,13 +345,19 @@ def suggestions_walking(event_id, place_type):
     :return: list of Places ordered by avg walking time
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    result = suggestions.get_suggestions(request_id, event_id,
-                                         place_type, "walking")
+    result = suggestions.get_suggestions(
+        request_id,
+        event_id,
+        place_type,
+        "walking"
+    )
     return jsonify({"data": result}), 200
 
 
-@suggestions_bp.route("/suggestions/cycle/<int:event_id>:<string:place_type>",
-                      methods=["GET"])
+@suggestions_bp.route(
+    "/suggestions/cycle/<int:event_id>:<string:place_type>",
+    methods=["GET"]
+)
 @flask_jwt_extended.jwt_required
 def suggestions_bicycling(event_id, place_type):
     """
@@ -341,6 +368,10 @@ def suggestions_bicycling(event_id, place_type):
     :return: list of Places ordered by avg cycling time
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    result = suggestions.get_suggestions(request_id, event_id,
-                                         place_type, "bicycling")
+    result = suggestions.get_suggestions(
+        request_id,
+        event_id,
+        place_type,
+        "bicycling"
+    )
     return jsonify({"data": result}), 200

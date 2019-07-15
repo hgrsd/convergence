@@ -27,8 +27,10 @@ def find_centroid(coordinates):
     x = float(x_total / len(coordinates))
     y = float(y_total / len(coordinates))
     z = float(z_total / len(coordinates))
-    return Point(math.degrees(math.atan2(z, math.sqrt(x * x + y * y))),
-                 math.degrees(math.atan2(y, x)))
+    return Point(
+        math.degrees(math.atan2(z, math.sqrt(x * x + y * y))),
+        math.degrees(math.atan2(y, x))
+    )
 
 
 def mean_dist_from_centroid(coordinates, centroid):

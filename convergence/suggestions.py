@@ -26,12 +26,16 @@ def get_suggestions(request_id, event_id, place_type, suggestions_mode):
     users = user_store.get_users_by_ids(ids)
     user_coordinates = [Point(*user.get_location()) for user in users]
     centroid = location.find_centroid(user_coordinates)
-    mean_dist = location.mean_dist_from_centroid(user_coordinates,
-                                                 centroid)
+    mean_dist = location.mean_dist_from_centroid(
+        user_coordinates,
+        centroid
+    )
     radius = math.ceil(mean_dist * MEAN_DIST_TO_RADIUS_RATIO)
-    potential_places = places.get_places_around_centroid(centroid,
-                                                         radius,
-                                                         place_type)
+    potential_places = places.get_places_around_centroid(
+        centroid,
+        radius,
+        place_type
+    )
     if not potential_places:
         return []
     if len(potential_places) > MAX_PLACES_PER_SUGGESTION:

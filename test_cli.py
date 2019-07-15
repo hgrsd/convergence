@@ -31,7 +31,7 @@ def main():
             elif event_mode == "l":
                 leave_event(session)
         elif mode == "i":
-            invite_mode = input("[p]ending invitations, [r]espond to invitation")
+            invite_mode = input("[p]ending invitations, [r]espond to invitation\n> ")
             if invite_mode == "p":
                 get_invitations(session)
             elif invite_mode == "r":

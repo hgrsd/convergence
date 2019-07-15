@@ -46,7 +46,7 @@ class EventStore(Store):
         """
         self.session.add(event)
         try:
-            self.session.flush()
+            self.session.commit()
         except SQLAlchemyError as e:
             self.session.rollback()
             raise exceptions.DatabaseError(f"Error: {str(e)}")

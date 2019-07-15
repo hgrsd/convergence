@@ -22,8 +22,11 @@ def invite_user_to_event(request_id, user_id, event_id):
         raise exceptions.NotFoundError("Invalid event id.")
     if not user_store.get_user_by_id(user_id):
         raise exceptions.NotFoundError("Invalid user id.")
-    userinvite = UserInvite(inviter_id=request_id, invitee_id=user_id,
-                            event_id=event_id)
+    userinvite = UserInvite(
+        inviter_id=request_id,
+        invitee_id=user_id,
+        event_id=event_id
+    )
     userinvite_store.add_userinvite(userinvite)
     return userinvite.as_dict()
 
@@ -61,5 +64,5 @@ def respond_to_invitation(request_id, invite_id, accept):
         user_id = userinvite.invitee_id
         event_id = userinvite.event_id
         events.add_user_to_event(user_id, event_id)
-    userinvite_store.delete_userinvite(invite_id)
+    userinvite_store.delete_userinvite(userinvite)
     return event_store.get_event_by_id(event_id).as_dict() if accept else None

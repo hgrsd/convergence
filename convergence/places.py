@@ -18,14 +18,15 @@ def get_places_around_centroid(point, radius, place_type):
     :param point: the centroid, of type Point
     :param radius: radius (in metres)
     :param place_type: type of place to be searched for
-    :return: list of places aroind centroid
+    :return: list of places around centroid
     """
     places_query = place_store.get_places_around_point(point, radius)
-    places = [place.as_dict() for place in places_query
-              if place_type in place.gm_types]
-    if len(places) < MIN_PLACES_FROM_DATABASE:
-        places = gmaps_api.places_around_point(point, radius, place_type)
-        for place in places:
+    if len(places_query) >= MIN_PLACES_FROM_DATABASE:
+        return [p.as_dict() for p in places_query if place_type in p.gm_types]
+    places_ids = {place["gm_id"] for place in places_query}
+    places = gmaps_api.get_places_around_point(point, radius, place_type)
+    for place in places:
+        if place["gm_id"] not in places_ids:
             place_store.add_place(
                 Place(
                     name=place["name"],
@@ -50,8 +51,9 @@ def get_distance_for_places(user_coordinates, places):
     :param places: list of places
     :return: list of places with added travel_total key
     """
-    places_coordinates = [Point(place["lat"], place["long"])
-                          for place in places]
+    places_coordinates = [
+        Point(place["lat"], place["long"]) for place in places
+    ]
     for place in places:
         place["travel_total"] = 0
     for user in user_coordinates:
@@ -69,18 +71,23 @@ def get_travel_time_for_places(user_coordinates, places, mode):
     :param mode: mode of transportation
     :return: list of places with added travel_total key
     """
-    places_coordinates = [Point(place["lat"],
-                          place["long"]) for place in places]
-    dist_matrix = gmaps_api.distance_matrix(
+    places_coordinates = []
+    for place in places:
+        places_coordinates.append(Point(place["lat"], place["long"]))
+        place["travel_total"] = 0
+    dist_matrix = gmaps_api.get_distance_matrix(
         user_coordinates,
         places_coordinates,
         mode
     )
-    for place in places:
-        place["travel_total"] = 0
-    for row in dist_matrix:
-        for i, place in enumerate(row):
-            places[i]["travel_total"] += place["duration"]["value"]
+    for user_idx, user_to_places in enumerate(dist_matrix):
+        for place_idx, duration in enumerate(user_to_places):
+            if duration:
+                places[place_idx]["travel_total"] += duration
+            else:
+                # if Google Distance matrix couldn't provide duration, use avg
+                places[place_idx]["travel_total"] \
+                    += places[place_idx]["travel_total"] / user_idx + 1
     return places
 
 

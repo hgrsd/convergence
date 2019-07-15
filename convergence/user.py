@@ -42,8 +42,11 @@ def register_user(email, password, screen_name, phone):
         raise exceptions.InputError("Invalid password.")
     if phone and not validators.is_phone_format(phone):
         raise exceptions.InputError("Invalid phone number.")
-    user = User(screen_name=screen_name, email=email,
-                phone=phone)
+    user = User(
+        screen_name=screen_name,
+        email=email,
+        phone=phone
+    )
     user.hash_password(password)
     user_store.add_user(user)
     return user.full_info()

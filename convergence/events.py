@@ -16,8 +16,11 @@ def create_event(user_id, name):
     :param name: the name of the new event
     :return: event info as dict
     """
-    event = Event(event_name=name, event_owner_id=user_id,
-                  creation_date=datetime.datetime.utcnow())
+    event = Event(
+        event_name=name,
+        event_owner_id=user_id,
+        creation_date=datetime.datetime.utcnow()
+    )
     event_store.add_event(event)
     userevent = UserEvent(user_id=user_id, event_id=event.id)
     userevent_store.add_userevent(userevent)
