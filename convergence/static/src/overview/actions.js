@@ -22,7 +22,7 @@ export function overviewLoadStart() {
 			type: OVERVIEW_LOAD_START
 		});
 
-		let service = new ConvergenceService();
+		const service = new ConvergenceService();
 
 		service.getEvents().then(
 			resp => {
@@ -57,7 +57,7 @@ export function eventSaveStart(event) {
 			event
 		});
 
-		let service = new ConvergenceService();
+		const service = new ConvergenceService();
 		service.createEvent(event).then(
 			resp => {
 				// TODO: push returned event into event list
@@ -115,7 +115,7 @@ export function eventLeaveStart(eventId) {
 			eventId
 		});
 
-		let service = new ConvergenceService();
+		const service = new ConvergenceService();
 		service.leaveEvent(eventId, getState().login.userId).then(
 			resp => {
 				dispatch(eventLeaveSuccess(eventId));
@@ -148,7 +148,7 @@ export function eventDeleteStart(eventId) {
 			eventId
 		});
 
-		let service = new ConvergenceService();
+		const service = new ConvergenceService();
 		service.deleteEvent(eventId, getState().login.userId).then(
 			resp => {
 				dispatch(eventDeleteSuccess(eventId));

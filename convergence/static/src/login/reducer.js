@@ -2,6 +2,7 @@ import {
 	LOGIN_START,
 	LOGIN_SUCCESS,
 	LOGIN_FAILURE,
+	LOGIN_CHECK,
 	REGISTER_START,
 	REGISTER_SUCCESS,
 	REGISTER_FAILURE
@@ -19,6 +20,12 @@ const initialState = {
 
 export function loginReducer(state = initialState, action) {
 	switch (action.type) {
+		case LOGIN_CHECK:
+			return {
+				...state,
+				isLoggedIn: action.isLoggedIn,
+				userId: action.userId
+			};
 		case LOGIN_START:
 			return {
 				...state,

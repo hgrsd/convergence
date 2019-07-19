@@ -3,9 +3,11 @@ import ReactDOM from "react-dom";
 import { createStore, combineReducers, applyMiddleware } from "redux";
 import thunk from "redux-thunk";
 import { Provider } from "react-redux";
-import { Router, Route, Redirect, Switch } from "react-router-dom";
-import { Login, loginReducer } from "./login";
-import { Overview, overviewReducer } from "./overview";
+import { Router } from "react-router-dom";
+import { loginReducer } from "./login";
+import { loginCheck } from "./login/actions";
+import { overviewReducer } from "./overview";
+import App from "./app";
 import history from "./history";
 
 const appReducers = combineReducers({
@@ -21,31 +23,12 @@ const logger = store => next => action => {
 };
 
 const appStore = createStore(appReducers, {}, applyMiddleware(logger, thunk));
-
-class App extends React.Component {
-	render() {
-		this.isAuthenticated = true;
-		return (
-			<Provider store={appStore}>
-				<Router history={history}>
-					<Switch>
-						<Route exact path="/login" component={Login} />
-						<Route
-							path="/"
-							render={props => {
-								return this.isAuthenticated ? (
-									<Overview />
-								) : (
-									<Redirect to="/login" />
-								);
-							}}
-						/>
-						<Route path="/home" component={Overview} />
-					</Switch>
-				</Router>
-			</Provider>
-		);
-	}
-}
-
-ReactDOM.render(<App />, document.getElementById("app-root"));
+appStore.dispatch(loginCheck());
+ReactDOM.render(
+	<Provider store={appStore}>
+		<Router history={history}>
+			<App />
+		</Router>
+	</Provider>,
+	document.getElementById("app-root")
+);
