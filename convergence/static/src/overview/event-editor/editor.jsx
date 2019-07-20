@@ -3,9 +3,7 @@ import React from "react";
 // A form, which allows creating a new event or editing 
 // an existing one.
 // TODO: localize static strings
-// TODO: consider creating a connected component for this
-// TODO: add invited people list
-export class EditEventView extends React.Component {
+export class EventEditor extends React.Component {
 	constructor() {
 		super();
 		this.eventNameInput = React.createRef();

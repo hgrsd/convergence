@@ -1,50 +1,10 @@
-import { connect } from "react-redux";
-import {
-	overviewLoadStart,
-	eventEditStart,
-	eventEditSuccess,
-	eventSaveStart,
-	eventSaveSuccess,
-	eventLeaveStart,
-	eventDeleteStart
-} from "./actions";
-import { OverviewView } from "./overview";
+import { combineReducers } from "redux";
+import { eventEditorReducer } from "./event-editor";
+import { eventListReducer } from "./event-list";
 
-function mapStateToProps(state) {
-	return state.overview;
-}
+export const overviewReducer = combineReducers({
+	eventEditor: eventEditorReducer,
+	eventList: eventListReducer
+});
 
-function mapDispatchToProps(dispatch) {
-	return {
-		overviewLoadStart: (username, password) => {
-			dispatch(overviewLoadStart(username, password));
-		},
-		eventEditStart: () => {
-			dispatch(eventEditStart());
-		},
-		eventEditSuccess: () => {
-			dispatch(eventEditSuccess());
-		},
-		eventSaveStart: event => {
-			dispatch(eventSaveStart(event));
-		},
-		eventSaveSuccess: () => {
-			dispatch(eventSaveSuccess());
-		},
-		eventLeaveStart: (eventId) => {
-			dispatch(eventLeaveStart(eventId));
-		},
-		eventDeleteStart: (eventId) => {
-			dispatch(eventDeleteStart(eventId));
-		}
-	};
-}
-
-export const Overview = connect(
-	mapStateToProps,
-	mapDispatchToProps
-)(OverviewView);
-
-export { overviewReducer } from "./reducer";
-export { NavbarView } from "./navbar";
-export { EditEventView } from "./edit-event";
+export { Overview } from "./overview";
