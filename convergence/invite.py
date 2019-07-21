@@ -1,7 +1,8 @@
 from convergence import events
 from convergence import exceptions
 from convergence.models import UserInvite
-from convergence.repo import UserInviteStore, EventStore, UserStore, UserEventStore
+from convergence.repo import UserInviteStore, EventStore, UserStore, \
+                             UserEventStore
 
 userinvite_store = UserInviteStore()
 event_store = EventStore()
