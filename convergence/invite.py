@@ -1,11 +1,12 @@
 from convergence import events
 from convergence import exceptions
 from convergence.models import UserInvite
-from convergence.repo import UserInviteStore, EventStore, UserStore
+from convergence.repo import UserInviteStore, EventStore, UserStore, UserEventStore
 
 userinvite_store = UserInviteStore()
 event_store = EventStore()
 user_store = UserStore()
+userevent_store = UserEventStore()
 
 
 def invite_user_to_event(request_id, user_id, event_id):
@@ -22,6 +23,10 @@ def invite_user_to_event(request_id, user_id, event_id):
         raise exceptions.NotFoundError("Invalid event id.")
     if not user_store.get_user_by_id(user_id):
         raise exceptions.NotFoundError("Invalid user id.")
+    if userevent_store.get_userevent(user_id, event_id):
+        raise exceptions.InvalidRequestError("User already a member of event.")
+    if userinvite_store.get_invitation_by_details(user_id, event_id):
+        raise exceptions.InvalidRequestError("Invite already pending.")
     userinvite = UserInvite(
         inviter_id=request_id,
         invitee_id=user_id,

@@ -53,6 +53,19 @@ class UserInviteStore(Store):
                            .filter(UserInvite.invitee_id == user_id) \
                            .all()
 
+    def get_invitation_by_details(self, user_id, event_id):
+        """
+        Return pending invites, if they exist, based on the 
+        specified user_id and event_id.
+        :param user_id: user id
+        :param event_id: event id
+        :return: UserInvite, else None
+        """
+        return self.session.query(UserInvite) \
+                   .filter(UserInvite.invitee_id == user_id,
+                           UserInvite.event_id == event_id) \
+                   .first()
+
     def delete_userinvite(self, userinvite):
         """
         Delete UserInvite from database
