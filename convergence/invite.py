@@ -54,11 +54,11 @@ def invite_users_to_event(request_id, emails, event_id):
     if not event or not event.event_owner_id == request_id:
         raise exceptions.NotFoundError("Invalid event id.")
 
-    already_pending = set([user.id for user in \
-        userinvite_store.get_users_by_event(event_id)])
+    already_pending = set(user.id for user in \
+        userinvite_store.get_users_by_event(event_id))
 
-    already_accepted = set([user.id for user in \
-        userevent_store.get_users_by_event(event_id)])
+    already_accepted = set(user.id for user in \
+        userevent_store.get_users_by_event(event_id))
 
     # TODO: figure out what to do with already rejected
 

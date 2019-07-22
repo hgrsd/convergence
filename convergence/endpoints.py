@@ -189,6 +189,7 @@ def invite_user_to_event(event_id, user_id):
     methods=["POST"]
 )
 @flask_jwt_extended.jwt_required
+@validators.contains_json_keys(["emails"])
 def invite_users_to_event(event_id):
     """
     Invite multiple users to an event (requesting user must be event owner)
