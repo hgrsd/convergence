@@ -24,6 +24,19 @@ class UserInviteStore(Store):
             raise exceptions.DatabaseError(f"Error: {str(e)}")
         return None
 
+    def add_userinvites(self, userinvites):
+        """
+        Add multiple UserInvite objects to a database
+        :param userinvites: UserInvite objects
+        """
+        try:
+            self.session.bulk_save_objects(userinvites)
+            self.session.commit()
+        except SQLAlchemyError as e:
+            self.session.rollback()
+            raise exceptions.DatabaseError(f"Error: {str(e)}")
+        return None
+
     def get_invitation_by_id(self, invite_id):
         """
         Return invitation by id
@@ -65,6 +78,17 @@ class UserInviteStore(Store):
                    .filter(UserInvite.invitee_id == user_id,
                            UserInvite.event_id == event_id) \
                    .first()
+
+    def get_users_by_event(self, event_id):
+        """
+        Return all members who have a pending invitation to an event
+        :param event_id: event id
+        :return: list of User objects
+        """
+        return self.session.query(User) \
+                           .join(UserInvite.invitee_ids) \
+                           .filter(UserInvite.event_id == event_id) \
+                           .all()
 
     def delete_userinvite(self, userinvite):
         """

@@ -184,6 +184,25 @@ def invite_user_to_event(event_id, user_id):
     invite.invite_user_to_event(request_id, user_id, event_id)
     return jsonify({"success": True}), 200
 
+@events_bp.route(
+    "/events/invite/<int:event_id>",
+    methods=["POST"]
+)
+@flask_jwt_extended.jwt_required
+@validators.contains_json_keys(["emails"])
+def invite_users_to_event(event_id):
+    """
+    Invite multiple users to an event (requesting user must be event owner)
+    :param event_id: event to invite user to
+    :param email: users emails to invite to an event
+    :return: success status
+    """
+    request_id = flask_jwt_extended.get_jwt_identity()
+    not_invited = invite.invite_users_to_event(request_id,
+        request.get_json()["emails"],
+        event_id)
+    return jsonify({"data": {"not_invited": list(not_invited)}}), 200
+
 
 @events_bp.route(
     "/events/invite/<int:invite_id>/accept",

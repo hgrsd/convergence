@@ -34,6 +34,15 @@ class UserStore(Store):
         """
         return self.session.query(User).filter(User.id.in_(user_ids)).all()
 
+    def get_users_by_emails(self, emails):
+        """
+        Return users with given set of usernames (emails).
+        Resulting list might be equal or less in length
+        then requested usernames.
+        :param usernames list of user names (emails)
+        """
+        return self.session.query(User).filter(User.email.in_(emails)).all()
+
     def add_user(self, user):
         """
         Add user to database
