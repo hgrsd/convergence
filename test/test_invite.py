@@ -66,6 +66,53 @@ class TestInviteUser(unittest.TestCase):
             invite.invite_user_to_event(3, 9, 4)  # Invite already pending
 
 
+class TestInviteUsers(unittest.TestCase):
+
+    @patch.object(invite, "userevent_store")
+    @patch.object(invite, "userinvite_store")
+    @patch.object(invite, "user_store")
+    @patch.object(invite, "event_store")
+    def test_invite_users_to_event_success(self, mock_es, mock_us, mock_uis,
+                                           mock_ues):
+        mock_es.get_event_by_id = fakes.get_fake_event
+        mock_us.get_users_by_emails = fakes.get_fake_users_by_emails
+        mock_ues.get_users_by_event = lambda *args: None
+        mock_uis.get_users_by_event = lambda *args: None
+
+        emails = [
+            "testuser1@gmail.com",
+            "testuser2@gmail.com",
+            "testuser3@gmail.com"
+        ]
+        response = invite.invite_users_to_event(3, emails, 1)
+        self.assertEqual(response, set())
+        mock_uis.add_userinvites.assert_called_once()
+
+    @patch.object(invite, "userevent_store")
+    @patch.object(invite, "userinvite_store")
+    @patch.object(invite, "user_store")
+    @patch.object(invite, "event_store")
+    def test_invite_users_to_event_fail(self, mock_es, mock_us, mock_uis,
+                                        mock_ues):
+        mock_es.get_event_by_id = fakes.get_fake_event
+        mock_us.get_users_by_emails = fakes.get_fake_users_by_emails
+        mock_ues.get_users_by_event = lambda *args: None
+        mock_uis.get_users_by_event = lambda *args: None
+
+        emails = [
+            "testuser1@gmail.com",
+            "testuser2@gmail.com",
+            "testuser3@gmail.com"
+        ]
+        with self.assertRaises(exceptions.NotFoundError):
+            invite.invite_users_to_event(2, emails, 1)
+        mock_uis.add_userinvites.assert_not_called()
+
+        emails = ["testuser@gmail.com"] * (invite.MAX_INVITES_PER_REQUEST + 1)
+        with self.assertRaises(exceptions.InvalidRequestError):
+            invite.invite_users_to_event(3, emails, 1)
+
+
 class TestGetInvitations(unittest.TestCase):
 
     @patch.object(invite, "userinvite_store")

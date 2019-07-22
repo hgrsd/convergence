@@ -30,7 +30,7 @@ class UserEventStore(Store):
         :return: list of User objects
         """
         return self.session.query(User) \
-                           .join(UserEvent, User.userevents) \
+                           .join(UserEvent, User.rel_userevents) \
                            .filter(UserEvent.event_id == event_id) \
                            .all()
 

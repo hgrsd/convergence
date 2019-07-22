@@ -10,7 +10,6 @@ userinvite_store = UserInviteStore()
 userevent_store = UserEventStore()
 event_store = EventStore()
 user_store = UserStore()
-userevent_store = UserEventStore()
 
 
 def invite_user_to_event(request_id, user_id, event_id):
@@ -54,11 +53,10 @@ def invite_users_to_event(request_id, emails, event_id):
     if not event or not event.event_owner_id == request_id:
         raise exceptions.NotFoundError("Invalid event id.")
 
-    already_pending = set(user.id for user in \
-        userinvite_store.get_users_by_event(event_id))
-
-    already_accepted = set(user.id for user in \
-        userevent_store.get_users_by_event(event_id))
+    userinvites = userinvite_store.get_users_by_event(event_id)
+    already_pending = set(u.id for u in userinvites) if userinvites else {}
+    userevents = userevent_store.get_users_by_event(event_id)
+    already_accepted = set(u.id for u in userevents) if userevents else {}
 
     # TODO: figure out what to do with already rejected
 
@@ -70,8 +68,8 @@ def invite_users_to_event(request_id, emails, event_id):
 
     for user in users:
         if (user.id == request_id or
-            user.id in already_pending or
-            user.id in already_accepted):
+                user.id in already_pending or
+                user.id in already_accepted):
             continue
         userinvites.append(UserInvite(
             inviter_id=request_id,

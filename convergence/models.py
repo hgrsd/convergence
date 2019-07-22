@@ -19,8 +19,8 @@ class User(base):
     latitude = sa.Column(sa.Float)
     longitude = sa.Column(sa.Float)
 
-    events = sa.orm.relationship("Event", backref="event_owners")
-    userevents = sa.orm.relationship("UserEvent", backref="users")
+    rel_events = sa.orm.relationship("Event", backref="event_owners")
+    rel_userevents = sa.orm.relationship("UserEvent", backref="users")
 
     def hash_password(self, password):
         self.password_hash = pwd_context.hash(password)
@@ -52,8 +52,8 @@ class Event(base):
                                index=True)
     creation_date = sa.Column(sa.DateTime)
 
-    userinvites = sa.orm.relation("UserInvite", backref="events")
-    userevents = sa.orm.relation("UserEvent", backref="events")
+    rel_userinvites = sa.orm.relation("UserInvite", backref="events")
+    rel_userevents = sa.orm.relation("UserEvent", backref="events")
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
@@ -71,10 +71,10 @@ class UserInvite(base):
     __table_args__ = (sa.UniqueConstraint("inviter_id", "invitee_id",
                                           "event_id"),)
 
-    inviter_ids = sa.orm.relationship("User", foreign_keys=[inviter_id],
-                                      backref="userinvites_inviters")
-    invitee_ids = sa.orm.relationship("User", foreign_keys=[invitee_id],
-                                      backref="userinvites_invitees")
+    rel_inviter_ids = sa.orm.relationship("User", foreign_keys=[inviter_id],
+                                          backref="userinvites_inviters")
+    rel_invitee_ids = sa.orm.relationship("User", foreign_keys=[invitee_id],
+                                          backref="userinvites_invitees")
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}

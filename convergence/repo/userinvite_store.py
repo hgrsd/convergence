@@ -60,9 +60,9 @@ class UserInviteStore(Store):
                                   event_owner.c.screen_name,
                                   UserInvite.id,
                                   inviter.c.screen_name) \
-                           .join(UserInvite, Event.userinvites) \
-                           .join(event_owner, Event.event_owners) \
-                           .join(inviter, UserInvite.inviter_ids) \
+                           .join(UserInvite, Event.rel_userinvites) \
+                           .join(event_owner, Event.rel_event_owners) \
+                           .join(inviter, UserInvite.rel_inviter_ids) \
                            .filter(UserInvite.invitee_id == user_id) \
                            .all()
 
@@ -86,7 +86,7 @@ class UserInviteStore(Store):
         :return: list of User objects
         """
         return self.session.query(User) \
-                           .join(UserInvite.invitee_ids) \
+                           .join(UserInvite.rel_invitee_ids) \
                            .filter(UserInvite.event_id == event_id) \
                            .all()
 

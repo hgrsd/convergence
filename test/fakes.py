@@ -36,6 +36,10 @@ def get_fake_users_by_event(event_id):
     return [get_fake_user_by_id(1), get_fake_user_by_id(2)]
 
 
+def get_fake_users_by_emails(emails):
+    return [get_fake_user_by_email(email) for email in emails]
+
+
 def get_fake_event(event_id):
     return Event(
         id=event_id,
@@ -43,6 +47,19 @@ def get_fake_event(event_id):
         event_owner_id=3,
         creation_date=datetime.datetime.utcnow()
     )
+
+
+def get_fake_user_by_email(email):
+    user = User(
+        id=5,
+        email=email,
+        screen_name="Fake User",
+        phone="+44(0)1144728913",
+        latitude=50.1444,
+        longitude=1.25515
+    )
+    user.hash_password("fakepassword")
+    return user
 
 
 def get_fake_user_by_id(user_id):
