@@ -5,6 +5,7 @@ from urllib.parse import quote
 
 from convergence import app
 from convergence.exceptions import ServerError
+from convergence.repo import DurationStore
 
 GM_PLACES_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/" \
                 "json?location={:f},{:f}&radius={:d}&type={:s}&key={:s}"
@@ -59,6 +60,7 @@ def get_distance_matrix(origins, destinations, mode):
     :param mode: mode of transportation
     :return: distance matrix of dimension len(origins) * len(destinations)
     """
+    print("dist matrix called")
     distance_matrix = [[None] * len(destinations) for _ in range(len(origins))]
 
     no_requests = math.ceil(

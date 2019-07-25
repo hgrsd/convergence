@@ -1,14 +1,16 @@
 from datetime import datetime
 
 from convergence import gmaps_api
+from convergence import duration
 from convergence.models import Place
 from convergence.location import Point
-from convergence.repo import PlaceStore
+from convergence.repo import PlaceStore, DurationStore
 
 MIN_PLACES_FROM_DATABASE = 4
 
 
 place_store = PlaceStore()
+duration_store = DurationStore()
 
 
 def get_places_around_centroid(point, radius, place_type):
@@ -43,7 +45,7 @@ def get_places_around_centroid(point, radius, place_type):
     return places
 
 
-def get_distance_for_places(user_coordinates, places):
+def add_distance_to_places(user_coordinates, places):
     """
     Calculate distance between each user and each place, add them
     up to calculate total distance for each place.
@@ -62,34 +64,16 @@ def get_distance_for_places(user_coordinates, places):
     return places
 
 
-def get_travel_time_for_places(user_coordinates, places, mode):
+def add_travel_time_to_places(user_coordinates, places, mode):
     """
-    Query Google Distance Matrix API for travel times for each user
-    to each place, and calculate total travel time for each place.
+    Return all places with total travel time added for each place.
+
     :param user_coordinates: list of Points for relevant users
-    :param places: list of places
+    :param places: list of places (dicts)
     :param mode: mode of transportation
     :return: list of places with added travel_total key
     """
-    places_coordinates = []
-    for place in places:
-        places_coordinates.append(Point(place["lat"], place["long"]))
-        place["travel_total"] = 0
-    dist_matrix = gmaps_api.get_distance_matrix(
-        user_coordinates,
-        places_coordinates,
-        mode
-    )
-    for user_idx, user_to_places in enumerate(dist_matrix):
-        for place_idx, duration in enumerate(user_to_places):
-            if duration:
-                places[place_idx]["travel_total"] += duration
-            else:
-                # if Google Distance matrix couldn't provide duration, use avg
-                places[place_idx]["travel_total"] \
-                    += places[place_idx]["travel_total"] / user_idx + 1
-    return places
-
+    return duration.add_duration_to_places(user_coordinates, places, mode)
 
 def sort_places_by_travel_total(places):
     return sorted(places, key=lambda x: x["travel_total"])

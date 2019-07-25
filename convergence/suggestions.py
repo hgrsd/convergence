@@ -43,14 +43,14 @@ def get_suggestions(request_id, event_id, place_type, suggestions_mode):
             potential_places
         )[:MAX_PLACES_PER_SUGGESTION]
     if suggestions_mode == "distance":
-        potential_places = places.get_distance_for_places(
+        potential_places = places.add_distance_to_places(
             user_coordinates,
             potential_places
         )
     else:
-        potential_places = places.get_travel_time_for_places(
+        potential_places = places.add_travel_time_to_places(
             user_coordinates,
             potential_places,
-            suggestions_mode
+            suggestions_mode,
         )
     return places.sort_places_by_travel_total(potential_places)

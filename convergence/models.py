@@ -111,8 +111,8 @@ class Place(base):
         """Check whether point is within radius of self."""
         self_lat = math.radians(self.lat)
         self_long = math.radians(self.long)
-        other_lat = math.radians(point[0])
-        other_long = math.radians(point[1])
+        other_lat = math.radians(point.lat)
+        other_long = math.radians(point.long)
         R = 6371
         dist = math.acos(math.sin(self_lat) * math.sin(other_lat)
                          + math.cos(self_lat) * math.cos(other_lat)
@@ -134,3 +134,151 @@ class Place(base):
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+class DurationWalk(base):
+    __tablename__ = "durationswalk"
+    id = sa.Column(sa.Integer, primary_key=True)
+    lat_a = sa.Column(sa.Float)
+    long_a = sa.Column(sa.Float)
+    lat_b = sa.Column(sa.Float)
+    long_b = sa.Column(sa.Float)
+    duration = sa.Column(sa.Integer)
+    timestamp = sa.Column(sa.DateTime)
+
+    @hybrid_method
+    def within_range(self, point, radius):
+        """Check whether point is within radius of self."""
+        self_lat = math.radians(self.lat_a)
+        self_long = math.radians(self.long_a)
+        other_lat = math.radians(point.lat)
+        other_long = math.radians(point.long)
+        R = 6371
+        dist = math.acos(math.sin(self_lat) * math.sin(other_lat)
+                         + math.cos(self_lat) * math.cos(other_lat)
+                         * math.cos(self_long - other_long)) * R
+        return dist < radius / 1000  # radius in metres, convert to km
+
+    @within_range.expression
+    def within_range(cls, point, radius):
+        """SQL-expression version of within_range"""
+        self_lat = sa.func.radians(cls.lat_a)
+        self_long = sa.func.radians(cls.long_a)
+        other_lat = sa.func.radians(point.lat)
+        other_long = sa.func.radians(point.long)
+        R = 6371
+        dist = sa.func.acos(sa.func.sin(self_lat) * sa.func.sin(other_lat)
+                            + sa.func.cos(self_lat) * sa.func.cos(other_lat)
+                            * sa.func.cos(self_long - other_long)) * R
+        return dist < radius / 1000  # radius in metres, convert to km
+
+
+class DurationCycle(base):
+    __tablename__ = "durationscycle"
+    id = sa.Column(sa.Integer, primary_key=True)
+    lat_a = sa.Column(sa.Float)
+    long_a = sa.Column(sa.Float)
+    lat_b = sa.Column(sa.Float)
+    long_b = sa.Column(sa.Float)
+    duration = sa.Column(sa.Integer)
+    timestamp = sa.Column(sa.DateTime)
+
+    @hybrid_method
+    def within_range(self, point, radius):
+        """Check whether point is within radius of self."""
+        self_lat = math.radians(self.lat_a)
+        self_long = math.radians(self.long_a)
+        other_lat = math.radians(point.lat)
+        other_long = math.radians(point.long)
+        R = 6371
+        dist = math.acos(math.sin(self_lat) * math.sin(other_lat)
+                         + math.cos(self_lat) * math.cos(other_lat)
+                         * math.cos(self_long - other_long)) * R
+        return dist < radius / 1000  # radius in metres, convert to km
+
+    @within_range.expression
+    def within_range(cls, point, radius):
+        """SQL-expression version of within_range"""
+        self_lat = sa.func.radians(cls.lat_a)
+        self_long = sa.func.radians(cls.long_a)
+        other_lat = sa.func.radians(point.lat)
+        other_long = sa.func.radians(point.long)
+        R = 6371
+        dist = sa.func.acos(sa.func.sin(self_lat) * sa.func.sin(other_lat)
+                            + sa.func.cos(self_lat) * sa.func.cos(other_lat)
+                            * sa.func.cos(self_long - other_long)) * R
+        return dist < radius / 1000  # radius in metres, convert to km
+
+
+class DurationTransit(base):
+    __tablename__ = "durationstransit"
+    id = sa.Column(sa.Integer, primary_key=True)
+    lat_a = sa.Column(sa.Float)
+    long_a = sa.Column(sa.Float)
+    lat_b = sa.Column(sa.Float)
+    long_b = sa.Column(sa.Float)
+    duration = sa.Column(sa.Integer)
+    timestamp = sa.Column(sa.DateTime)
+
+    @hybrid_method
+    def within_range(self, point, radius):
+        """Check whether point is within radius of self."""
+        self_lat = math.radians(self.lat_a)
+        self_long = math.radians(self.long_a)
+        other_lat = math.radians(point.lat)
+        other_long = math.radians(point.long)
+        R = 6371
+        dist = math.acos(math.sin(self_lat) * math.sin(other_lat)
+                         + math.cos(self_lat) * math.cos(other_lat)
+                         * math.cos(self_long - other_long)) * R
+        return dist < radius / 1000  # radius in metres, convert to km
+
+    @within_range.expression
+    def within_range(cls, point, radius):
+        """SQL-expression version of within_range"""
+        self_lat = sa.func.radians(cls.lat_a)
+        self_long = sa.func.radians(cls.long_a)
+        other_lat = sa.func.radians(point.lat)
+        other_long = sa.func.radians(point.long)
+        R = 6371
+        dist = sa.func.acos(sa.func.sin(self_lat) * sa.func.sin(other_lat)
+                            + sa.func.cos(self_lat) * sa.func.cos(other_lat)
+                            * sa.func.cos(self_long - other_long)) * R
+        return dist < radius / 1000  # radius in metres, convert to km
+
+
+class DurationDrive(base):
+    __tablename__ = "durationsdrive"
+    id = sa.Column(sa.Integer, primary_key=True)
+    lat_a = sa.Column(sa.Float)
+    long_a = sa.Column(sa.Float)
+    lat_b = sa.Column(sa.Float)
+    long_b = sa.Column(sa.Float)
+    duration = sa.Column(sa.Integer)
+    timestamp = sa.Column(sa.DateTime)
+
+    @hybrid_method
+    def within_range(self, point, radius):
+        """Check whether point is within radius of self."""
+        self_lat = math.radians(self.lat_a)
+        self_long = math.radians(self.long_a)
+        other_lat = math.radians(point.lat)
+        other_long = math.radians(point.long)
+        R = 6371
+        dist = math.acos(math.sin(self_lat) * math.sin(other_lat)
+                         + math.cos(self_lat) * math.cos(other_lat)
+                         * math.cos(self_long - other_long)) * R
+        return dist < radius / 1000  # radius in metres, convert to km
+
+    @within_range.expression
+    def within_range(cls, point, radius):
+        """SQL-expression version of within_range"""
+        self_lat = sa.func.radians(cls.lat_a)
+        self_long = sa.func.radians(cls.long_a)
+        other_lat = sa.func.radians(point.lat)
+        other_long = sa.func.radians(point.long)
+        R = 6371
+        dist = sa.func.acos(sa.func.sin(self_lat) * sa.func.sin(other_lat)
+                            + sa.func.cos(self_lat) * sa.func.cos(other_lat)
+                            * sa.func.cos(self_long - other_long)) * R
+        return dist < radius / 1000  # radius in metres, convert to km
