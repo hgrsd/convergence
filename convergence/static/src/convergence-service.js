@@ -90,4 +90,10 @@ export class ConvergenceService {
 	leaveEvent(eventId, userId) {
 		return axios.delete(`/events/user_event/${eventId}:${userId}`);
 	}
+
+	inviteUsers(eventId, usernames) {
+		return axios.post(`/events/invite/${eventId}`, {
+			emails: usernames
+		});
+	}
 }

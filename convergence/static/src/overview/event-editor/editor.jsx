@@ -37,11 +37,17 @@ export class EventEditor extends React.Component {
 							</label>
 						</div>
 
+						<UserList
+							users={this.props.users}
+							eventEditRemoveUser={this.props.eventEditRemoveUser}
+							eventEditAddUser={this.props.eventEditAddUser}
+						/>
+
 						<div className="text-right">
 							<a
 								className="btn btn-light m-1"
 								href="#"
-								onClick={this.props.eventEditSuccess}>
+								onClick={this.props.eventEditSuccess.bind(this)}>
 								Cancel
 							</a>
 							<a
@@ -62,5 +68,65 @@ export class EventEditor extends React.Component {
 			name: this.eventNameInput.current.value,
 			dateTime: this.eventDateTimeInput.current.value
 		});
+	}
+}
+
+class UserList extends React.Component {
+	constructor() {
+		super();
+		this.usernameInput = React.createRef();
+	}
+
+	render() {
+		const userItems = this.props.users.map(u => {
+			return (
+				<li className="list-group-item" key={u}>
+					<div className="d-flex w-100 justify-content-between align-items-center">
+						<span className="mx-2">{u}</span>
+						<small>
+							<button
+								className="btn btn-danger"
+								onClick={() => this.props.eventEditRemoveUser(u)}>
+								<i className="fas fa-trash"></i>
+							</button>
+						</small>
+					</div>
+				</li>
+			);
+		});
+		return (
+			<div>
+				<ul className="list-group">
+					<li className="list-group-item">
+						<h5>Invited Users</h5>
+					</li>
+					{userItems}
+					<li className="list-group-item">
+						<div
+							className="d-flex w-100 justify-content-between
+										align-items-center">
+							<input
+								placeholder="Username"
+								type="email"
+								className="form-control mr-2"
+								ref={this.usernameInput}
+							/>
+							<small>
+								<button
+									className="btn btn-primary"
+									onClick={() => {
+										this.props.eventEditAddUser(
+											this.usernameInput.current.value
+										);
+										this.usernameInput.current.value = "";
+									}}>
+									<i className="fas fa-plus"></i>
+								</button>
+							</small>
+						</div>
+					</li>
+				</ul>
+			</div>
+		);
 	}
 }

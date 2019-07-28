@@ -3,7 +3,9 @@ import {
 	EVENT_EDIT_SUCCESS,
 	EVENT_SAVE_START,
 	EVENT_SAVE_SUCCESS,
-	EVENT_SAVE_FAILURE
+	EVENT_SAVE_FAILURE,
+	EVENT_EDIT_ADD_USER,
+	EVENT_EDIT_REMOVE_USER
 } from "./actions";
 
 const initialState = {
@@ -35,6 +37,17 @@ export function eventEditorReducer(state = initialState, action) {
 				...state,
 				isSavingEvent: false,
 				errorMessage: action.errorMessage
+			};
+		case EVENT_EDIT_ADD_USER:
+			return {
+				...state,
+				users: [...state.users, action.username]
+			};
+		case EVENT_EDIT_REMOVE_USER:
+			// TODO: consider removing by index
+			return {
+				...state,
+				users: state.users.filter(u => u !== action.username)
 			};
 	}
 
