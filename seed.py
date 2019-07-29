@@ -31,8 +31,8 @@ def generate_users(n_users=100, password="testing", country_code="GB"):
         user.phone = fake.phone_number()
         user.hash_password(password)
         user.latitude, user.longitude = fake.local_latlng(country_code=country_code, coords_only=True)
-        db.session.add(user)
-    db.session.flush()
+        session.add(user)
+    session.flush()
 
 
 def generate_places(n_places=2500, country_code="GB"):
@@ -47,8 +47,8 @@ def generate_places(n_places=2500, country_code="GB"):
         place.gm_types = [random.choice(["bar", "cafe", "restaurant", "art_gallery", "museum", "night_club", "movie_theater"]) for _ in range(2)]
         place.address = fake.address().replace("\n", ", ")
         place.timestamp = fake.date_time()
-        db.session.add(place)
-    db.session.flush()
+        session.add(place)
+    session.flush()
 
 
 def generate_events(n_events=25, total_users=100):
@@ -56,30 +56,30 @@ def generate_events(n_events=25, total_users=100):
     for i in range(n_events):
         event = Event()
         event.event_name = fake.domain_word()
-        event.event_owner_id = random.choice(db.session.query(User).all()).id
+        event.event_owner_id = random.choice(session.query(User).all()).id
         event.creation_date = fake.past_datetime(start_date="-7d", tzinfo=None)
-        db.session.add(event)
-        db.session.flush()
+        session.add(event)
+        session.flush()
         # add owner of event to UserEvent
         userevent = UserEvent()
         userevent.event_id = event.id
         userevent.user_id = event.event_owner_id
-        db.session.add(userevent)
-        db.session.flush()
+        session.add(userevent)
+        session.flush()
 
 
 def generate_userevents(n_per_user=2, total_users=100, total_events=25):
     print(f"[>] Generating UserEvents, {n_per_user} events per user for a total of {total_users} users...")
-    for user in db.session.query(User).all():
+    for user in session.query(User).all():
         for k in range(n_per_user):
             userevent = UserEvent()
             userevent.user_id = user.id
-            userevent.event_id = random.choice(db.session.query(Event).all()).id
+            userevent.event_id = random.choice(session.query(Event).all()).id
             # check if UserEvent already exists
-            if db.session.query(UserEvent).filter_by(user_id=user.id, event_id=userevent.event_id).first():
+            if session.query(UserEvent).filter_by(user_id=user.id, event_id=userevent.event_id).first():
                 continue
-            db.session.add(userevent)
-        db.session.flush()
+            session.add(userevent)
+        session.flush()
 
 
 # -- run the script:
@@ -100,7 +100,8 @@ fake.seed(seed)
 db_address = f"postgresql://localhost/{db_name}"
 print("[o] Initialising database...")
 db = ConvergenceDB(db_address)
-db.create_tables()
+session = db.create_session()
+db.initialise_tables()
 print("[+] Initial database setup complete.\n")
 
 # Use the following testing data generation parameters:
@@ -112,7 +113,7 @@ generate_userevents(n_per_user=2, total_users=100)
 print("[+] Generation complete.")
 print("[o] Committing to database.")
 try:
-    db.session.commit()
+    session.commit()
     print("[+] Database write completed. Script finished.")
     print(f"\tSeed used: {seed}. Please note for reproducibility.")
 except:

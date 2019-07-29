@@ -21,3 +21,4 @@ from . import error_handling
 app.register_blueprint(endpoints.user_bp)
 app.register_blueprint(endpoints.events_bp)
 app.register_blueprint(endpoints.suggestions_bp)
+app.register_blueprint(endpoints.friends_bp)

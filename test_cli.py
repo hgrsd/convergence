@@ -9,9 +9,21 @@ def main():
     session = requests.Session()
     login(session)
     while True:
-        mode = input("Menu:\n\t[u]ser\n\t[e]vents\n\t[i]nvites\n\t[s]uggestions\n\t[q]uit\n\n> ")
+        mode = input("Menu:\n\t[u]ser\n\t[f]riends\n\t[e]vents\n\t[i]nvites\n\t[s]uggestions\n\t[q]uit\n\n> ")
         if mode == "q":
             break
+        elif mode == "f":
+            friend_mode = input("[l]ist friends, [d]elete friend, [i]nvite friend, [p]ending invitations, [r]espond to invitation\n> ")
+            if friend_mode == "l":
+                list_friends(session)
+            elif friend_mode == "i":
+                invite_friend(session)
+            elif friend_mode == "p":
+                get_friend_invites(session)
+            elif friend_mode == "r":
+                respond_friend_invite(session)
+            elif friend_mode == "d":
+                delete_friend(session)
         elif mode == "e":
             event_mode = input("[c]urrent user's events, [o]wned events, [n]ew, [d]elete, [i]nvite user, [r]emove user, [l]eave event, [g]et members, [q]uit event menu: ")
             if event_mode == "n":
@@ -78,8 +90,8 @@ def delete_event(session):
 
 def invite_user_to_event(session):
     event_id = input("Event id: ")
-    user_id = input("User id: ")
-    response = session.post(f"http://localhost:5000/events/invite/{event_id}:{user_id}", cookies=session.cookies, headers=header).json()
+    invite_id = input("User id: ")
+    response = session.post(f"http://localhost:5000/events/invite/{event_id}:{invite_id}", cookies=session.cookies, headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
 
@@ -95,6 +107,35 @@ def respond_to_invitation(session):
     print(json.dumps(response, sort_keys=True, indent=4))
 
 
+def list_friends(session):
+    response = session.get(f"http://localhost:5000/friends", cookies=session.cookies, headers=header).json()
+    print(json.dumps(response, sort_keys=True, indent=4))
+
+
+def invite_friend(session):
+    invite_id = input("Friend's user id: ")
+    response = session.post(f"http://localhost:5000/friends/{invite_id}", cookies=session.cookies, headers=header).json()
+    print(json.dumps(response, sort_keys=True, indent=4))
+
+
+def delete_friend(session):
+    friend_id = input("Friend's user id: ")
+    response = session.delete(f"http://localhost:5000/friends/{friend_id}", cookies=session.cookies, headers=header).json()
+    print(json.dumps(response, sort_keys=True, indent=4))
+
+
+def get_friend_invites(session):
+    response = session.get(f"http://localhost:5000/friends/invites", cookies=session.cookies, headers=header).json()
+    print(json.dumps(response, sort_keys=True, indent=4))
+
+
+def respond_friend_invite(session):
+    invite_id = input("Invitation id: ")
+    action = "accept" if input("Accept (y/n): ").lower() == "y" else "reject"
+    response = session.post(f"http://localhost:5000/friends/{action}/{invite_id}", cookies=session.cookies, headers=header).json()
+    print(json.dumps(response, sort_keys=True, indent=4))
+
+
 def find_user(session):
     email = input("Email: ")
     response = session.get(f"http://localhost:5000/user/{email}", cookies=session.cookies, headers=header).json()
@@ -104,7 +145,7 @@ def find_user(session):
 def leave_event(session):
     event_id = input("Event id: ")
     response = session.delete(f"http://localhost:5000/events/user_event/{event_id}:{user_id}", cookies=session.cookies, headers=header).json()
-    print(json.dumps(response, sort_keys=True, indent=4))    
+    print(json.dumps(response, sort_keys=True, indent=4))
 
 
 def remove_user_from_event(session):
@@ -125,7 +166,7 @@ def new_user(session):
     password = input("Password (careful, plain text): ")
     screen_name = input("Screen name: ")
     phone = input("Phone number: ")
-    response = session.post("http://localhost:5000/user", json={"email": email, 
+    response = session.post("http://localhost:5000/user", json={"email": email,
                                                                 "password": password,
                                                                 "screen_name": screen_name,
                                                                 "phone": phone}).json()

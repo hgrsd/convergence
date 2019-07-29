@@ -6,12 +6,14 @@ from convergence import validators
 from convergence import events
 from convergence import user
 from convergence import suggestions
-from convergence import invite
+from convergence import invites
+from convergence import friends
 
 user_bp = Blueprint("user", __name__)
 events_bp = Blueprint("events", __name__)
 location_bp = Blueprint("locations", __name__)
 suggestions_bp = Blueprint("suggestions", __name__)
+friends_bp = Blueprint("friends", __name__)
 
 
 # -- web interface:
@@ -117,6 +119,99 @@ def update_location(lat, long):
     return jsonify({"data": result}), 200
 
 
+# -- friend endpoints
+@friends_bp.route("/friends/invites", methods=["GET"])
+@flask_jwt_extended.jwt_required
+def get_friend_invites():
+    """
+    Get pending friend invitations for current user
+    :return: pending invitations
+    """
+    request_id = flask_jwt_extended.get_jwt_identity()
+    result = friends.get_invites(request_id)
+    return jsonify({"data": result}), 200
+
+
+@friends_bp.route("/friends", methods=["GET"])
+@flask_jwt_extended.jwt_required
+def get_friendships():
+    """
+    Get friendships for current user
+    :return: friendships
+    """
+    request_id = flask_jwt_extended.get_jwt_identity()
+    result = friends.get_friendships(request_id)
+    return jsonify({"data": result}), 200
+
+
+@friends_bp.route("/friends/<int:user_id>", methods=["POST"])
+@flask_jwt_extended.jwt_required
+def propose_friendship(user_id):
+    request_id = flask_jwt_extended.get_jwt_identity()
+    result = friends.propose_friendship(request_id, user_id)
+    return jsonify({"data": result}), 200
+
+
+@friends_bp.route("/friends/bulk_add", methods=["POST"])
+@flask_jwt_extended.jwt_required
+@validators.contains_json_keys(["emails"])
+def propose_friendships(event_id):
+    """
+    Invite multiple users to become friends
+    :param email: users emails to invite
+    :return: success status
+    """
+    request_id = flask_jwt_extended.get_jwt_identity()
+    not_invited = friends.propose_friendships(
+        request_id,
+        request.get_json()["emails"],
+    )
+    return jsonify({"data": {"not_invited": list(not_invited)}}), 200
+
+
+@friends_bp.route("/friends/accept/<int:invite_id>", methods=["POST"])
+@flask_jwt_extended.jwt_required
+def accept_friend_invite(invite_id):
+    """
+    Accept specified pending invite
+    :return: friendship info
+    """
+    request_id = flask_jwt_extended.get_jwt_identity()
+    result = friends.respond_to_invite(
+        request_id,
+        invite_id,
+        True
+    )
+    return jsonify({"data": result}), 200
+
+
+@friends_bp.route("/friends/reject/<int:invite_id>", methods=["POST"])
+@flask_jwt_extended.jwt_required
+def reject_friend_invite(invite_id):
+    """
+    Reject specified pending invite
+    """
+    request_id = flask_jwt_extended.get_jwt_identity()
+    result = friends.respond_to_invite(
+        request_id,
+        invite_id,
+        False
+    )
+    return jsonify({"data": result}), 200
+
+
+@friends_bp.route("/friends/<int:friend_id>", methods=["DELETE"])
+@flask_jwt_extended.jwt_required
+def delete_friend(friend_id):
+    """
+    Remove friend
+    :param friend_id: friend to remove
+    :return: success status
+    """
+    request_id = flask_jwt_extended.get_jwt_identity()
+    friends.delete_friendship(request_id, friend_id)
+    return jsonify({"success": True}), 200
+
 # -- event endpoints:
 @events_bp.route("/events/<string:name>", methods=["POST"])
 @flask_jwt_extended.jwt_required
@@ -158,13 +253,13 @@ def owned_events():
 
 @events_bp.route("/events/invite", methods=["GET"])
 @flask_jwt_extended.jwt_required
-def get_invitations():
+def get_invites():
     """
     Get pending invitations for current user
     :return: pending invitations
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    result = invite.get_invitations(request_id)
+    result = invites.get_invites(request_id)
     return jsonify({"data": result}), 200
 
 
@@ -181,13 +276,11 @@ def invite_user_to_event(event_id, user_id):
     :return: success status
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    invite.invite_user_to_event(request_id, user_id, event_id)
+    invites.invite_user_to_event(request_id, user_id, event_id)
     return jsonify({"success": True}), 200
 
-@events_bp.route(
-    "/events/invite/<int:event_id>",
-    methods=["POST"]
-)
+
+@events_bp.route("/events/invite/<int:event_id>", methods=["POST"])
 @flask_jwt_extended.jwt_required
 @validators.contains_json_keys(["emails"])
 def invite_users_to_event(event_id):
@@ -198,24 +291,23 @@ def invite_users_to_event(event_id):
     :return: success status
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    not_invited = invite.invite_users_to_event(request_id,
+    not_invited = invites.invite_users_to_event(
+        request_id,
         request.get_json()["emails"],
-        event_id)
+        event_id
+    )
     return jsonify({"data": {"not_invited": list(not_invited)}}), 200
 
 
-@events_bp.route(
-    "/events/invite/<int:invite_id>/accept",
-    methods=["POST"]
-)
+@events_bp.route("/events/invite/<int:invite_id>/accept", methods=["POST"])
 @flask_jwt_extended.jwt_required
-def accept_invitation(invite_id):
+def accept_invite(invite_id):
     """
-    Accept specified pending invitation
-    :return: event info for accepted invitation
+    Accept specified pending invite
+    :return: event info for accepted invite
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    result = invite.respond_to_invitation(request_id, invite_id, True)
+    result = invites.respond_to_invite(request_id, invite_id, True)
     return jsonify({"data": result}), 200
 
 
@@ -224,13 +316,13 @@ def accept_invitation(invite_id):
     methods=["POST"]
 )
 @flask_jwt_extended.jwt_required
-def reject_invitation(invite_id):
+def reject_invite(invite_id):
     """
-    Reject specified pending invitation
+    Reject specified pending invite
     :return: success status
     """
     request_id = flask_jwt_extended.get_jwt_identity()
-    invite.respond_to_invitation(request_id, invite_id, False)
+    invites.respond_to_invite(request_id, invite_id, False)
     return jsonify({"success": True}), 200
 
 

@@ -19,8 +19,8 @@ class User(base):
     latitude = sa.Column(sa.Float)
     longitude = sa.Column(sa.Float)
 
-    rel_events = sa.orm.relationship("Event", backref="event_owners")
-    rel_userevents = sa.orm.relationship("UserEvent", backref="users")
+    rel_events = sa.orm.relationship("Event", backref="rel_event_owners")
+    rel_userevents = sa.orm.relationship("UserEvent", backref="rel_users")
 
     def hash_password(self, password):
         self.password_hash = pwd_context.hash(password)
@@ -29,7 +29,7 @@ class User(base):
         return pwd_context.verify(password, self.password_hash)
 
     def basic_info(self):
-        return {"id": self.id, "email": self.email,
+        return {"user_id": self.id, "email": self.email,
                 "screen_name": self.screen_name}
 
     def get_location(self):
@@ -37,7 +37,7 @@ class User(base):
 
     def full_info(self):
         """ Return all info except for password hash """
-        return {"id": self.id, "screen_name": self.screen_name,
+        return {"user_id": self.id, "screen_name": self.screen_name,
                 "email": self.email,
                 "phone": self.phone,
                 "latitude": self.latitude,
@@ -52,8 +52,8 @@ class Event(base):
                                index=True)
     creation_date = sa.Column(sa.DateTime)
 
-    rel_userinvites = sa.orm.relation("UserInvite", backref="events")
-    rel_userevents = sa.orm.relation("UserEvent", backref="events")
+    rel_userinvites = sa.orm.relation("UserInvite", backref="rel_events")
+    rel_userevents = sa.orm.relation("UserEvent", backref="rel_events")
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
@@ -72,9 +72,52 @@ class UserInvite(base):
                                           "event_id"),)
 
     rel_inviter_ids = sa.orm.relationship("User", foreign_keys=[inviter_id],
-                                          backref="userinvites_inviters")
+                                          backref="rel_userinvites_inviters")
     rel_invitee_ids = sa.orm.relationship("User", foreign_keys=[invitee_id],
-                                          backref="userinvites_invitees")
+                                          backref="rel_userinvites_invitees")
+
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+class FriendInvite(base):
+    __tablename__ = "friendinvites"
+    id = sa.Column(sa.Integer, primary_key=True)
+    requesting_id = sa.Column(sa.ForeignKey("users.id", ondelete="CASCADE"),
+                              index=True)
+    requested_id = sa.Column(sa.ForeignKey("users.id", ondelete="CASCADE"),
+                             index=True)
+    __table_args__ = (sa.UniqueConstraint("requesting_id", "requested_id"),)
+
+    rel_requesting_ids = sa.orm.relationship(
+        "User",
+        foreign_keys=[requesting_id],
+        backref="rel_requesting_friend"
+    )
+    rel_requested_ids = sa.orm.relationship(
+        "User",
+        foreign_keys=[requested_id],
+        backref="rel_requested_friend"
+    )
+
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+class Friend(base):
+    __tablename__ = "friends"
+    id = sa.Column(sa.Integer, primary_key=True)
+    friend_a_id = sa.Column(sa.ForeignKey("users.id", ondelete="CASCADE"),
+                            index=True)
+    friend_b_id = sa.Column(sa.ForeignKey("users.id", ondelete="CASCADE"),
+                            index=True)
+    creation_date = sa.Column(sa.DateTime)
+    __table_args__ = (sa.UniqueConstraint("friend_a_id", "friend_b_id"),)
+
+    rel_friend_a_ids = sa.orm.relationship("User", foreign_keys=[friend_a_id],
+                                           backref="rel_friends_a")
+    rel_friend_b_ids = sa.orm.relationship("User", foreign_keys=[friend_b_id],
+                                           backref="rel_friends_b")
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
