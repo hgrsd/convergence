@@ -40,7 +40,7 @@ export class EventList extends React.Component {
 				);
 			});
 
-			 * TODO: turn this into a component
+			// TODO: turn this into a component
 			const newEventCard = (
 				<div className="col-12 col-md-6 col-lg-4">
 					<div className="card m-1 event-card">
