@@ -3,6 +3,9 @@ import { Route, Redirect, Switch } from "react-router-dom";
 import { Login } from "../login";
 import { Overview } from "../overview";
 
+/**
+ * App component, composes and routes major application components.
+ */
 export class App extends React.Component {
 	render() {
 		return (

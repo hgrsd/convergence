@@ -3,12 +3,15 @@ import { Link } from "react-router-dom";
 import { EventCard } from "./card";
 import { SmallSpinner } from "../../common";
 
-// TODO: replace or remove placeholder images on each card
-// TODO: format event date instead of creation date
-// TODO: localize static strings
-// TODO: display "no current events" label
-// TODO: move "Events" title to the nav bar
-// TODO: move event list classes into a separate file
+/**
+ * An event list component, which renders a set of event cards on screen.
+ * TODO: replace or remove placeholder images on each card
+ * TODO: format event date instead of creation date
+ * TODO: localize static strings
+ * TODO: display "no current events" label
+ * TODO: move "Events" title to the nav bar
+ * TODO: move event list classes into a separate file
+ */
 export class EventList extends React.Component {
 	componentDidMount() {
 		this.props.eventListLoadStart();
@@ -37,7 +40,7 @@ export class EventList extends React.Component {
 				);
 			});
 
-			// TODO: turn this into a component
+			 * TODO: turn this into a component
 			const newEventCard = (
 				<div className="col-12 col-md-6 col-lg-4">
 					<div className="card m-1 event-card">

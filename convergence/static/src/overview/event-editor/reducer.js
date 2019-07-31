@@ -1,9 +1,9 @@
 import {
 	EVENT_EDIT_START,
-	EVENT_EDIT_SUCCESS,
+	EVENT_EDIT_END,
 	EVENT_SAVE_START,
-	EVENT_SAVE_SUCCESS,
-	EVENT_SAVE_FAILURE,
+	EVENT_SAVE_END,
+	EVENT_SAVE_FAIL,
 	EVENT_EDIT_ADD_USER,
 	EVENT_EDIT_REMOVE_USER
 } from "./actions";
@@ -20,19 +20,19 @@ export function eventEditorReducer(state = initialState, action) {
 	switch (action.type) {
 		case EVENT_EDIT_START:
 			return { ...initialState };
-		case EVENT_EDIT_SUCCESS:
+		case EVENT_EDIT_END:
 			return { ...initialState };
 		case EVENT_SAVE_START:
 			return {
 				...state,
 				isSavingEvent: true
 			};
-		case EVENT_SAVE_SUCCESS:
+		case EVENT_SAVE_END:
 			return {
 				...state,
 				isSavingEvent: false
 			};
-		case EVENT_SAVE_FAILURE:
+		case EVENT_SAVE_FAIL:
 			return {
 				...state,
 				isSavingEvent: false,

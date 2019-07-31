@@ -1,5 +1,8 @@
-// src/app module contains a wrapper App component,
-// which is responsible for general app layout.
+/**
+ * src/app module contains a wrapper App component,
+ * which is responsible for general app layout.
+ */
+
 
 import { App } from "./app";
 import { connect } from "react-redux";

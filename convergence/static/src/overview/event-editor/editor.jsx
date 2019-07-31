@@ -1,8 +1,10 @@
 import React from "react";
 
-// A form, which allows creating a new event or editing 
-// an existing one.
-// TODO: localize static strings
+/**
+ * Renders a form, which allows creating a new event or editing
+ * an existing one.
+ * TODO: localize static strings
+ */
 export class EventEditor extends React.Component {
 	constructor() {
 		super();
@@ -47,7 +49,7 @@ export class EventEditor extends React.Component {
 							<a
 								className="btn btn-light m-1"
 								href="#"
-								onClick={this.props.eventEditSuccess.bind(this)}>
+								onClick={this.props.eventEditEnd.bind(this)}>
 								Cancel
 							</a>
 							<a

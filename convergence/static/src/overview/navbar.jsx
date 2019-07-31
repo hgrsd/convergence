@@ -1,5 +1,8 @@
 import React from "react";
 
+/**
+ * A component, which renders a top navigation bar.
+ */
 export class NavbarView extends React.Component {
 	render() {
 		return (

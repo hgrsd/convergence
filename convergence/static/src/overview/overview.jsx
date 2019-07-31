@@ -4,6 +4,9 @@ import EventEditor from "./event-editor";
 import EventList from "./event-list";
 import { NavbarView } from "./navbar";
 
+/**
+ * Overview component renders main overview screen.
+ */
 export class Overview extends React.Component {
 	render() {
 		return (

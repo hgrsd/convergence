@@ -1,5 +1,8 @@
-// src/login module contains actions, reducer and views
-// responsible for sign in and sign up process
+/**
+ * src/login module contains actions, reducer and views
+ 
+ * responsible for sign in and sign up process
+ */
 
 import { LoginView } from "./login";
 import { connect } from "react-redux";

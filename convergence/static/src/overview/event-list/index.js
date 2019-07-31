@@ -1,10 +1,16 @@
+/**
+ * src/overview/event-list module contains components, actions and reducer
+ * for the list of events, which is visible in overiew.
+ * This mobule is included by src/overview.
+ */
+
 import { connect } from "react-redux";
 import {
 	eventListLoadStart,
 	eventEditStart,
-	eventEditSuccess,
+	eventEditEnd,
 	eventSaveStart,
-	eventSaveSuccess,
+	eventSaveEnd,
 	eventLeaveStart,
 	eventDeleteStart
 } from "./actions";

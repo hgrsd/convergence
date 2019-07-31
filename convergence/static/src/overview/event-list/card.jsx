@@ -1,5 +1,9 @@
 import React from "react";
 
+/**
+ * Component, which renders a single event card with
+ * available actions (leave, delete, details).
+ */
 export class EventCard extends React.Component {
 	render() {
 		const event = this.props.event;
@@ -55,9 +59,14 @@ export class EventCard extends React.Component {
 	}
 }
 
-// formats a `date` relative to `now`
-// depending on how distant `date` is from `now` will return
-// more or less precise date strings
+/**
+ * Formats a `date` relative to `now`.
+ * Depending on how distant `date` is from `now` will return
+ * more or less precise date strings.
+ * @param {Date} now current date
+ * @param {Date} date a timestamp to format
+ * @return {String} date string
+ */
 function formatRelativeDate(now, date) {
 	const locale = navigator.language;
 	if (now.getYear() !== date.getYear()) {

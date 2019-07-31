@@ -1,11 +1,11 @@
 import {
 	LOGIN_START,
-	LOGIN_SUCCESS,
-	LOGIN_FAILURE,
+	LOGIN_END,
+	LOGIN_FAIL,
 	LOGIN_CHECK,
 	REGISTER_START,
-	REGISTER_SUCCESS,
-	REGISTER_FAILURE
+	REGISTER_END,
+	REGISTER_FAIL
 } from "./actions";
 
 const initialState = {
@@ -33,7 +33,7 @@ export function loginReducer(state = initialState, action) {
 				isBusy: true,
 				username: action.username
 			};
-		case LOGIN_FAILURE:
+		case LOGIN_FAIL:
 			return {
 				...state,
 				isLoggingIn: false,
@@ -41,7 +41,7 @@ export function loginReducer(state = initialState, action) {
 				isBusy: false,
 				errorMessage: action.errorMessage
 			};
-		case LOGIN_SUCCESS:
+		case LOGIN_END:
 			return {
 				...state,
 				userId: action.userId,
@@ -56,7 +56,7 @@ export function loginReducer(state = initialState, action) {
 				isBusy: true,
 				username: action.username
 			};
-		case REGISTER_FAILURE:
+		case REGISTER_FAIL:
 			return {
 				...state,
 				isRegistering: false,
@@ -64,7 +64,7 @@ export function loginReducer(state = initialState, action) {
 				isBusy: false,
 				errorMessage: action.errorMessage
 			};
-		case REGISTER_SUCCESS:
+		case REGISTER_END:
 			return {
 				...state,
 				userId: action.userId,

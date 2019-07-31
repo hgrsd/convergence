@@ -2,8 +2,10 @@ import React from "react";
 import { loginStart } from "./actions";
 import { SmallSpinner } from "../common";
 
-// LoginView displays a login/signup form,
-// available at "/login" path.
+/**
+ * LoginView displays a login/signup form,
+ * available at "/login" path.
+ */
 export class LoginView extends React.Component {
 	constructor(props) {
 		super(props);

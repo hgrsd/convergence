@@ -1,6 +1,6 @@
 import { connect } from "react-redux";
 import {
-	eventEditSuccess,
+	eventEditEnd,
 	eventSaveStart,
 	eventEditAddUser,
 	eventEditRemoveUser
@@ -13,8 +13,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
 	return {
-		eventEditSuccess: () => {
-			dispatch(eventEditSuccess());
+		eventEditEnd: () => {
+			dispatch(eventEditEnd());
 		},
 		eventEditAddUser: username => {
 			dispatch(eventEditAddUser(username));
