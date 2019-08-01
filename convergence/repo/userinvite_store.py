@@ -37,17 +37,17 @@ class UserInviteStore(Store):
             raise exceptions.DatabaseError(f"Error: {str(e)}")
         return None
 
-    def get_invitation_by_id(self, invite_id):
+    def get_invite_by_id(self, invite_id):
         """
-        Return invitation by id
+        Return invite by id
         :param invite_id: invite id
         :return: UserInvite object
         """
         return self.session.query(UserInvite).get(invite_id)
 
-    def get_invitations_by_user(self, user_id):
+    def get_invites_by_user(self, user_id):
         """
-        Return all pending invitations for specified user
+        Return all pending invites for specified user
         :param user_id: user id
         :return: list of tuples(Event, Event owner's screen name,
                                 UserInvite's id, inviter's screen name)
@@ -66,9 +66,9 @@ class UserInviteStore(Store):
                            .filter(UserInvite.invitee_id == user_id) \
                            .all()
 
-    def get_invitation_by_details(self, user_id, event_id):
+    def get_invite_by_details(self, user_id, event_id):
         """
-        Return pending invites, if they exist, based on the 
+        Return pending invites, if they exist, based on the
         specified user_id and event_id.
         :param user_id: user id
         :param event_id: event id
@@ -81,7 +81,7 @@ class UserInviteStore(Store):
 
     def get_users_by_event(self, event_id):
         """
-        Return all members who have a pending invitation to an event
+        Return all members who have a pending invite to an event
         :param event_id: event id
         :return: list of User objects
         """

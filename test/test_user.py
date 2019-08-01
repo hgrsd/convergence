@@ -32,7 +32,7 @@ class TestUserGetInfo(unittest.TestCase):
     def test_user_get_info_success(self, mock_us):
         mock_us.get_user_by_id = fakes.get_fake_user_by_id
         response = user.get_info(5)
-        self.assertEqual(response["id"], 5)
+        self.assertEqual(response["user_id"], 5)
         self.assertEqual(response["email"], "fakeuser@gmail.com")
         self.assertEqual(response["screen_name"], "Fake User")
         self.assertEqual(response["phone"], "+44(0)1144728913")
@@ -128,7 +128,7 @@ class TestFindUser(unittest.TestCase):
         response = user.find_user("fakeuser@gmail.com")
         self.assertEqual(response["email"], "fakeuser@gmail.com")
         self.assertEqual(response["screen_name"], "Fake User")
-        self.assertEqual(response["id"], 12)
+        self.assertEqual(response["user_id"], 12)
 
         mock_us.get_user_by_email = lambda _: None
         response = user.find_user("fakeuser@gmail.com")

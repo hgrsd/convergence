@@ -127,7 +127,7 @@ class TestGetMembers(unittest.TestCase):
         mock_ues.get_users_by_event = fakes.get_fake_users_by_event
         response = events.get_members(3, 7)
         self.assertEqual(len(response), 2)
-        self.assertEqual(response[0]["id"], 1)
+        self.assertEqual(response[0]["user_id"], 1)
         self.assertEqual(response[1]["screen_name"], "Fake User")
 
         mock_ues.get_users_by_event = lambda *args: []

@@ -58,6 +58,25 @@ class UserEventStore(Store):
             raise exceptions.DatabaseError(f"Error: {str(e)}")
         return None
 
+    def add_user_to_event_from_invite(self, userinvite):
+        """
+        Add user to event based on passed-in userinvite,
+        then delete userinvite
+        """
+        userevent = UserEvent(
+            user_id=userinvite.invitee_id,
+            event_id=userinvite.event_id
+        )
+        try:
+            self.session.add(userevent)
+            local_object = self.session.merge(userinvite)  # merge into session
+            self.session.delete(local_object)
+            self.session.commit()
+        except SQLAlchemyError as e:
+            self.session.rollback()
+            raise exceptions.DatabaseError(f"Error: {str(e)}")
+        return userevent
+
     def delete_userevent(self, userevent):
         """
         Delete UserEvent from database
