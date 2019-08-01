@@ -9,9 +9,18 @@ friend_store = FriendStore()
 
 
 def get_friendships(request_id):
+    """
+    Get list of friends for user
+    :param request_id: requesting user
+    :return: List of Friendships (screen name added)
+    """
     friends = friend_store.get_friendships_by_user(request_id)
     if friends:
-        return [friend.as_dict() for friend in friends]
+        return_list = []
+        for i, friend in enumerate(friends):
+            return_list.append(friend[0].as_dict())
+            return_list[0]["friend_name"] = friend[1]
+        return return_list
     return []
 
 
@@ -105,12 +114,12 @@ def respond_to_invite(request_id, invite_id, accept):
     if not friendinvite or not friendinvite.requested_id == request_id:
         raise exceptions.NotFoundError("Invite not found.")
     if accept:
-        other_id = friendinvite.requesting_id
         friendships = [
             friend.as_dict() for friend in
-            friend_store.add_friendship(request_id, other_id)
+            friend_store.add_friendship_from_invite(friendinvite)
         ]
-    friend_store.delete_friendinvite(friendinvite)
+    else:
+        friend_store.delete_friendinvite(friendinvite)
     return friendships
 
 

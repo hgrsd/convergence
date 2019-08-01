@@ -155,7 +155,7 @@ def propose_friendship(user_id):
 @friends_bp.route("/friends/bulk_add", methods=["POST"])
 @flask_jwt_extended.jwt_required
 @validators.contains_json_keys(["emails"])
-def propose_friendships(event_id):
+def propose_friendships():
     """
     Invite multiple users to become friends
     :param email: users emails to invite

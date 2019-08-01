@@ -39,7 +39,8 @@ class FriendStore(Store):
         return None
 
     def get_friendships_by_user(self, user_id):
-        return self.session.query(Friend) \
+        return self.session.query(Friend, User.screen_name) \
+                           .join(User, Friend.rel_friend_b_ids) \
                            .filter(Friend.friend_a_id == user_id) \
                            .all()
 
@@ -72,6 +73,32 @@ class FriendStore(Store):
         return self.session.query(FriendInvite) \
                            .filter(FriendInvite.requesting_id == user_id) \
                            .all()
+
+    def add_friendship_from_invite(self, friendinvite):
+        """
+        Add friendship to db from friendinvite passed in and
+        remove friendinvite from db.
+        :param friendinvite: FriendInvite object
+        :return: both Friend objects
+        """
+        a_to_b = Friend(
+            friend_a_id=friendinvite.requesting_id,
+            friend_b_id=friendinvite.requested_id,
+            creation_date=datetime.datetime.utcnow()
+        )
+        b_to_a = Friend(
+            friend_a_id=friendinvite.requested_id,
+            friend_b_id=friendinvite.requesting_id,
+            creation_date=datetime.datetime.utcnow()
+        )
+        try:
+            self.session.bulk_save_objects([a_to_b, b_to_a])
+            self.session.delete(friendinvite)
+            self.session.commit()
+        except SQLAlchemyError as e:
+            self.session.rollback()
+            raise exceptions.DatabaseError(f"Error: {str(e)}")
+        return (a_to_b, b_to_a)
 
     def add_friendship(self, friend_a_id, friend_b_id):
         """

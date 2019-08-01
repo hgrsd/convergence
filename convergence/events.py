@@ -55,6 +55,16 @@ def add_user_to_event(user_id, event_id):
     return userevent.as_dict()
 
 
+def add_user_to_event_from_invite(userinvite):
+    """
+    Add user to a event. Delete invite.
+    :param user_id: user to be added to event
+    :param event_id: event to add user to
+    """
+    userevent = userevent_store.add_user_to_event_from_invite(userinvite)
+    return userevent.as_dict()
+
+
 def leave_event(request_id, event_id):
     """
     Leave an event.
