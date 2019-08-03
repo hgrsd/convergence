@@ -1,12 +1,13 @@
 import datetime
 
 from convergence import exceptions
-from convergence.repo import EventStore, UserStore, UserEventStore
+from convergence.repo import EventStore, UserStore, UserEventStore, UserInviteStore
 from convergence.models import Event, UserEvent
 
 event_store = EventStore()
 user_store = UserStore()
 userevent_store = UserEventStore()
+userinvite_store = UserInviteStore()
 
 
 def create_event(user_id, name):

@@ -114,7 +114,9 @@ def respond_to_invite(request_id, invite_id, accept):
     if not userinvite or not userinvite.invitee_id == request_id:
         raise exceptions.NotFoundError("Invite not found.")
     if accept:
-        return events.add_user_to_event_from_invite(userinvite)
+        print("Hoi")
+        userevent = events.add_user_to_event_from_invite(userinvite)
+        return userevent
     else:
         userinvite_store.delete_userinvite(userinvite)
         return None

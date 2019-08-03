@@ -138,16 +138,18 @@ class TestGetInvitations(unittest.TestCase):
 
 class TestRespondToInvitation(unittest.TestCase):
 
+    @patch.object(invites, "userevent_store")
     @patch.object(invites, "event_store")
     @patch.object(invites, "events")
     @patch.object(invites, "userinvite_store")
-    def test_respond_accept(self, mock_uis, mock_events, mock_es):
+    def test_respond_accept(self, mock_uis, mock_e, mock_es, mock_ues):
         mock_uis.get_invite_by_id = fakes.get_fake_userinvite
         mock_es.get_event_by_id = fakes.get_fake_event
+        mock_e.add_user_to_event_from_invite = fakes.get_fake_userevent_from_invite
         event_response = invites.respond_to_invite(7, 2, True)
-        self.assertEqual(event_response["id"], 6)
-        self.assertEqual(event_response["event_name"], "Fake Event")
-        self.assertEqual(event_response["event_owner_id"], 3)
+
+        self.assertEqual(event_response.user_id, 7)
+        self.assertEqual(event_response.event_id, 6)
 
     @patch.object(invites, "event_store")
     @patch.object(invites, "events")

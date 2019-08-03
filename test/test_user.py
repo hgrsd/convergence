@@ -10,13 +10,13 @@ class TestUserLogin(unittest.TestCase):
 
     @patch.object(user, "user_store")
     def test_user_login_success(self, mock_us):
-        mock_us.get_user_by_email = fakes.get_fake_user_by_email
+        mock_us.get_user_by_email = fakes.get_fake_user_by_email_pw
         response = user.login("testuser@gmail.com", "fakepassword")
-        self.assertEqual(response, 12)
+        self.assertEqual(response, 5)
 
     @patch.object(user, "user_store")
     def test_user_login_fail(self, mock_us):
-        mock_us.get_user_by_email = fakes.get_fake_user_by_email
+        mock_us.get_user_by_email = fakes.get_fake_user_by_email_pw
 
         with self.assertRaises(exceptions.LoginError):
             user.login("testuser@gmail.com", "wrongpassword")
@@ -128,7 +128,7 @@ class TestFindUser(unittest.TestCase):
         response = user.find_user("fakeuser@gmail.com")
         self.assertEqual(response["email"], "fakeuser@gmail.com")
         self.assertEqual(response["screen_name"], "Fake User")
-        self.assertEqual(response["user_id"], 12)
+        self.assertEqual(response["user_id"], 5)
 
         mock_us.get_user_by_email = lambda _: None
         response = user.find_user("fakeuser@gmail.com")
