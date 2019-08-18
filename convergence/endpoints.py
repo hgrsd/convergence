@@ -213,16 +213,19 @@ def delete_friend(friend_id):
     return jsonify({"success": True}), 200
 
 # -- event endpoints:
-@events_bp.route("/events/<string:name>", methods=["POST"])
+@events_bp.route("/events", methods=["POST"])
 @flask_jwt_extended.jwt_required
-def create_event(name):
+@validators.contains_json_keys(["event_name", "event_date"])
+def create_event():
     """
     Create new event, owned by current user
     :param name: event name
     :return: new event info
     """
     user_id = flask_jwt_extended.get_jwt_identity()
-    result = events.create_event(user_id, name)
+    event_name = request.get_json()["event_name"]
+    event_date = request.get_json()["event_date"]
+    result = events.create_event(user_id, event_name, event_date)
     return jsonify({"data": result}), 200
 
 

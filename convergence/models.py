@@ -51,6 +51,7 @@ class Event(base):
     event_owner_id = sa.Column(sa.ForeignKey("users.id", ondelete="CASCADE"),
                                index=True)
     creation_date = sa.Column(sa.DateTime)
+    event_date = sa.Column(sa.DateTime)
 
     rel_userinvites = sa.orm.relation("UserInvite", backref="rel_events")
     rel_userevents = sa.orm.relation("UserEvent", backref="rel_events")

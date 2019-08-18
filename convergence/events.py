@@ -1,7 +1,8 @@
 import datetime
 
 from convergence import exceptions
-from convergence.repo import EventStore, UserStore, UserEventStore, UserInviteStore
+from convergence.repo import EventStore, UserStore, UserEventStore, \
+                             UserInviteStore
 from convergence.models import Event, UserEvent
 
 event_store = EventStore()
@@ -10,16 +11,18 @@ userevent_store = UserEventStore()
 userinvite_store = UserInviteStore()
 
 
-def create_event(user_id, name):
+def create_event(user_id, event_name, event_date):
     """
     Create new event.
     :param user_id: the user creating the event
-    :param name: the name of the new event
+    :param event_name: the name of the new event
+    :param event_date: the date of the new event as string
     :return: event info as dict
     """
     event = Event(
-        event_name=name,
+        event_name=event_name,
         event_owner_id=user_id,
+        event_date=datetime.datetime.strptime(event_date, "%d/%m/%Y %H:%M"),
         creation_date=datetime.datetime.utcnow()
     )
     event_store.add_event(event)

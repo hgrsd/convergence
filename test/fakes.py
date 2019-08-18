@@ -1,5 +1,6 @@
 import datetime
-from convergence.models import Event, User, UserInvite, UserEvent, Friend, FriendInvite
+from convergence.models import Event, User, UserInvite, UserEvent, \
+                               Friend, FriendInvite
 
 
 def get_fake_friendships():
@@ -100,13 +101,15 @@ def get_fake_events_by_owner(owner_id):
             id=1,
             event_name="Fake Event",
             event_owner_id=owner_id,
-            creation_date=datetime.datetime.utcnow()
+            creation_date=datetime.datetime.utcnow(),
+            event_date=datetime.datetime.utcnow()
         ),
         Event(
             id=2,
             event_name="Fake Event Two",
             event_owner_id=owner_id,
-            creation_date=datetime.datetime.utcnow()
+            creation_date=datetime.datetime.utcnow(),
+            event_date=datetime.datetime.utcnow()
         )
     ]
 
@@ -130,7 +133,8 @@ def get_fake_event(event_id):
         id=event_id,
         event_name="Fake Event",
         event_owner_id=3,
-        creation_date=datetime.datetime.utcnow()
+        creation_date=datetime.datetime.utcnow(),
+        event_date=datetime.datetime.utcnow()
     )
 
 
@@ -196,6 +200,6 @@ def get_fake_userinvites(user_id):
         )
     ]
     additional_data = [("Fake Owner", 1, "Fake Owner"),
-                        ("Another Fake", 2, "Not The Owner")]
+                       ("Another Fake", 2, "Not The Owner")]
     return [tuple([event, *additional_data[i]])
             for i, event in enumerate(events)]
