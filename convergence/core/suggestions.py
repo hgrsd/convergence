@@ -1,10 +1,10 @@
 import math
 
-from convergence import location
-from convergence import places
-from convergence import events
-from convergence.point import Point
-from convergence.repo import UserStore
+from convergence.core import location
+from convergence.core import places
+from convergence.core import events
+from convergence.utils.point import Point
+from convergence.data.repo import UserStore
 
 MEAN_DIST_TO_RADIUS_RATIO = 0.25
 MAX_PLACES_PER_SUGGESTION = 10
@@ -22,7 +22,11 @@ def get_suggestions(request_id, event_id, place_type, suggestions_mode):
     :param suggestions_mode: suggestions mode (e.g. "distance" or "transit")
     :return: list of places in requested order (e.g. distance, transit time)
     """
-    ids = [member["id"] for member in events.get_members(request_id, event_id)]
+    ids = [
+        member["user_id"] for member in events.get_members(
+            request_id, event_id
+        )
+    ]
     users = user_store.get_users_by_ids(ids)
     user_coordinates = [Point(*user.get_location()) for user in users]
     centroid = location.find_centroid(user_coordinates)

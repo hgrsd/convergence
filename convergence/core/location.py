@@ -1,6 +1,6 @@
 import math
 
-from convergence.point import Point
+from convergence.utils.point import Point
 
 MIN_LAT = -90.0
 MAX_LAT = 90.0

@@ -1,8 +1,8 @@
 from sqlalchemy.exc import SQLAlchemyError
 
-from convergence import exceptions
-from convergence.repo import Store
-from convergence.models import Event, User, UserEvent
+from convergence.utils import exceptions
+from convergence.data.repo import Store
+from convergence.data.models import Event, User, UserEvent
 
 
 class UserEventStore(Store):

@@ -2,7 +2,7 @@ import re
 from flask import request
 from functools import wraps
 
-from convergence.exceptions import InvalidRequestError
+from convergence.utils.exceptions import InvalidRequestError
 
 
 def contains_json_keys(keys):

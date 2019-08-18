@@ -1,6 +1,6 @@
 import unittest
 
-from convergence.point import Point
+from convergence.utils.point import Point
 
 
 class TestInitPoint(unittest.TestCase):

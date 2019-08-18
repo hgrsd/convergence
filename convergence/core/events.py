@@ -1,9 +1,9 @@
 import datetime
 
-from convergence import exceptions
-from convergence.repo import EventStore, UserStore, UserEventStore, \
-                             UserInviteStore
-from convergence.models import Event, UserEvent
+from convergence.utils import exceptions
+from convergence.data.repo import EventStore, UserStore, UserEventStore, \
+                                  UserInviteStore
+from convergence.data.models import Event, UserEvent
 
 event_store = EventStore()
 user_store = UserStore()

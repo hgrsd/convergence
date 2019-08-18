@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
-from convergence import validators
-from convergence import exceptions
+from convergence.utils import validators
+from convergence.utils import exceptions
 
 fake_json = {
             "email": "random@email.com",

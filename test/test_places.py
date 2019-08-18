@@ -1,9 +1,9 @@
 import unittest
 import datetime
 
-from convergence import places
-from convergence.models import Place, User
-from convergence.point import Point
+from convergence.core import places
+from convergence.data.models import Place, User
+from convergence.utils.point import Point
 
 fake_users = [
     User(

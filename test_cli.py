@@ -92,19 +92,19 @@ def delete_event(session):
 def invite_user_to_event(session):
     event_id = input("Event id: ")
     invite_id = input("User id: ")
-    response = session.post(f"http://localhost:5000/events/invite/{event_id}:{invite_id}", cookies=session.cookies, headers=header).json()
+    response = session.post(f"http://localhost:5000/{event_id}/{invite_id}", cookies=session.cookies, headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
 
 def get_invitations(session):
-    response = session.get(f"http://localhost:5000/events/invite", cookies=session.cookies, headers=header).json()
+    response = session.get(f"http://localhost:5000/events/invites", cookies=session.cookies, headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
 
 def respond_to_invitation(session):
     invitation_id = input("Invitation id: ")
     action = "accept" if input("Accept (y/n): ").lower() == "y" else "reject"
-    response = session.post(f"http://localhost:5000/events/invite/{invitation_id}/{action}", cookies=session.cookies, headers=header).json()
+    response = session.post(f"http://localhost:5000/events/invites/{invitation_id}/{action}", cookies=session.cookies, headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
 
@@ -133,7 +133,7 @@ def get_friend_invites(session):
 def respond_friend_invite(session):
     invite_id = input("Invitation id: ")
     action = "accept" if input("Accept (y/n): ").lower() == "y" else "reject"
-    response = session.post(f"http://localhost:5000/friends/{action}/{invite_id}", cookies=session.cookies, headers=header).json()
+    response = session.post(f"http://localhost:5000/friends/invites/{invite_id}/{action}", cookies=session.cookies, headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
 
@@ -152,7 +152,7 @@ def leave_event(session):
 def remove_user_from_event(session):
     event_id = input("Event id: ")
     user_id = input("User id: ")
-    response = session.delete(f"http://localhost:5000/events/user_event/{event_id}:{user_id}", cookies=session.cookies, headers=header).json()
+    response = session.delete(f"http://localhost:5000/events/{event_id}/{user_id}", cookies=session.cookies, headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
 
@@ -210,42 +210,42 @@ def login(session):
 def update_location(session):
     lat = input("New latitude: ")
     long = input("New longitude: ")
-    response = session.put(f"http://localhost:5000/user/location/{lat}:{long}", cookies=session.cookies, headers=header).json()
+    response = session.put(f"http://localhost:5000/user/location", cookies=session.cookies, headers=header, json={"latitude": lat, "longitude": long}).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
 
 def dist_suggestions(session):
     event = input("Event id: ")
     sug_type = input("Type: ")
-    response = session.get(f"http://localhost:5000/suggestions/distance/{event}:{sug_type}", cookies=session.cookies, headers=header).json()
+    response = session.get(f"http://localhost:5000/events/{event}/{sug_type}/distance", cookies=session.cookies, headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
 
 def transit_suggestions(session):
     event = input("Event id: ")
     sug_type = input("Type: ")
-    response = session.get(f"http://localhost:5000/suggestions/transit/{event}:{sug_type}", cookies=session.cookies, headers=header).json()
+    response = session.get(f"http://localhost:5000/events/{event}/{sug_type}/transit", cookies=session.cookies, headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
 
 def driving_suggestions(session):
     event = input("Event id: ")
     sug_type = input("Type: ")
-    response = session.get(f"http://localhost:5000/suggestions/drive/{event}:{sug_type}", cookies=session.cookies, headers=header).json()
+    response = session.get(f"http://localhost:5000/events/{event}/{sug_type}/drive", cookies=session.cookies, headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
 
 def cycling_suggestions(session):
     event = input("Event id: ")
     sug_type = input("Type: ")
-    response = session.get(f"http://localhost:5000/suggestions/cycle/{event}:{sug_type}", cookies=session.cookies, headers=header).json()
+    response = session.get(f"http://localhost:5000/events/{event}/{sug_type}/cycle", cookies=session.cookies, headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
 
 def walking_suggestions(session):
     event = input("Event id: ")
     sug_type = input("Type: ")
-    response = session.get(f"http://localhost:5000/suggestions/walk/{event}:{sug_type}", cookies=session.cookies, headers=header).json()
+    response = session.get(f"http://localhost:5000/events/{event}/{sug_type}/walk", cookies=session.cookies, headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
 

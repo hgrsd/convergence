@@ -1,9 +1,9 @@
 from datetime import datetime
 
-from convergence import gmaps_api
-from convergence.models import Place
-from convergence.location import Point
-from convergence.repo import PlaceStore
+from convergence.apis import google_maps
+from convergence.data.models import Place
+from convergence.data.repo import PlaceStore
+from convergence.utils.point import Point
 
 MIN_PLACES_FROM_DATABASE = 4
 
@@ -24,7 +24,7 @@ def get_places_around_centroid(point, radius, place_type):
     if len(places_query) >= MIN_PLACES_FROM_DATABASE:
         return [p.as_dict() for p in places_query if place_type in p.gm_types]
     places_ids = {place["gm_id"] for place in places_query}
-    places = gmaps_api.get_places_around_point(point, radius, place_type)
+    places = google_maps.get_places_around_point(point, radius, place_type)
     for place in places:
         if place["gm_id"] not in places_ids:
             place_store.add_place(
@@ -75,7 +75,7 @@ def get_travel_time_for_places(user_coordinates, places, mode):
     for place in places:
         places_coordinates.append(Point(place["lat"], place["long"]))
         place["travel_total"] = 0
-    dist_matrix = gmaps_api.get_distance_matrix(
+    dist_matrix = google_maps.get_distance_matrix(
         user_coordinates,
         places_coordinates,
         mode

@@ -1,9 +1,9 @@
 import sqlalchemy as sa
 from sqlalchemy.exc import SQLAlchemyError
 
-from convergence import exceptions
-from convergence.repo import Store
-from convergence.models import User, UserInvite, Event
+from convergence.utils import exceptions
+from convergence.data.repo import Store
+from convergence.data.models import User, UserInvite, Event
 
 
 class UserInviteStore(Store):

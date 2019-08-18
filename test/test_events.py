@@ -1,8 +1,9 @@
 import unittest
+import datetime
 from unittest.mock import patch
 
-from convergence import events
-from convergence import exceptions
+from convergence.core import events
+from convergence.utils import exceptions
 from test import fakes
 
 
@@ -13,7 +14,8 @@ class TestCreateEvent(unittest.TestCase):
     def test_create_event(self, mock_es, mock_ues):
         response = events.create_event(
             7,
-            "Fake Event"
+            "Fake Event",
+            datetime.datetime.utcnow().strftime("%d/%m/%Y %H:%M")
         )
         self.assertEqual(response["event_name"], "Fake Event")
         self.assertEqual(response["event_owner_id"], 7)

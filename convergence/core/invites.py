@@ -1,8 +1,8 @@
-from convergence import events
-from convergence import exceptions
-from convergence.models import UserInvite
-from convergence.repo import UserInviteStore, EventStore, UserStore, \
-                             UserEventStore
+from convergence.core import events
+from convergence.utils import exceptions
+from convergence.data.models import UserInvite
+from convergence.data.repo import UserInviteStore, EventStore, UserStore, \
+                                  UserEventStore
 
 MAX_INVITES_PER_REQUEST = 100
 

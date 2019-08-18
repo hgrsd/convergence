@@ -1,6 +1,6 @@
-from convergence import exceptions
-from convergence.models import FriendInvite
-from convergence.repo import UserStore, FriendStore
+from convergence.utils import exceptions
+from convergence.data.models import FriendInvite
+from convergence.data.repo import UserStore, FriendStore
 
 MAX_INVITES_PER_REQUEST = 100
 

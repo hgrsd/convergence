@@ -2,9 +2,9 @@ import sqlalchemy as sa
 import datetime
 from sqlalchemy.exc import SQLAlchemyError
 
-from convergence import exceptions
-from convergence.repo import Store
-from convergence.models import User, Friend, FriendInvite
+from convergence.utils import exceptions
+from convergence.data.repo import Store
+from convergence.data.models import User, Friend, FriendInvite
 
 
 class FriendStore(Store):

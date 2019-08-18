@@ -4,7 +4,7 @@ import math
 from urllib.parse import quote
 
 from convergence import app
-from convergence.exceptions import ServerError
+from convergence.utils.exceptions import ServerError
 
 GM_PLACES_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/" \
                 "json?location={:f},{:f}&radius={:d}&type={:s}&key={:s}"
@@ -59,7 +59,7 @@ def get_distance_matrix(origins, destinations, mode):
     :param mode: mode of transportation
     :return: distance matrix of dimension len(origins) * len(destinations)
     """
-    distance_matrix = [[None] * len(destinations) for _ in range(len(origins))]
+    dist_matrix = [[None] * len(destinations) for _ in range(len(origins))]
 
     no_requests = math.ceil(
         len(origins) * len(destinations) / DISTANCE_MATRIX_MAX_ELEMENTS
@@ -89,12 +89,15 @@ def get_distance_matrix(origins, destinations, mode):
             raise ServerError("Error retrieving distance information")
         for row_idx, row in enumerate(response["rows"]):
             for el_idx, element in enumerate(row["elements"]):
-                distance_matrix[row_idx][el_idx] = element["duration"]["value"]
+                if element["status"] != "OK":
+                    dist_matrix[row_idx][el_idx] = math.inf
+                else:
+                    dist_matrix[row_idx][el_idx] = element["duration"]["value"]
         if i < no_requests - 1:
             start = cutoff
             time.sleep(1)  # sleep before next request
 
-    return distance_matrix
+    return dist_matrix
 
 
 def _json_extract_places(response_string):

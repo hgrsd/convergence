@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import patch
 
-from convergence import user
-from convergence import exceptions
+from convergence.core import user
+from convergence.utils import exceptions
 from test import fakes
 
 

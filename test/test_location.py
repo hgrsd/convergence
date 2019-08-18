@@ -1,7 +1,7 @@
 import unittest
 
-from convergence import location
-from convergence import point
+from convergence.core import location
+from convergence.utils import point
 
 
 class TestFindCentroid(unittest.TestCase):

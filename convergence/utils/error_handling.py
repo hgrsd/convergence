@@ -1,6 +1,6 @@
 from flask import jsonify
 
-from convergence import exceptions
+from convergence.utils import exceptions
 from convergence import app
 
 

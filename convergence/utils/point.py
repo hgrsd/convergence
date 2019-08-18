@@ -1,6 +1,6 @@
 import math
 
-from convergence import location
+from convergence.core import location
 
 
 class Point:

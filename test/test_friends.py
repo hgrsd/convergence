@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import patch
 
-from convergence import friends
-from convergence import exceptions
+from convergence.core import friends
+from convergence.utils import exceptions
 from test import fakes
 
 

@@ -1,8 +1,8 @@
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 
-from convergence import exceptions
-from convergence.repo import Store
-from convergence.models import User
+from convergence.utils import exceptions
+from convergence.data.repo import Store
+from convergence.data.models import User
 
 
 class UserStore(Store):

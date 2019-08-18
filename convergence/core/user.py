@@ -1,8 +1,8 @@
-from convergence import location
-from convergence import exceptions
-from convergence import validators
-from convergence.models import User
-from convergence.repo import UserStore
+from convergence.core import location
+from convergence.utils import exceptions
+from convergence.utils import validators
+from convergence.data.models import User
+from convergence.data.repo import UserStore
 
 user_store = UserStore()
 

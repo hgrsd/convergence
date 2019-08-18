@@ -1,6 +1,6 @@
 import datetime
-from convergence.models import Event, User, UserInvite, UserEvent, \
-                               Friend, FriendInvite
+from convergence.data.models import Event, User, UserInvite, UserEvent, \
+                                    Friend, FriendInvite
 
 
 def get_fake_friendships():

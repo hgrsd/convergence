@@ -1,6 +1,6 @@
 import unittest
 
-from convergence import gmaps_api
+from convergence.apis import google_maps
 
 valid_json = {
     "results": [
@@ -66,7 +66,7 @@ invalid_json = {
 class TestJsonExtractPlaces(unittest.TestCase):
 
     def test_json_extract_places_valid(self):
-        places = gmaps_api._json_extract_places(valid_json)
+        places = google_maps._json_extract_places(valid_json)
         self.assertEqual(len(places), 2)
         self.assertEqual(places[0]["name"], "Fake Place")
         self.assertEqual(places[0]["lat"], 51.114)
@@ -82,7 +82,7 @@ class TestJsonExtractPlaces(unittest.TestCase):
         self.assertEqual(places[1]["types"], ["bar"])
 
     def test_json_extract_places_invalid(self):
-        places = gmaps_api._json_extract_places(invalid_json)
+        places = google_maps._json_extract_places(invalid_json)
         self.assertEqual(len(places), 1)
         self.assertEqual(places[0]["name"], "Fake Place")
         self.assertEqual(places[0]["lat"], 51.114)
