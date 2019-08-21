@@ -5,11 +5,13 @@ A REStful API service that helps you find the ideal place to meet.
 
 import flask_jwt_extended
 from flask import Flask
+from flask_cors import CORS
 
 from convergence.data import convergence_db
 
 
 app = Flask(__name__, instance_relative_config=True, static_url_path="/static")
+CORS(app, supports_credentials=True)
 app.config.from_object("config")
 app.config.from_pyfile("config.py")
 db_url = app.config["DB_URL"]

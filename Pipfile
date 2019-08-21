@@ -16,6 +16,7 @@ requests = "*"
 flask-jwt-extended = "*"
 faker = "*"
 sqlalchemy = "*"
+flask-cors = "*"
 
 [requires]
 python_version = "3.7"
