@@ -4,6 +4,7 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+pylint = "*"
 
 [packages]
 flask = "*"
@@ -17,6 +18,7 @@ flask-jwt-extended = "*"
 faker = "*"
 sqlalchemy = "*"
 flask-cors = "*"
+jedi = "*"
 
 [requires]
 python_version = "3.7"

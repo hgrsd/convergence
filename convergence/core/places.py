@@ -23,7 +23,7 @@ def get_places_around_centroid(point, radius, place_type):
     places_query = place_store.get_places_around_point(point, radius)
     if len(places_query) >= MIN_PLACES_FROM_DATABASE:
         return [p.as_dict() for p in places_query if place_type in p.gm_types]
-    places_ids = {place["gm_id"] for place in places_query}
+    places_ids = {place.gm_id for place in places_query}
     places = google_maps.get_places_around_point(point, radius, place_type)
     for place in places:
         if place["gm_id"] not in places_ids:

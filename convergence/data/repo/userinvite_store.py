@@ -2,6 +2,7 @@ import sqlalchemy as sa
 from sqlalchemy.exc import SQLAlchemyError
 
 from convergence.utils import exceptions
+from convergence.utils import logger
 from convergence.data.repo import Store
 from convergence.data.models import User, UserInvite, Event
 
@@ -20,8 +21,9 @@ class UserInviteStore(Store):
         try:
             self.session.commit()
         except SQLAlchemyError as e:
+            logger.log_error(f"Database Error: {str(e)}")
             self.session.rollback()
-            raise exceptions.DatabaseError(f"Error: {str(e)}")
+            raise exceptions.ServerError("Error inviting user.")
         return None
 
     def add_userinvites(self, userinvites):
@@ -33,8 +35,9 @@ class UserInviteStore(Store):
             self.session.bulk_save_objects(userinvites)
             self.session.commit()
         except SQLAlchemyError as e:
+            logger.log_error(f"Database Error: {str(e)}")
             self.session.rollback()
-            raise exceptions.DatabaseError(f"Error: {str(e)}")
+            raise exceptions.ServerError("Error inviting users")
         return None
 
     def get_invite_by_id(self, invite_id):
@@ -99,6 +102,7 @@ class UserInviteStore(Store):
         try:
             self.session.commit()
         except SQLAlchemyError as e:
+            logger.log_error(f"Database Error: {str(e)}")
             self.session.rollback()
-            raise exceptions.DatabaseError(f"Error: {str(e)}")
+            raise exceptions.ServerError("Error deleting invite")
         return None

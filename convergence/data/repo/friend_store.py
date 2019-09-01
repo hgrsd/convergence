@@ -3,6 +3,7 @@ import datetime
 from sqlalchemy.exc import SQLAlchemyError
 
 from convergence.utils import exceptions
+from convergence.utils import logger
 from convergence.data.repo import Store
 from convergence.data.models import User, Friend, FriendInvite
 
@@ -21,8 +22,9 @@ class FriendStore(Store):
         try:
             self.session.commit()
         except SQLAlchemyError as e:
+            logger.log_error(f"Database Error: {str(e)}")
             self.session.rollback()
-            raise exceptions.DatabaseError(f"Error: {str(e)}")
+            raise exceptions.ServerError("Error adding invite")
         return None
 
     def add_friendinvites(self, friendinvites):
@@ -34,8 +36,9 @@ class FriendStore(Store):
             self.session.bulk_save_objects(friendinvites)
             self.session.commit()
         except SQLAlchemyError as e:
+            logger.log_error(f"Database Error: {str(e)}")
             self.session.rollback()
-            raise exceptions.DatabaseError(f"Error: {str(e)}")
+            raise exceptions.ServerError("Error adding invites")
         return None
 
     def get_friendships_by_user(self, user_id):
@@ -96,8 +99,9 @@ class FriendStore(Store):
             self.session.delete(friendinvite)
             self.session.commit()
         except SQLAlchemyError as e:
+            logger.log_error(f"Database Error: {str(e)}")
             self.session.rollback()
-            raise exceptions.DatabaseError(f"Error: {str(e)}")
+            raise exceptions.ServerError("Error adding friendship")
         return (a_to_b, b_to_a)
 
     def add_friendship(self, friend_a_id, friend_b_id):
@@ -121,8 +125,9 @@ class FriendStore(Store):
             self.session.bulk_save_objects([a_to_b, b_to_a])
             self.session.commit()
         except SQLAlchemyError as e:
+            logger.log_error(f"Database Error: {str(e)}")
             self.session.rollback()
-            raise exceptions.DatabaseError(f"Error: {str(e)}")
+            raise exceptions.ServerError("Error adding friendship")
         return (a_to_b, b_to_a)
 
     def delete_friendship(self, friend_a_id, friend_b_id):
@@ -147,8 +152,9 @@ class FriendStore(Store):
         try:
             self.session.commit()
         except SQLAlchemyError as e:
+            logger.log_error(f"Database Error: {str(e)}")
             self.session.rollback()
-            raise exceptions.DatabaseError(f"Error: {str(e)}")
+            raise exceptions.ServerError("Error deleting friendship")
         return None
 
     def delete_friendinvite(self, friendinvite):
@@ -160,8 +166,9 @@ class FriendStore(Store):
         try:
             self.session.commit()
         except SQLAlchemyError as e:
+            logger.log_error(f"Database Error: {str(e)}")
             self.session.rollback()
-            raise exceptions.DatabaseError(f"Error: {str(e)}")
+            raise exceptions.ServerError("Error deleting invite")
         return None
 
     def get_invite_by_details(self, requesting_id, requested_id):

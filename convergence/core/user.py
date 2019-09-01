@@ -1,3 +1,5 @@
+from convergence.utils import logger
+
 from convergence.core import location
 from convergence.utils import exceptions
 from convergence.utils import validators
@@ -14,6 +16,7 @@ def login(email, password):
     """
     user = user_store.get_user_by_email(email)
     if not user or not user.verify_password(password):
+        logger.log_info(f"Invalid login attempt for {email}")
         raise exceptions.LoginError("Incorrect email address or password.")
     return user.id
 
