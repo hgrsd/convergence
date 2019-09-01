@@ -88,7 +88,7 @@ def propose_friendships(request_id, emails):
 def get_invites(request_id):
     """
     Get all pending invites for user
-    :param user_id: id of requesting user
+    :param request_id: id of requesting user
     :return: list of pending invites with user and event info
     """
     invites_data = friend_store.get_pending_invites_received(request_id)

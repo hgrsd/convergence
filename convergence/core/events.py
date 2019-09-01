@@ -34,7 +34,7 @@ def create_event(user_id, event_name, event_date):
 def delete_event(request_id, event_id):
     """
     Delete a event.
-    :param user_id: user deleting the event (must be event owner)
+    :param request_id: user deleting the event (must be event owner)
     :param event_id: event to be deleted
     """
     to_delete = event_store.get_event_by_id(event_id)
@@ -62,8 +62,8 @@ def add_user_to_event(user_id, event_id):
 def add_user_to_event_from_invite(userinvite):
     """
     Add user to a event. Delete invite.
-    :param user_id: user to be added to event
-    :param event_id: event to add user to
+    :param userinvite: UserInvite
+    :return: UserEvent as Dict
     """
     userevent = userevent_store.add_user_to_event_from_invite(userinvite)
     return userevent.as_dict()
