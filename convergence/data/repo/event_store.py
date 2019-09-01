@@ -1,6 +1,8 @@
 from sqlalchemy.exc import SQLAlchemyError
 
+
 from convergence.utils import exceptions
+from convergence.utils import logger
 from convergence.data.repo import Store
 from convergence.data.models import Event
 
@@ -48,8 +50,9 @@ class EventStore(Store):
         try:
             self.session.commit()
         except SQLAlchemyError as e:
+            logger.log_error(f"Database Error: {str(e)}")
             self.session.rollback()
-            raise exceptions.DatabaseError(f"Error: {str(e)}")
+            raise exceptions.ServerError("Error creating event.")
         return None
 
     def delete_event(self, event):
@@ -61,6 +64,7 @@ class EventStore(Store):
         try:
             self.session.commit()
         except SQLAlchemyError as e:
+            logger.log_error(f"Database Error: {str(e)}")
             self.session.rollback()
-            raise exceptions.DatabaseError(f"Error: {str(e)}")
+            raise exceptions.ServerError("Error deleting event.")
         return None

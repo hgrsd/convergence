@@ -1,6 +1,7 @@
 from sqlalchemy.exc import SQLAlchemyError
 
 from convergence.utils import exceptions
+from convergence.utils import logger
 from convergence.data.repo import Store
 from convergence.data.models import Event, User, UserEvent
 
@@ -54,8 +55,9 @@ class UserEventStore(Store):
         try:
             self.session.commit()
         except SQLAlchemyError as e:
+            logger.log_error(f"Database Error: {str(e)}")
             self.session.rollback()
-            raise exceptions.DatabaseError(f"Error: {str(e)}")
+            raise exceptions.ServerError("Error adding user to event")
         return None
 
     def add_user_to_event_from_invite(self, userinvite):
@@ -73,8 +75,9 @@ class UserEventStore(Store):
             self.session.delete(local_object)
             self.session.commit()
         except SQLAlchemyError as e:
+            logger.log_error(f"Database Error: {str(e)}")
             self.session.rollback()
-            raise exceptions.DatabaseError(f"Error: {str(e)}")
+            raise exceptions.ServerError("Error adding user to event")
         return userevent
 
     def delete_userevent(self, userevent):
@@ -86,6 +89,7 @@ class UserEventStore(Store):
         try:
             self.session.commit()
         except SQLAlchemyError as e:
+            logger.log_error(f"Database Error: {str(e)}")
             self.session.rollback()
-            raise exceptions.DatabaseError(f"Error: {str(e)}")
+            raise exceptions.ServerError("Error removing user from event")
         return None

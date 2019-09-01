@@ -1,3 +1,4 @@
+import logging
 import flask_jwt_extended
 from flask import Blueprint, jsonify, request
 

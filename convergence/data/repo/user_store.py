@@ -1,6 +1,7 @@
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 
 from convergence.utils import exceptions
+from convergence.utils import logger
 from convergence.data.repo import Store
 from convergence.data.models import User
 
@@ -56,7 +57,8 @@ class UserStore(Store):
             if isinstance(e, IntegrityError):
                 raise exceptions.InputError("Email address in use.")
             else:
-                raise exceptions.DatabaseError(f"Error: {str(e)}")
+                logger.log_error(f"Database Error: {str(e)}")
+                raise exceptions.ServerError("Error adding user")
         return None
 
     def delete_user(self, user):
@@ -69,7 +71,8 @@ class UserStore(Store):
             self.session.commit()
         except SQLAlchemyError as e:
             self.session.rollback()
-            raise exceptions.DatabaseError(f"Error: {str(e)}")
+            logger.log_error(f"Database Error: {str(e)}")
+            raise exceptions.ServerError("Error deleting user")
         return None
 
     def commit_changes(self):
@@ -77,4 +80,5 @@ class UserStore(Store):
         try:
             self.session.commit()
         except SQLAlchemyError as e:
-            raise exceptions.DatabaseError(f"Error: {str(e)}")
+            logger.log_error(f"Database Error: {str(e)}")
+            raise exceptions.ServerError("Error updating user info")

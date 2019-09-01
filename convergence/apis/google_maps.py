@@ -4,6 +4,7 @@ import math
 from urllib.parse import quote
 
 from convergence import app
+from convergence.utils import logger
 from convergence.utils.exceptions import ServerError
 
 GM_PLACES_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/" \
@@ -33,6 +34,9 @@ def get_places_around_point(point, radius, place_type):
     )
     response = requests.get(base_request).json()
     if not response:
+        logger.log_error(
+            f"Invalid response from Google API. Request URL: {base_request}"
+        )
         raise ServerError("Unable to reach Google Maps API (Places).")
     places = _json_extract_places(response)
     while "next_page_token" in response:
@@ -40,6 +44,11 @@ def get_places_around_point(point, radius, place_type):
         response = requests.get(
             base_request + "&pagetoken=" + quote(response["next_page_token"])
         ).json()
+        if not response:
+            logger.log_error(
+                f"Invalid response from Google API. Request URL: {base_request}"
+            )
+            raise ServerError("Unable to reach Google Maps API (Places).")
         places.extend(_json_extract_places(response))
     return places
 
@@ -86,6 +95,9 @@ def get_distance_matrix(origins, destinations, mode):
         )
         response = requests.get(request).json()
         if not response["rows"]:
+            logger.log_error(
+                f"Invalid response from Google API. Request URL: {request}"
+            )
             raise ServerError("Error retrieving distance information")
         for row_idx, row in enumerate(response["rows"]):
             for el_idx, element in enumerate(row["elements"]):
@@ -109,6 +121,9 @@ def _json_extract_places(response_string):
     places = []
     for result in response_string["results"]:
         if "permanently_closed" in result:
+            logger.log_info(
+                f"Place permanently closed: {result['place_id']}"
+            )
             continue
         try:
             lat = result["geometry"]["location"]["lat"]
