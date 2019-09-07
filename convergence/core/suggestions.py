@@ -34,7 +34,7 @@ def get_suggestions(request_id, event_id, place_type, suggestions_mode):
         user_coordinates,
         centroid
     )
-    radius = math.ceil(mean_dist * MEAN_DIST_TO_RADIUS_RATIO)
+    radius = max(1500, math.ceil(mean_dist * MEAN_DIST_TO_RADIUS_RATIO))
     potential_places = places.get_places_around_centroid(
         centroid,
         radius,

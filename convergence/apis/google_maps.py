@@ -1,4 +1,5 @@
 import requests
+import sys
 import time
 import math
 from urllib.parse import quote
@@ -102,13 +103,12 @@ def get_distance_matrix(origins, destinations, mode):
         for row_idx, row in enumerate(response["rows"]):
             for el_idx, element in enumerate(row["elements"]):
                 if element["status"] != "OK":
-                    dist_matrix[row_idx][el_idx] = math.inf
+                    dist_matrix[row_idx][el_idx] = sys.maxsize
                 else:
                     dist_matrix[row_idx][el_idx] = element["duration"]["value"]
         if i < no_requests - 1:
             start = cutoff
             time.sleep(1)  # sleep before next request
-
     return dist_matrix
 
 

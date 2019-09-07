@@ -92,7 +92,7 @@ def delete_event(session):
 def invite_user_to_event(session):
     event_id = input("Event id: ")
     invite_id = input("User id: ")
-    response = session.post(f"http://localhost:5000/{event_id}/{invite_id}", cookies=session.cookies, headers=header).json()
+    response = session.post(f"http://localhost:5000/events/{event_id}/{invite_id}", cookies=session.cookies, headers=header).json()
     print(json.dumps(response, sort_keys=True, indent=4))
 
 
